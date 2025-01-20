@@ -4,6 +4,7 @@ import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
 import { holidaysWorld, lunarString } from '../lib/holidays'
 import { DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, formatRelativeDate, getJournalDayDate, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor } from '../lib/lib'
+import { advancedQuery, queryCodeFileFromOriginalName } from '../lib/query/advancedQuery'
 
 
 let processingFoundBoundaries: boolean = false
@@ -272,12 +273,14 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
 
 // 日誌のページが存在するかどうかのインディケーターを表示する
 const indicator = async (targetPageName: string, dayOfMonthElement: HTMLSpanElement) => {
-  const existsPage = await logseq.Editor.getPage(targetPageName) as { file: PageEntity["file"] } | null
-  if (!existsPage?.file) return
-  const indicatorElement = createElementWithClass('span', 'indicator')
-  indicatorElement.innerText = "●"
-  indicatorElement.title = t("Page exists")
-  dayOfMonthElement.appendChild(indicatorElement)
+  const pageEntities = await advancedQuery(queryCodeFileFromOriginalName, `"${targetPageName}"`) as { file: PageEntity["file"] }[] | null
+  if (pageEntities && pageEntities.length > 0)
+    if (pageEntities[0].file) {
+      const indicatorElement = createElementWithClass('span', 'indicator')
+      indicatorElement.innerText = "●"
+      indicatorElement.title = t("Page exists")
+      dayOfMonthElement.appendChild(indicatorElement)
+    }
 }
 
 

@@ -15,3 +15,10 @@ export const queryCodeJournalDayFromOriginalName = `
           [?b :block/original-name ?name]
           [?b :block/journal-day ?day]] 
   `
+  export const queryCodeFileFromOriginalName = `
+  [:find (pull ?b [:block/file])
+          :in $ ?name
+          :where
+          [?b :block/original-name ?name]
+          [?b :block/file ?file]] 
+  `
