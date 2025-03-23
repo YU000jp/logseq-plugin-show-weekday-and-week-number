@@ -228,6 +228,7 @@ body {
                                 &>thead>tr>th {
                                     padding: 0.55em;
                                     text-align: center;
+                                    font-size: 0.9em;
                                 }
 
                                 &>tbody>tr>td {
