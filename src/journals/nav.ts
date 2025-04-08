@@ -26,7 +26,7 @@ export const createNavLinkWeekNumber = (day: Date, ISO: boolean, configWeekNumbe
 
       // weekNumberFormat ["YYYY-Www", "YYYY/qqq/Www", "YYYY/Www"]
       const linkString = configWeekNumberFormat === "YYYY-Www" ?
-            `${monthFirstWeekNumber.year}/W${monthFirstWeekNumber.weekString}`
+            `${monthFirstWeekNumber.year}-W${monthFirstWeekNumber.weekString}`
             : configWeekNumberFormat === "YYYY/qqq/Www" ?
                   `${monthFirstWeekNumber.year}/Q${monthFirstWeekNumber.quarter}/W${monthFirstWeekNumber.weekString}`
                   : `${monthFirstWeekNumber.year}/W${monthFirstWeekNumber.weekString}`
