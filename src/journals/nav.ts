@@ -25,7 +25,7 @@ export const createNavLinkWeekNumber = (day: Date, ISO: boolean, configWeekNumbe
       } = getWeeklyNumberFromDate(day, ISO ? 1 : 0)
 
       // weekNumberFormat ["YYYY-Www", "YYYY/qqq/Www", "YYYY/Www"]
-      const linkString = configWeekNumberFormat === "YYYY-Www" ?
+      const linkString = configWeekNumberFormat === "YYYY-Www" ? // fix a bug https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/pull/163
             `${monthFirstWeekNumber.year}-W${monthFirstWeekNumber.weekString}`
             : configWeekNumberFormat === "YYYY/qqq/Www" ?
                   `${monthFirstWeekNumber.year}/Q${monthFirstWeekNumber.quarter}/W${monthFirstWeekNumber.weekString}`
