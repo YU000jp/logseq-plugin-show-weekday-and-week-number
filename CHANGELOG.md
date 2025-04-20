@@ -1,3 +1,18 @@
+## [1.60.4](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.60.3...v1.60.4) (2025-04-13)
+
+
+### Bug Fixes
+
+* **bug:** Fix typo in week navigation [#163](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/163) ([5c81e4b](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/5c81e4b525d11e3d858fc44e64168abb13b45d8e))
+* **bug:** Shrink left calendar size (CSS) ([b8fb35a](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/b8fb35a34cdafc5a460aeb7b91fc1ddf0ff3feba))
+* **bug:** User date format does not match due to slow triggering of logseq.App.getUserConfigs() [#156](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/156) ([d49c354](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/d49c354fce93d9acee382674d9cbcabb124b251d))
+
+
+### Performance Improvements
+
+* **ref:** refactor ([219037c](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/219037c0889cc33a1e8d99c9ccfe2b03fa046c4b))
+* **ref:** refactor ([d674546](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/d674546097035baa11de5ff066579f76cf3c5f88))
+
 ## [1.60.3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.60.2...v1.60.3) (2025-01-12)
 
 
