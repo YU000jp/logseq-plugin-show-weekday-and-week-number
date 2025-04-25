@@ -9,7 +9,7 @@ import { currentPageIsMonthlyJournal } from "./journals/monthlyJournal"
 import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal, weeklyEmbed } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
-import { getJournalDayDate, removeElementById } from "./lib/lib"
+import { getDateFromJournalDay, removeAllElements, removeElementById } from "./lib/lib"
 import fileMainCSS from "./main.css?inline"
 import { mapLanguageCodeToCountry } from "./settings/languageCountry"
 import { notice } from "./settings/notice"
@@ -35,7 +35,9 @@ import tr from "./translations/tr.json"
 import uk from "./translations/uk.json"
 import zhCN from "./translations/zh-CN.json"
 import zhHant from "./translations/zh-Hant.json"
-import { advancedQuery, queryCodeJournalDayFromOriginalName } from "./lib/query/advancedQuery"
+import { advancedQuery, queryCodeGetJournalDayFromOriginalName } from "./lib/query/advancedQuery"
+import { initializeBoard } from "./board/handle"
+import { shortKey } from "./board/constant"
 
 // プラグイン名(小文字タイプ)
 export const pluginNameCut = "show-weekday-and-week-number"
@@ -43,6 +45,7 @@ export const pluginNameCut = "show-weekday-and-week-number"
 export const pluginName = `${pluginNameCut} ${t("plugin")}`
 // コンソールの署名用
 export const consoleSignature = ` <----- [${pluginName}]`
+
 
 let configPreferredLanguage: string
 let configPreferredDateFormat: string
@@ -72,6 +75,7 @@ export const getUserConfig = async () => {
   configPreferredDateFormat = preferredDateFormat
   getHolidaysBundle(preferredLanguage)
 }
+
 
 
 let processingCheck = false //処理中フラグ
@@ -188,18 +192,21 @@ const main = async () => {
 
 
   // CSS適用
-  if (logseq.settings!.weeklyEmbed === true)
-    weeklyEmbed()
+  weeklyEmbed()
 
   if (logseq.settings!.boundariesBottom === true)
     parent.document.body.classList!.add("boundaries-bottom")
 
 
+  // Left Calendarのセットアップ
   loadLeftCalendar()
 
 
-  // ユーザー設定が変更されたときにチェックを実行
-  handleSettingsUpdate()
+
+  // ボード機能のセットアップ
+  // メニュー用のボタンを設置する
+  initializeBoard()//ページ読み込み時に実行コールバック
+ 
 
 
   // プラグインオフ時に実行
@@ -216,18 +223,26 @@ const main = async () => {
 
     // Left Calendarのcontainerを取り除く
     removeElementById(keyLeftCalendarContainer)
+    
+    // ボード機能のメニューを取り除く
+    removeAllElements(`.${shortKey}--nav-header`)
 
   })
 
 
+  // グラフが変更されたときに実行
   logseq.App.onCurrentGraphChanged(() => {
     // ユーザー設定を取得して更新
     getUserConfig()
   })
 
+
   // ショートカットキーを登録
   loadShortcutItems()
 
+
+  // ユーザー設定が変更されたときにチェックを実行
+  handleSettingsUpdate()
 
 } /* end_main */
 
@@ -323,11 +338,11 @@ const validateJournalTitle = async (titleElement: HTMLElement) => {
     else {
       // Daily Journal Detailsの処理
       setTimeout(async () => { // 遅延処理
-        const pageEntities = await advancedQuery(queryCodeJournalDayFromOriginalName, `"${title}"`) as { "journal-day": PageEntity["journalDay"] }[] | null
+        const pageEntities = await advancedQuery(queryCodeGetJournalDayFromOriginalName, `"${title}"`) as { "journal-day": PageEntity["journalDay"] }[] | null
         if (pageEntities && pageEntities.length > 0) {
           const journalDay = pageEntities[0]["journal-day"]
           if (journalDay)
-            dailyJournalDetails(getJournalDayDate(String(journalDay)), titleElement)
+            dailyJournalDetails(getDateFromJournalDay(String(journalDay)), titleElement)
         }
       }, 10)
     }

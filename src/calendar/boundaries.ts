@@ -3,8 +3,8 @@ import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday,
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
 import { holidaysWorld, lunarString } from '../lib/holidays'
-import { DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, formatRelativeDate, getJournalDayDate, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor } from '../lib/lib'
-import { advancedQuery, queryCodeFileFromOriginalName } from '../lib/query/advancedQuery'
+import { DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor } from '../lib/lib'
+import { advancedQuery, isPageExist, isPageFileExist, queryCodeGetFileFromOriginalName } from '../lib/query/advancedQuery'
 
 
 let processingFoundBoundaries: boolean = false
@@ -74,7 +74,7 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
           processingFoundBoundaries = false
           return
         }
-        targetDate = getJournalDayDate(String(journalDay)) as Date
+        targetDate = getDateFromJournalDay(String(journalDay)) as Date
       } else
         if (targetElementName === "weeklyJournal")
           targetDate = selectStartDate as Date
@@ -216,7 +216,7 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
       dayCell.appendChild(dayOfMonthElement)
       //日付と相対時間をtitleに追加する
       dayCell.title += logseq.settings?.booleanRelativeTime === true ?
-        dateFormatString + '\n' + formatRelativeDate(dayDate)//相対時間を表示する場合
+        dateFormatString + '\n' + getRelativeDateString(dayDate, today)//相対時間を表示する場合
         : dateFormatString
 
       //indexが0~6
@@ -273,14 +273,12 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
 
 // 日誌のページが存在するかどうかのインディケーターを表示する
 const indicator = async (targetPageName: string, dayOfMonthElement: HTMLSpanElement) => {
-  const pageEntities = await advancedQuery(queryCodeFileFromOriginalName, `"${targetPageName}"`) as { file: PageEntity["file"] }[] | null
-  if (pageEntities && pageEntities.length > 0)
-    if (pageEntities[0].file) {
-      const indicatorElement = createElementWithClass('span', 'indicator')
-      indicatorElement.innerText = "●"
-      indicatorElement.title = t("Page exists")
-      dayOfMonthElement.appendChild(indicatorElement)
-    }
+  if (await isPageFileExist(targetPageName) === true) {
+    const indicatorElement = createElementWithClass('span', 'indicator')
+    indicatorElement.innerText = "●"
+    indicatorElement.title = t("Page exists")
+    dayOfMonthElement.appendChild(indicatorElement)
+  }
 }
 
 
@@ -320,7 +318,7 @@ export function openPageToSingleDay(pageName: string): (this: HTMLSpanElement, e
       //Shiftキーを押さずにクリックした場合は、ページを開く
       if (logseq.settings!.booleanNoPageFoundCreatePage === true)
         //ページが存在しない場合は作成しない
-        if (await logseq.Editor.getPage(pageName) as { name: string } | null)
+        if (await isPageExist(pageName) as boolean)
           logseq.App.pushState('page', { name: pageName })//ページが存在する場合は開く
         else
           logseq.UI.showMsg(t("Page not found"), "warning", { timeout: 3000 })//ページが存在しない場合は警告を表示する

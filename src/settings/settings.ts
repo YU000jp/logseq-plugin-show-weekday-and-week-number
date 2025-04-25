@@ -24,6 +24,12 @@ const highlightColors: string[] = [
   "unset"
 ]
 
+export const styleList = [
+  "Tile",
+  "Gallery",
+  "Expansion",
+]
+
 export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
 
   //共通設定
@@ -222,24 +228,6 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     default: "#00BFFF",
     description: t("User color") + "🆕",
   },
-  // タスク(SCHEDULEDやDEADLINE)との統合
-  // {
-  //   key: "booleanTaskColor",
-  //   title: t("Task color"),
-  //   type: "boolean",
-  //   default: true,
-  //   description: "",
-  // },
-  // {//タスクの色指定
-  //   key: "choiceTaskColor",
-  //   title: "",
-  //   type: "string",
-  //   inputAs: "color",
-  //   default: "#FF0000",
-  //   description: t("Task color") + "🆕",
-  // },
-  //TODO: 進捗ゼロ
-
   // 共通設定ここまで
 
 
@@ -682,5 +670,95 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     type: "string",
     default: "",
     description: t("Input the template name (default is blank)"),
+  },
+
+
+  {
+    key: SettingKeys.headingBatchBoard,
+    type: "heading",
+    title: t("Dashboard configuration"),
+    default: null,
+    // 各日記を、embedによって一括表示するダッシュボードです。
+    // ダッシュボードはキャッシュされたページです。
+    // プラグインがその日のためのキャッシュを生成します。
+    // キャッシュに書き込むと、翌日には更新されて消えてしまいます。
+    // 箇条書きの折りたたみは、ページでの作業中にのみ有効です。
+
+    // embedについて
+    // ページタイトルをクリックすると、ページが開きます。
+    // ページタイトルにカーソルを置くと、ツールチップが表示されます。(有効な場合)
+    description: `
+    ${t("A dashboard that displays each journal in bulk by embed.")}
+    ${t("The dashboard is a cached page.")}
+    ${t("This plugin generates a cache for the day.")}
+    ${t("If you write to the cache, it will be updated the next day and disappear.")}
+    ${t("Bullet point collapsing is only valid while working on a page.")}
+
+    ${t("About embed")}:
+    ${t("Click the page title to open the page.")}
+    ${t("Hover over the page title to display a tooltip.")} (${t("If enabled")})
+    `,
+  },
+  {
+    key: SettingKeys.addLeftMenu,
+    type: "boolean",
+    default: true,
+    // 左メニューバーにボタンを追加して、このプラグインにアクセスできるようにします。
+    title: t("Enable"),
+    description: t("Add a button to the left menu bar to access this plugin"),
+  },
+  {
+    key: SettingKeys.show7days,
+    title: "+ " + t("Show 7 days section"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
+  },
+  {// ファイルが存在しない場合にどう処理するか
+    key: SettingKeys.show7daysNotExist,
+    title: t("What to do if the file does not exist"),
+    type: "enum",
+    enumChoices: ["Put those links", "Nothing (embed)", "Insert template (embed)"],
+    default: "Put those links",
+    description: `
+    ${t("The journal template is not applied in embed.")}
+
+    Insert template:
+    ${t("Templates can be inserted by this plugin.")}
+    ${t("On the days you did not write, you need to leave some string such as ✖.")}
+    `,
+  },
+  {
+    key: SettingKeys.showMemo,
+    title: "+ " + t("Show memo section"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
+  },
+  {// Memo: Contentsページにするか、新規ページにするか。
+    key: SettingKeys.showMemoPageName,
+    title: `${t("memo")}: ${t("Select either “Contents”, which is common to the sidebar, or a new page")}`,
+    type: "enum",
+    enumChoices: ["Contents", "new page"],
+    default: "Contents",
+    description: "",
+  },
+  {
+    key: SettingKeys.showLinkedReferences,
+    title: "+ " + t("Show linked references section"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
+  },
+  {
+    key: SettingKeys.showTasks,
+    title: "+ " + t("Show tasks section"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
   },
 ]

@@ -7,6 +7,7 @@ import { holidaysWorld, lunarString } from "../lib/holidays"
 import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, removeElementById, userColor } from "../lib/lib"
 import { isEssentialSettingsAltered } from "../settings/onSettingsChanged"
 import { openPageToSingleDay } from "./boundaries"
+import { advancedQuery, isPageExist, queryCodeGetUuidFromOriginalName } from "../lib/query/advancedQuery"
 
 export const keyLeftCalendarContainer = "left-calendar-container"
 
@@ -15,26 +16,28 @@ let flagWeekly = false //週間表示フラグ
 
 export const loadLeftCalendar = () => {
 
-    //プラグイン設定変更時
-    logseq.onSettingsChanged(async (newSet: LSPluginBaseInfo['settings'], oldSet: LSPluginBaseInfo['settings']) => {
-        if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
-            if (newSet.booleanLeftCalendar === true)
-                main()//表示する
-            else
-                removeElementById(keyLeftCalendarContainer)//消す
-        }
-        if (oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
-            || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
-            || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
-            || isEssentialSettingsAltered(newSet, oldSet) === true //共通処理
-        )
-            refreshCalendar(currentCalendarDate, false, false)
-
-    })
-
     if (logseq.settings!.booleanLeftCalendar === true)
         main()
 
+
+    setTimeout(() => {
+        //プラグイン設定変更時
+        logseq.onSettingsChanged(async (newSet: LSPluginBaseInfo['settings'], oldSet: LSPluginBaseInfo['settings']) => {
+            if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
+                if (newSet.booleanLeftCalendar === true)
+                    main()//表示する
+                else
+                    removeElementById(keyLeftCalendarContainer)//消す
+            }
+            if (oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
+                || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
+                || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
+                || isEssentialSettingsAltered(newSet, oldSet) === true //共通処理
+            )
+                refreshCalendar(currentCalendarDate, false, false)
+
+        })
+    }, 500)
 }
 
 const main = () => {
@@ -241,41 +244,39 @@ export const createCalendar = async (targetDate: Date, preferredDateFormat: stri
     // 3段目以降の日付を作成
     const tbodyElement = document.createElement("tbody")
     for (let index = 0; index < eachDays.length; index++) {
-        const date = eachDays[index];
+        const date = eachDays[index]
         const weekNumber = enableWeekNumber ?
-            `${ISO ? getISOWeek(date) : getWeek(date, { weekStartsOn })}` : "";
-        const day = date.getDate().toString();
+            `${ISO ? getISOWeek(date) : getWeek(date, { weekStartsOn })}` : ""
+        const day = date.getDate().toString()
 
         // 先頭の日付の場合
         if (index % 7 === 0) {
-            const rowElement = document.createElement("tr");
+            const rowElement = document.createElement("tr")
 
             // 週番号を表示するかどうか
             if (enableWeekNumber) {
-                const weekNumberCell = createTableCell(weekNumber, "", t("Week"));
-                if (weekNumber === "W53") weekNumberCell.style.opacity = "0.5";
-                weekNumberCell.style.fontSize = "0.85em";
-                const { year, weekString, quarter } = getWeeklyNumberFromDate(date, logseq.settings?.weekNumberFormat === "US format" ? 0 : 1); // 週番号を取得する
-                const pageName = getWeeklyNumberString(year, weekString, quarter); // 週番号からユーザー指定文字列を取得する
+                const weekNumberCell = createTableCell(weekNumber, "", t("Week"))
+                if (weekNumber === "W53") weekNumberCell.style.opacity = "0.5"
+                weekNumberCell.style.fontSize = "0.85em"
+                const { year, weekString, quarter } = getWeeklyNumberFromDate(date, logseq.settings?.weekNumberFormat === "US format" ? 0 : 1) // 週番号を取得する
+                const pageName = getWeeklyNumberString(year, weekString, quarter) // 週番号からユーザー指定文字列を取得する
                 if (logseq.settings!.booleanWeeklyJournal === true) {
-                    weekNumberCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(pageName, shiftKey));
-                    weekNumberCell.classList.add("cursor");
-                    logseq.Editor.getPage(pageName, { includeChildren: false })
-                        .then((pageEntity: { uuid: PageEntity["uuid"] } | null) => {
-                            if (pageEntity) weekNumberCell.style.textDecoration = "underline";
-                        });
-                    weekNumberCell.title = pageName;
+                    weekNumberCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(pageName, shiftKey))
+                    weekNumberCell.classList.add("cursor")
+                    if (await isPageExist(pageName) as boolean)
+                        weekNumberCell.style.textDecoration = "underline"
+                    weekNumberCell.title = pageName
                 }
-                rowElement.appendChild(weekNumberCell);
+                rowElement.appendChild(weekNumberCell)
             }
-            const dayCell = await createDayCell(date, month, preferredDateFormat, innerElement, targetDate, ISO, weekStartsOn, flag);
-            if (dayCell) rowElement.appendChild(dayCell);
-            tbodyElement.appendChild(rowElement);
+            const dayCell = await createDayCell(date, month, preferredDateFormat, innerElement, targetDate, ISO, weekStartsOn, flag)
+            if (dayCell) rowElement.appendChild(dayCell)
+            tbodyElement.appendChild(rowElement)
         } else {
-            const rowElement = tbodyElement.lastElementChild as HTMLTableRowElement | null;
+            const rowElement = tbodyElement.lastElementChild as HTMLTableRowElement | null
             if (rowElement) {
-                const dayCell = await createDayCell(date, month, preferredDateFormat, innerElement, targetDate, ISO, weekStartsOn, flag);
-                if (dayCell) rowElement.appendChild(dayCell);
+                const dayCell = await createDayCell(date, month, preferredDateFormat, innerElement, targetDate, ISO, weekStartsOn, flag)
+                if (dayCell) rowElement.appendChild(dayCell)
             }
         }
     }
@@ -353,7 +354,7 @@ const checkDay = async (dayDate: Date, month: number, dayCell: HTMLElement, pref
         setTimeout(async () => {
             const pageName = format(dayDate, preferredDateFormat)
             if (pageName)
-                if (await logseq.Editor.getPage(pageName) as { uuid: PageEntity["uuid"] } | null)
+                if (await isPageExist(pageName) as boolean)
                     dayCell.style.textDecoration = "underline"
         }, 1)
 

@@ -84,8 +84,8 @@ export const handleSettingsUpdate = () => {
           removeBoundaries()
         } else
           if (boundaryKeys.some(key => oldSet[key] === false && newSet[key] === true)) {
-          ApplyBoundarySettingsOnChange(newSet)
-        }
+            ApplyBoundarySettingsOnChange(newSet)
+          }
       }
 
       if ([
@@ -117,11 +117,10 @@ export const handleSettingsUpdate = () => {
       }
 
       if (oldSet.weeklyEmbed !== newSet.weeklyEmbed) {
-        if (newSet.weeklyEmbed === true) {
+        if (newSet.weeklyEmbed === true)
           weeklyEmbed()
-        } else {
+        else
           removeProvideStyle(keyThisWeekPopup)
-        }
       }
 
       [{
@@ -133,31 +132,28 @@ export const handleSettingsUpdate = () => {
       },
       {
         key: SettingKeys.boundariesBottom, action: () => {
-          if (newSet.boundariesBottom === true) {
+          if (newSet.boundariesBottom === true)
             parent.document.body.classList!.add("boundaries-bottom")
-          } else {
+          else
             parent.document.body.classList!.remove("boundaries-bottom")
-          }
         }
       },
       {
         key: SettingKeys.booleanBoundariesHolidays, action: () => {
-          if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true) {
+          if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true)
             getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true })
-          } else
-            if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false) {
+          else
+            if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false)
               removeHolidaysBundle()
-            }
         }
       },
       {
         key: SettingKeys.underHolidaysAlert, action: () => {
-          if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true) {
+          if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true)
             getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true })
-          } else
-            if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false) {
+          else
+            if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false)
               removeHolidaysBundle()
-            }
         }
       },
       { key: SettingKeys.holidaysCountry, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
@@ -168,9 +164,7 @@ export const handleSettingsUpdate = () => {
       { key: SettingKeys.weekNumberChangeRevert, action: () => convertWeekToQuarterFormat("/", true) },
       { key: SettingKeys.weekNumberChangeSlash, action: () => convertWeekNumberToSlash() }
       ].forEach(({ key, action }) => {
-        if (oldSet[key] !== newSet[key]) {
-          action()
-        }
+        if (oldSet[key] !== newSet[key]) action()
       })
 
       const journalKeys = [
@@ -181,9 +175,8 @@ export const handleSettingsUpdate = () => {
       ]
       if (journalKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
         journalKeys.forEach(key => {
-          if (oldSet[key] === true && newSet[key] === false) {
+          if (oldSet[key] === true && newSet[key] === false)
             removeElementById(`${key.replace('boolean', '').toLowerCase()}Nav`)
-          }
         })
       }
     }

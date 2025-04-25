@@ -1,4 +1,3 @@
-
 export const SettingKeys = {
   heading000: "heading000",
   weekNumberFormat: "weekNumberFormat",
@@ -77,4 +76,18 @@ export const SettingKeys = {
   heading007: "heading007",
   booleanYearlyJournal: "booleanYearlyJournal",
   yearlyJournalTemplateName: "yearlyJournalTemplateName",
+  headingBatchBoard: "headingBatchBoard",
+  addLeftMenu: "addLeftMenu",
+  show7days: "show7days",
+  show7daysNotExist: "show7daysNotExist",
+  showMemo: "showMemo",
+  showMemoPageName: "showMemoPageName",
+  showLinkedReferences: "showLinkedReferences",
+  showTasks: "showTasks",
+  showTasksToday: "showTasksToday",
+  showTasks7days: "showTasks7days",
+  showTasksUnplanned: "showTasksUnplanned",
+  showTodayTasks: "showTodayTasks",
+  showScheduledTasks: "showScheduledTasks",
+  showUnplannedTasks: "showUnplannedTasks",
 }

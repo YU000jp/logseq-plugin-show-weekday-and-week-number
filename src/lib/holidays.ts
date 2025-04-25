@@ -1,5 +1,6 @@
 import Holidays from "date-holidays"
 import { HolidayUtil, Lunar } from 'lunar-typescript'
+import { getConfigPreferredLanguage } from ".."
 
 
 let holidaysBundle: Holidays | null // バンドルを作成するための変数
@@ -48,7 +49,7 @@ export const lunarString = (targetDate: Date, dayElement: HTMLSpanElement, addTo
       dayElement.title = string + ` (${getHolidayName})` + "\n"// 中国の祝日
     dayElement.style.border = `2px solid var(${logseq.settings!.choiceHolidaysColor as string || "--highlight-bg-color"})`
   } else
-    dayElement.title = string + "\n"// 祝日がない場合は、中国の伝統的な暦を表示する(旧暦) 
+    dayElement.title = string + "\n"// 祝日がない場合は、旧暦 (中国の伝統的な暦) を表示する 
   return string
 }
 
@@ -68,6 +69,44 @@ export const holidaysWorld = (targetDate: Date, dayElement: HTMLSpanElement, add
         dayElement.title = holidayName + "\n"
       dayElement.style.border = `2px solid var(${logseq.settings!.choiceHolidaysColor as string || "--highlight-bg-color"})`
       return holidayName
+    }
+  }
+  return ""
+}
+
+
+// 祝日情報を取得する
+/**
+ * Retrieves the holiday name for a given date based on the user's preferred language and settings.
+ * 
+ * If the user's preferred language is Chinese (either Traditional or Simplified) and the lunar calendar setting is enabled,
+ * it will return the Chinese lunar calendar day along with the holiday name if it is a holiday.
+ * 
+ * For other languages or if the lunar calendar setting is disabled, it will return the name of the public holiday if it is a holiday.
+ * 
+ * @param {Date} targetDate - The date for which to retrieve the holiday name.
+ * @returns {Promise<string>} - A promise that resolves to the holiday name or an empty string if there is no holiday.
+ */
+export const getHolidays = async (targetDate: Date):Promise<string> => {
+  const configPreferredLanguage = await getConfigPreferredLanguage()
+  // Chinese lunar-calendar or holidays
+  if (logseq.settings!.booleanLunarCalendar === true // プラグイン設定で太陰暦オンの場合
+    && (configPreferredLanguage === "zh-Hant" //中国語の場合
+      || configPreferredLanguage === "zh-CN")) {
+    // 中国の祝日        
+    const getHoliday = HolidayUtil.getHoliday(targetDate.getFullYear(), targetDate.getMonth() + 1, targetDate.getDate()) // year, month, day
+    const getHolidayName = getHoliday ? getHoliday.getName() : undefined // 中国の祝日名
+    const string = (Lunar.fromDate(targetDate).getDayInChinese() as string) // 旧暦
+    return getHolidayName ? string + ` (${getHolidayName})` : string
+  } else {
+    // World holidays
+    const holidaysBundle = exportHolidaysBundle()
+    if (!holidaysBundle) return ""
+    const checkHoliday = holidaysBundle.isHoliday(targetDate)
+    if (checkHoliday !== false
+      && checkHoliday[0].type === "public") {
+      const holidayName = checkHoliday[0].name
+      return holidayName ? holidayName : ""
     }
   }
   return ""

@@ -3,7 +3,7 @@ import { t } from "logseq-l10n"
 import { HolidayUtil, Lunar } from "lunar-typescript"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage, fetchJournalTitles } from "."
 import { exportHolidaysBundle } from "./lib/holidays"
-import { createLinkMonthlyLink, createSettingButton, formatRelativeDate, getDayOfWeekName, getQuarter, getRelativeTimeHtml, getWeeklyNumberFromDate, getWeeklyNumberString, getWeekNumberHtml, localizeMonthString, openPageFromPageName, userColor } from "./lib/lib"
+import { createLinkMonthlyLink, createSettingButton, getRelativeDateString, getDayOfWeekName, getQuarterFromWeekNumber, getRelativeTimeHtml, getWeeklyNumberFromDate, getWeeklyNumberString, getWeekNumberHtml, localizeMonthString, openPageFromPageName, userColor } from "./lib/lib"
 
 // プロセス中かどうかを判定するフラグ
 let processingBehind: boolean = false
@@ -28,6 +28,12 @@ const createSpanElement = (id: string, textContent: string, style: string = ""):
 export const dailyJournalDetails = async (dayDate: Date, titleElement: HTMLElement) => {
   if (processingBehind) return // プロセス中の場合は処理をキャンセルする
 
+  // 日付のバリデーション
+  if (!(dayDate instanceof Date) || isNaN(dayDate.getTime())) {
+    console.error("Invalid date provided to dailyJournalDetails:", dayDate);
+    return;
+  }
+
   const baseLineElement: HTMLSpanElement = createBaseLineElement(dayDate)
   moveTitleElement(titleElement)
   titleElement.insertAdjacentElement("afterend", baseLineElement)
@@ -49,6 +55,12 @@ export const dailyJournalDetails = async (dayDate: Date, titleElement: HTMLEleme
 }
 
 const createBaseLineElement = (journalDate: Date): HTMLSpanElement => {
+  // 日付のバリデーション
+  if (!(journalDate instanceof Date) || isNaN(journalDate.getTime())) {
+    console.error("Invalid date provided to createBaseLineElement:", journalDate);
+    return createSpanElement("showWeekday", "");
+  }
+
   const dayOfWeekName = getDayOfWeekName(journalDate)
   const printHtmlWeekNumber = getWeekNumberHtml(journalDate)
   const relativeTime = getRelativeTimeHtml(journalDate)
@@ -133,7 +145,7 @@ const moveTitleElement = (titleElement: HTMLElement) => {
 }
 
 export const enableRelativeTime = (journalDate: Date): string => {
-  const formatString: string = formatRelativeDate(journalDate)
+  const formatString: string = getRelativeDateString(journalDate)
   return formatString !== "" ? `<span><small>(${formatString})</small></span>` : ""
 }
 
@@ -144,7 +156,7 @@ export const enableWeekNumber = (journalDate: Date, weekStartsOn: 0 | 1): string
     const printWeekNumber = logseq.settings!.booleanWeekNumberHideYear === true && weekString !== "53"
       ? `W<strong>${weekString}</strong>`
       : `${year}-W<strong>${weekString}</strong>`
-    const weeklyNumberString = getWeeklyNumberString(year, weekString, getQuarter(Number(weekString)))
+    const weeklyNumberString = getWeeklyNumberString(year, weekString, getQuarterFromWeekNumber(Number(weekString)))
 
     if (logseq.settings!.booleanWeeklyJournal === true) {
       const linkId = "weeklyJournal-" + weeklyNumberString

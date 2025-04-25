@@ -1,5 +1,5 @@
 import { AppUserConfigs, BlockEntity, IBatchBlock } from "@logseq/libs/dist/LSPlugin"
-import { getQuarter, getWeeklyNumberFromDate, getWeeklyNumberString } from "./lib/lib"
+import { getQuarterFromWeekNumber, getWeeklyNumberFromDate, getWeeklyNumberString } from "./lib/lib"
 import { addMonths, addWeeks, addYears, endOfYear, format, startOfMonth, } from "date-fns"
 
 export const loadShortcutItems = () => {
@@ -74,7 +74,7 @@ const weekNumberYearAll = async (selectYear: number, uuid: string) => {
     const weekNumberListWithYear = weekNumberList.map((weekNumber) =>
         getWeeklyNumberString(year,
             weekNumber.toString().padStart(2, "0"),
-            getQuarter(weekNumber)))
+            getQuarterFromWeekNumber(weekNumber)))
 
     let batch: IBatchBlock[]
     batch = weekNumberListWithYear.map((weekNumber) => ({

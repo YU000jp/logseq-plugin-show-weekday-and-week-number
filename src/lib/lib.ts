@@ -2,6 +2,8 @@ import { BlockEntity, BlockUUID } from "@logseq/libs/dist/LSPlugin.user"
 import { addDays, addWeeks, format, getISOWeek, getISOWeekYear, getWeek, getWeekYear, startOfISOWeek, startOfWeek } from "date-fns"
 import { t } from "logseq-l10n"
 import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
+import { SettingKeys } from "../settings/SettingKeys"
+import { getPageBlocks } from "./query/advancedQuery"
 
 
 export const shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as DayShortCode[]
@@ -15,7 +17,7 @@ export const colorMap: { [key: string]: string } = {
 
 
 
-export const getJournalDayDate = (str: string): Date =>
+export const getDateFromJournalDay = (str: string): Date =>
   new Date(
     Number(str.slice(0, 4)), //year
     Number(str.slice(4, 6)) - 1, //month 0-11
@@ -23,6 +25,11 @@ export const getJournalDayDate = (str: string): Date =>
   )
 
 export const getWeeklyNumberFromDate = (date: Date, weekStartsOn: 0 | 1): { year: number, weekString: string, quarter: number } => {
+  // 日付のバリデーション
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    console.error("Invalid date provided to getWeeklyNumberFromDate:", date);
+    return { year: 0, weekString: "00", quarter: 0 };
+  }
 
   const year: number = logseq.settings?.weekNumberFormat === "ISO(EU) format" ? //年
     getISOWeekYear(date) // ISO 8601
@@ -32,7 +39,13 @@ export const getWeeklyNumberFromDate = (date: Date, weekStartsOn: 0 | 1): { year
     getISOWeek(date)// ISO 8601
     : getWeek(date, { weekStartsOn })
 
-  const quarter: number = getQuarter(week) //四半期を求める
+  // 週番号のバリデーション
+  if (isNaN(week) || week < 1 || week > 53) {
+    console.error("Invalid week number calculated:", week);
+    return { year: 0, weekString: "00", quarter: 0 };
+  }
+
+  const quarter: number = getQuarterFromWeekNumber(week) //四半期を求める
 
   const weekString: string = (week < 10) ?
     String("0" + week)
@@ -42,10 +55,10 @@ export const getWeeklyNumberFromDate = (date: Date, weekStartsOn: 0 | 1): { year
     year,
     weekString,
     quarter
-  }//weekを2文字にする
+  }
 }
 
-export const getQuarter = (week: number): number => week < 14 ? 1 : week < 27 ? 2 : week < 40 ? 3 : 4
+export const getQuarterFromWeekNumber = (week: number): number => week < 14 ? 1 : week < 27 ? 2 : week < 40 ? 3 : 4
 
 export const getWeeklyNumberString = (year: number, weekString: string, quarter: number): string => {
   switch (logseq.settings?.weekNumberOptions) {
@@ -58,8 +71,8 @@ export const getWeeklyNumberString = (year: number, weekString: string, quarter:
   }
 }
 
-export const formatRelativeDate = (targetDate: Date): string => {
-  const currentDate = new Date()
+export const getRelativeDateString = (targetDate: Date, today?: Date): string => {
+  const currentDate = today ? today : new Date()
 
   // 日付を比較するために年月日の部分だけを取得
   const targetDateOnly = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate())
@@ -72,8 +85,9 @@ export const formatRelativeDate = (targetDate: Date): string => {
   // 相対的な日付差を計算
   const diffInDays: number = Math.floor((targetDateOnly.getTime() - currentDateOnly.getTime()) / (1000 * 60 * 60 * 24))
 
-  // 相対的な日付差をローカライズした文字列に変換
-  return new Intl.RelativeTimeFormat(("default"), { numeric: 'auto' }).format(diffInDays, 'day') as string
+  // 相対的な日付差をローカライズした文字列に変換し、先頭を大文字に
+  const relativeString = new Intl.RelativeTimeFormat((logseq.settings![SettingKeys.localizeOrEnglish] as string | "default"), { numeric: 'auto' }).format(diffInDays, 'day') as string
+  return relativeString.charAt(0).toUpperCase() + relativeString.slice(1)
 } //formatRelativeDate end
 
 export const getWeekStartOn = (): 0 | 1 | 6 => {
@@ -141,15 +155,15 @@ export const existInsertTemplate = async (blockUuid: BlockUUID, templateName: st
     logseq.UI.showMsg(`Template "${templateName}" does not exist.`, 'warning', { timeout: 2000 })
 }
 
-const formatDate = (date: Date, options: Intl.DateTimeFormatOptions): string => new Intl.DateTimeFormat((logseq.settings?.localizeOrEnglish as string || "default"), options).format(date)
+export const localizeDate = (date: Date, options: Intl.DateTimeFormatOptions): string => new Intl.DateTimeFormat((logseq.settings?.localizeOrEnglish as string || "default"), options).format(date)
 
-export const localizeMonthString = (date: Date, long: boolean): string => formatDate(date, { month: long === true ? "long" : "short" })
+export const localizeMonthString = (date: Date, long: boolean): string => localizeDate(date, { month: long === true ? "long" : "short" })
 
-export const localizeDayOfWeekString = (date: Date, long: boolean): string => formatDate(date, { weekday: long === true ? "long" : "short" })
+export const localizeDayOfWeekString = (date: Date, long: boolean): string => localizeDate(date, { weekday: long === true ? "long" : "short" })
 
-export const localizeMonthDayString = (date: Date): string => formatDate(date, { month: "short", day: "numeric" })
+export const localizeMonthDayString = (date: Date): string => localizeDate(date, { month: "short", day: "numeric" })
 
-export const localizeDayOfWeekDayString = (date: Date): string => formatDate(date, { weekday: "short", day: "numeric" })
+export const localizeDayOfWeekDayString = (date: Date): string => localizeDate(date, { weekday: "short", day: "numeric" })
 
 export const getWeekStartFromWeekNumber = (year: number, weekNumber: number, weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined, ISO: boolean): Date => {
   if (ISO === true) {
@@ -221,10 +235,7 @@ export const removeElementById = (elementById: string) => {
   if (ele) ele.remove()
 }
 
-export const clearBlocks = async (blocks: { uuid: BlockEntity["uuid"] }[]) => {
-  for (const block of blocks)
-    await logseq.Editor.removeBlock(block.uuid)
-}
+
 
 export const removeAllElements = (selector: string) => {
   const ele = parent.document.body.querySelectorAll(selector) as NodeListOf<HTMLElement>
@@ -237,19 +248,19 @@ export const hideElementBySelector = (selector: string) => {
     ele.style.display = "none"
 }
 
-export const removeMainPageChildren = async (pageTitle: string) => {
-  const blockEntities = await logseq.Editor.getPageBlocksTree(pageTitle) as { uuid: BlockEntity["uuid"]; children: BlockEntity["children"] }[] | null
-  if (blockEntities) {
-    await logseq.Editor.updateBlock(blockEntities[0].uuid, "", {})
-    if (blockEntities[0]) {
-      const children = blockEntities[0].children as { uuid: BlockEntity["uuid"] }[] | undefined
-      if (children)
-        for (const child of children)
-          await logseq.Editor.removeBlock(child.uuid)
-
-    }
-  }
+export const clearBlocks = async (blocks: { uuid: BlockEntity["uuid"] }[]) => {
+  for (const block of blocks)
+    await logseq.Editor.removeBlock(block.uuid)
 }
+
+export const clearPageBlocks = async (pageTitle: string) => {
+  const blocksUuid = await getPageBlocks(pageTitle) as { uuid: BlockEntity["uuid"] }[] | null
+  // console.log("pageName", pageTitle)
+  // console.log("blocksUuid", blocksUuid)
+  if (blocksUuid && blocksUuid.length > 0)
+    clearBlocks(blocksUuid)
+}
+
 /**
  * Create an HTML element with specified classes.
  * @param domElementTag The type of element to create.
@@ -261,6 +272,7 @@ export const createElementWithClass = (domElementTag: string, ...classNames: str
   element.classList.add(...classNames)
   return element
 }
+
 /**
  * Add an event listener to an element that will be executed only once.
  * @param element The element to add the event listener to.
@@ -270,4 +282,3 @@ export const createElementWithClass = (domElementTag: string, ...classNames: str
 export const addEventListenerOnce = (element: HTMLElement, event: string, handler: EventListenerOrEventListenerObject) => {
   element.addEventListener(event, handler, { once: true })
 }
-
