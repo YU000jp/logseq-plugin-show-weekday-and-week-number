@@ -690,23 +690,20 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
   {
     key: SettingKeys.headingBatchBoard,
     type: "heading",
-    title: t("Dashboard configuration"),
+    title: "8. " + t("Dashboard configuration") + "🆕",
     default: null,
     // 各日記を、embedによって一括表示するダッシュボードです。
     // ダッシュボードはキャッシュされたページです。
     // プラグインがその日のためのキャッシュを生成します。
-    // キャッシュに書き込むと、翌日には更新されて消えてしまいます。
-    // 箇条書きの折りたたみは、ページでの作業中にのみ有効です。
 
     // embedについて
     // ページタイトルをクリックすると、ページが開きます。
     // ページタイトルにカーソルを置くと、ツールチップが表示されます。(有効な場合)
     description: `
+    Prototype: ⚠️
     ${t("A dashboard that displays each journal in bulk by embed.")}
     ${t("The dashboard is a cached page.")}
     ${t("This plugin generates a cache for the day.")}
-    ${t("If you write to the cache, it will be updated the next day and disappear.")}
-    ${t("Bullet point collapsing is only valid while working on a page.")}
 
     ${t("About embed")}:
     ${t("Click the page title to open the page.")}
@@ -716,7 +713,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
   {
     key: SettingKeys.addLeftMenu,
     type: "boolean",
-    default: true,
+    default: false,
     // 左メニューバーにボタンを追加して、このプラグインにアクセスできるようにします。
     title: t("Enable"),
     description: t("Add a button to the left menu bar to access this plugin"),
@@ -745,7 +742,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
   },
   {
     key: SettingKeys.showMemo,
-    title: "+ " + t("Show memo section"),
+    title: "+ " + t("Show the Memo section"),
     type: "enum",
     enumChoices: ["show", "collapsed", "false"],
     default: "Show",
