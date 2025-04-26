@@ -66,6 +66,8 @@ export const SettingKeys = {
   weekNumberChangeQS: "weekNumberChangeQS",
   weekNumberChangeSlash: "weekNumberChangeSlash",
   weekNumberChangeRevert: "weekNumberChangeRevert",
+  weekNumberChangeToQfull: "weekNumberChangeToQfull",
+  weekNumberChangeFRevertToISO: "weekNumberChangeFRevertToISO",
   heading005: "heading005",
   booleanMonthlyJournal: "booleanMonthlyJournal",
   monthlyJournalTemplateName: "monthlyJournalTemplateName",

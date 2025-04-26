@@ -8,7 +8,7 @@ import { countryName, language } from "./languageCountry"
 // https://logseq.github.io/plugins/types/SettingSchemaDesc.html
 
 
-export const weekNumberFormat: string[] = ["YYYY-Www", "YYYY/qqq/Www", "YYYY/Www"]
+export const weekNumberFormat: string[] = ["YYYY-Www", "YYYY/qqq/Www", "YYYY/Www", "YYYY-qqq-Www"]
 
 const highlightColors: string[] = [
   "--highlight-bg-color",
@@ -560,7 +560,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     key: SettingKeys.weekNumberChangeQ,
     title: " YYYY-Www  ->  YYYY/qqq/Www",
     type: "boolean",
-    default: true,
+    default: false,
     description: "",
   },
   //20240518
@@ -568,7 +568,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     key: SettingKeys.weekNumberChangeQS,
     title: " YYYY/Www  ->  YYYY/qqq/Www",
     type: "boolean",
-    default: true,
+    default: false,
     description: "",
   },
   //20240518
@@ -576,7 +576,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     key: SettingKeys.weekNumberChangeSlash,
     title: " YYYY-Www  ->  YYYY/Www",
     type: "boolean",
-    default: true,
+    default: false,
     description: "",
   },
   //20240519
@@ -584,7 +584,21 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     key: SettingKeys.weekNumberChangeRevert,
     title: " YYYY/qqq/Www  ->  YYYY/Www",
     type: "boolean",
-    default: true,
+    default: false,
+    description: "",
+  },
+  {
+    key: SettingKeys.weekNumberChangeToQfull,
+    title: " YYYY-Www  ->  YYYY-qqq-Www",
+    type: "boolean",
+    default: false,
+    description: "",
+  },
+  {
+    key: SettingKeys.weekNumberChangeFRevertToISO,
+    title: " YYYY-qqq-Www  ->  YYYY-Www",
+    type: "boolean",
+    default: false,
     description: "",
   },
   // ここまでトグルの対象

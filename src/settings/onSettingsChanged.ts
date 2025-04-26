@@ -6,6 +6,7 @@ import { removeElementById, removeProvideStyle } from "../lib/lib"
 import { keyThisWeekPopup, weeklyEmbed } from "../journals/weeklyJournal"
 import { SettingKeys } from "./SettingKeys"
 import { removeBoundaries } from "../calendar/boundaries"
+import { isPageExist } from "../lib/query/advancedQuery"
 
 let processingSettingsChanged: boolean = false
 let processingRenamePage: boolean = false
@@ -68,6 +69,8 @@ export const handleSettingsUpdate = () => {
       SettingKeys.weekNumberChangeQS,
       SettingKeys.weekNumberChangeRevert,
       SettingKeys.weekNumberChangeSlash,
+      SettingKeys.weekNumberChangeFRevertToISO,
+      SettingKeys.weekNumberChangeToQfull,
       SettingKeys.booleanMonthlyJournal,
       SettingKeys.booleanQuarterlyJournal,
       SettingKeys.booleanYearlyJournal
@@ -159,10 +162,13 @@ export const handleSettingsUpdate = () => {
       { key: SettingKeys.holidaysCountry, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
       { key: SettingKeys.holidaysState, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
       { key: SettingKeys.holidaysRegion, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
-      { key: SettingKeys.weekNumberChangeQ, action: () => convertWeekToQuarterFormat("-", false) },
-      { key: SettingKeys.weekNumberChangeQS, action: () => convertWeekToQuarterFormat("/", false) },
-      { key: SettingKeys.weekNumberChangeRevert, action: () => convertWeekToQuarterFormat("/", true) },
-      { key: SettingKeys.weekNumberChangeSlash, action: () => convertWeekNumberToSlash() }
+      { key: SettingKeys.weekNumberChangeQ, action: () => convertWeekToQuarterFormat("-", false, "/") },
+      { key: SettingKeys.weekNumberChangeQS, action: () => convertWeekToQuarterFormat("/", false, "/") },
+      { key: SettingKeys.weekNumberChangeRevert, action: () => convertWeekToQuarterFormat("/", true, "/") },
+      { key: SettingKeys.weekNumberChangeSlash, action: () => convertWeekNumberToSlash() },
+      { key: SettingKeys.weekNumberChangeFRevertToISO, action: () => convertWeekToQuarterFormat("-", true, "-") },
+      { key: SettingKeys.weekNumberChangeToQfull, action: () => convertWeekToQuarterFormat("-", false, "-") },
+
       ].forEach(({ key, action }) => {
         if (oldSet[key] !== newSet[key]) action()
       })
@@ -216,7 +222,7 @@ const buildWeekArray = () => Array.from({ length: 53 }, (_, i) => i + 1)
 const buildYearArray = () => Array.from({ length: (new Date().getFullYear()) - 2022 + 2 }, (_, i) => (2022 + i).toString())
 
 // 週番号のフォーマットを変更する - から/に変更する
-const convertWeekNumberToSlash = () => {
+const convertWeekNumberToSlash = async () => {
   if (processingRenamePage) return
   processingRenamePage = true
   const weekList: number[] = buildWeekArray()
@@ -224,14 +230,13 @@ const convertWeekNumberToSlash = () => {
   for (const year of targetList)
     for (const week of weekList) {
       const weekNumber = week.toString().padStart(2, "0")
-      logseq.Editor.getPage(`${year}-W${weekNumber}`).then((page: { uuid: PageEntity["uuid"] } | null) => {
-        if (page) {
-          logseq.Editor.renamePage(`${year}-W${weekNumber}`, `${year}/W${weekNumber}`)
-          console.log(`Page ${year}-W${weekNumber} has been renamed to ${year}/W${weekNumber}.`)
-        }
-        else
-          console.log(`Page ${year}-W${weekNumber} does not exist.`)
-      })
+      const pageName = `${year}-W${weekNumber}`
+      if (await isPageExist(pageName)) {
+        logseq.Editor.renamePage(pageName, `${year}/W${weekNumber}`)
+        console.log(`Page ${year}-W${weekNumber} has been renamed to ${year}/W${weekNumber}.`)
+      }
+      else
+        console.log(`Page ${year}-W${weekNumber} does not exist.`)
     }
   logseq.UI.showMsg("Week number has been changed to the quarterly format.", "info", { timeout: 5000 })
   setTimeout(() => {
@@ -241,7 +246,7 @@ const convertWeekNumberToSlash = () => {
 }
 
 // 週番号のフォーマットを変更する 四半期との変換
-const convertWeekToQuarterFormat = async (separateString: string, revert: boolean) => {
+const convertWeekToQuarterFormat = async (newSeparater: "/" | "-", revert: boolean, oldSeparater: "/" | "-") => {
   if (processingRenamePage) return
   processingRenamePage = true
 
@@ -252,25 +257,23 @@ const convertWeekToQuarterFormat = async (separateString: string, revert: boolea
       const weekNumber = week.toString().padStart(2, "0")
       if (revert === true) {
         const weekNumberQuarter = quarterIdentifiers[Math.floor((week - 1) / 13)]
-        logseq.Editor.getPage(`${year}/${weekNumberQuarter}/W${weekNumber}`).then((page: { uuid: PageEntity["uuid"] } | null) => {
-          if (page) {
-            logseq.Editor.renamePage(`${year}/${weekNumberQuarter}/W${weekNumber}`, `${year}${separateString}W${weekNumber}`)
-            console.log(`Page ${year}/${weekNumberQuarter}/W${weekNumber} renamed to ${year}${separateString}W${weekNumber}.`)
-          }
-          else
-            console.log(`Page ${year}/${weekNumberQuarter}/W${weekNumber} does not exist.`)
-        })
+        const pageName = `${year}${oldSeparater}${weekNumberQuarter}${oldSeparater}W${weekNumber}`
+        if (await isPageExist(pageName)) {
+          logseq.Editor.renamePage(pageName, `${year}${newSeparater}W${weekNumber}`)
+          console.log(`Page ${pageName} renamed to ${year}${newSeparater}W${weekNumber}.`)
+        }
+        else
+          console.log(`Page ${pageName} does not exist.`)
       } else {
-        logseq.Editor.getPage(`${year}${separateString}W${weekNumber}`).then((page: { uuid: PageEntity["uuid"] } | null) => {
-          if (page) {
-            //四半世紀を入れる
-            const weekNumberQuarter = quarterIdentifiers[Math.floor((week - 1) / 13)]
-            logseq.Editor.renamePage(`${year}${separateString}W${weekNumber}`, `${year}/${weekNumberQuarter}/W${weekNumber}`)
-            console.log(`Page ${year}${separateString}W${weekNumber} renamed to ${year}/${weekNumberQuarter}/W${weekNumber}.`)
-          }
-          else
-            console.log(`Page ${year}${separateString}W${weekNumber} does not exist.`)
-        })
+        const pageName = `${year}${newSeparater}W${weekNumber}`
+        if (await isPageExist(pageName)) {
+          //四半世紀を入れる
+          const weekNumberQuarter = quarterIdentifiers[Math.floor((week - 1) / 13)]
+          logseq.Editor.renamePage(pageName, `${year}${oldSeparater}${weekNumberQuarter}${oldSeparater}W${weekNumber}`)
+          console.log(`Page ${pageName} renamed to ${year}${oldSeparater}${weekNumberQuarter}${oldSeparater}W${weekNumber}.`)
+        }
+        else
+          console.log(`Page ${pageName} does not exist.`)
       }
     }
   logseq.UI.showMsg("Changed to the format", "info", { timeout: 5000 })

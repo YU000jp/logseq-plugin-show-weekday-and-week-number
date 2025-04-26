@@ -66,6 +66,8 @@ export const getWeeklyNumberString = (year: number, weekString: string, quarter:
       return `${year}-W${weekString}` // "YYYY-Www"
     case "YYYY/qqq/Www":
       return `${year}/Q${quarter}/W${weekString}` // "YYYY/qqq/Www"
+    case "YYYY-qqq-Www":
+      return `${year}-Q${quarter}-W${weekString}` // "YYYY-qqq-Www"
     default:
       return `${year}/W${weekString}` // "YYYY/Www"
   }
