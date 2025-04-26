@@ -168,16 +168,20 @@ const generateContentForMainPageContent = async (
         const isCurrentDay = isToday(date) // 今日かどうか
 
         const block: IBatchBlock = {
-          content: `#### ${dayOfWeek}${holiday ? ` : **${holiday}**` : ""}  (${relativeDate})`,
+          content: `#### ${dayOfWeek}${holiday ? ` : **${holiday}**` : ""}${isCurrentDay ? "" : ` (${relativeDate})`}`,
         }
 
+        // 土曜日か日曜日の場合は背景色を変更
+        if (isSaturday(date) || isSunday(date))
+          block.properties = { "background-color": isSaturday(date) ? "blue" : "red" }
+
+        // 今日の場合は背景色を変更
         if (isCurrentDay)
-          block.properties = { "background-color": "green" }
+          block.children = [{
+            content: `### ${relativeDate}`,
+            properties: { "background-color": "green" }
+          }]
         else {
-
-          if (isSaturday(date) || isSunday(date))
-            block.properties = { "background-color": isSaturday(date) ? "blue" : "red" }
-
           if (logseq.settings![SettingKeys.show7daysNotExist] as string === "Nothing (embed)")
             block.children = [{ content: `{{embed [[${dateFormatString}]]}}` }]
           else
