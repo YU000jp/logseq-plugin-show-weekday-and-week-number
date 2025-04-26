@@ -1,9 +1,9 @@
-import { BlockEntity, BlockUUID } from "@logseq/libs/dist/LSPlugin.user"
+import { BlockEntity, BlockUUID, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { addDays, addWeeks, format, getISOWeek, getISOWeekYear, getWeek, getWeekYear, startOfISOWeek, startOfWeek } from "date-fns"
 import { t } from "logseq-l10n"
 import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
 import { SettingKeys } from "../settings/SettingKeys"
-import { getPageBlocks } from "./query/advancedQuery"
+import { getPageBlocks, isPageExist, isPageExistGetUuid } from "./query/advancedQuery"
 
 
 export const shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as DayShortCode[]
@@ -27,8 +27,8 @@ export const getDateFromJournalDay = (str: string): Date =>
 export const getWeeklyNumberFromDate = (date: Date, weekStartsOn: 0 | 1): { year: number, weekString: string, quarter: number } => {
   // 日付のバリデーション
   if (!(date instanceof Date) || isNaN(date.getTime())) {
-    console.error("Invalid date provided to getWeeklyNumberFromDate:", date);
-    return { year: 0, weekString: "00", quarter: 0 };
+    console.error("Invalid date provided to getWeeklyNumberFromDate:", date)
+    return { year: 0, weekString: "00", quarter: 0 }
   }
 
   const year: number = logseq.settings?.weekNumberFormat === "ISO(EU) format" ? //年
@@ -41,8 +41,8 @@ export const getWeeklyNumberFromDate = (date: Date, weekStartsOn: 0 | 1): { year
 
   // 週番号のバリデーション
   if (isNaN(week) || week < 1 || week > 53) {
-    console.error("Invalid week number calculated:", week);
-    return { year: 0, weekString: "00", quarter: 0 };
+    console.error("Invalid week number calculated:", week)
+    return { year: 0, weekString: "00", quarter: 0 }
   }
 
   const quarter: number = getQuarterFromWeekNumber(week) //四半期を求める
@@ -130,12 +130,12 @@ export const createLinkMonthlyLink = (linkString: string, pageName: string, elem
 }
 
 export const openPageFromPageName = async (pageName: string, shiftKey: boolean) => {
-  if (shiftKey === true) {
-    const page = await logseq.Editor.getPage(pageName) as { uuid: BlockUUID } | null
-    if (page)
-      logseq.Editor.openInRightSidebar(page.uuid) //ページが存在しない場合は開かない
-  } else
-    logseq.App.pushState('page', { name: pageName })
+  const pageUuid = await isPageExistGetUuid(pageName) as PageEntity["uuid"] | null
+  if (pageUuid)
+    if (shiftKey === true)
+      logseq.Editor.openInRightSidebar(pageUuid) //ページが存在しない場合は開かない
+    else
+      logseq.App.pushState('page', { name: pageName })
 }
 
 export const removeProvideStyle = (className: string) => {

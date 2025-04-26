@@ -135,8 +135,11 @@ const daySideMonth = (date: Date, boundariesInner: HTMLDivElement, monthDuplicat
     sideMonthElement.style.visibility = 'hidden'
   } else {
     const monthString: string = format(dateShowMonth, "yyyy/MM")
-    sideMonthElement.title = monthString
-    sideMonthElement.addEventListener("click", ({ shiftKey }) => openPageFromPageName(monthString, shiftKey))// 2023/10のようなページを開く
+    // monthStringが正しくない場合は、非表示
+    if (monthString.length === 7) {
+      sideMonthElement.title = monthString
+      sideMonthElement.addEventListener("click", ({ shiftKey }) => openPageFromPageName(monthString, shiftKey))// 2023/10のようなページを開く
+    }
   }
   boundariesInner.appendChild(sideMonthElement)
   return dateShowMonth

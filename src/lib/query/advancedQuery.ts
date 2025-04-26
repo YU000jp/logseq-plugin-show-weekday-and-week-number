@@ -1,18 +1,19 @@
-import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 
-export const advancedQuery = async (query: string, ...input: Array<string>): Promise<any | null> => {
+export const advancedQuery = async <T>(query: string, ...input: Array<string>): Promise<T | null> => {
   try {
-    return (await logseq.DB.datascriptQuery(query, ...input) as any)?.flat()
-  } catch (err: any) {
-    console.warn(err)
+    const result = await logseq.DB.datascriptQuery(query, ...input)
+    return result?.flat() as T
+  } catch (err) {
+    console.warn("Query execution failed:", err)
+    return null
   }
-  return null
 }
 
 export const getPageBlocks = async (pageName: string): Promise<{ uuid: PageEntity["uuid"] }[] | null> => {
   const query = `
     [:find (pull ?b [:block/uuid])
-      :in $ ?name
+     :in $ ?name
      :where
      [?p :block/original-name ?name]
      [?b :block/page ?p]
@@ -21,54 +22,31 @@ export const getPageBlocks = async (pageName: string): Promise<{ uuid: PageEntit
   return await advancedQuery(query, `"${pageName}"`)
 }
 
+const createBaseQuery = (field: string): string => `
+  [:find (pull ?b [:block/${field}])
+   :in $ ?name
+   :where
+   [?b :block/original-name ?name]
+   [?b :block/${field} ?${field}]] 
+`
 
-export const queryCodeGetJournalDayFromOriginalName = `
-  [:find (pull ?b [:block/journal-day])
-          :in $ ?name
-          :where
-          [?b :block/original-name ?name]
-          [?b :block/journal-day ?day]] 
-  `
+export const queryCodeGetJournalDayFromOriginalName = createBaseQuery("journal-day")
+export const queryCodeGetFileFromOriginalName = createBaseQuery("file")
+export const queryCodeGetUuidFromOriginalName = createBaseQuery("uuid")
 
-export const queryCodeGetFileFromOriginalName = `
-  [:find (pull ?b [:block/file])
-          :in $ ?name
-          :where
-          [?b :block/original-name ?name]
-          [?b :block/file ?file]] 
-  `
-
-export const queryCodeGetUuidFromOriginalName = `
-  [:find (pull ?b [:block/uuid])
-          :in $ ?name
-          :where
-          [?b :block/original-name ?name]
-          [?b :block/uuid ?uuid]]
-  `
-
-
-// ページが存在するかどうか
 export const isPageExist = async (pageName: string): Promise<boolean> => {
-  const pageEntities = await advancedQuery(queryCodeGetUuidFromOriginalName, `"${pageName}"`) as { uuid: PageEntity["uuid"] }[] | null
-  if (pageEntities && pageEntities.length > 0)
-    if (pageEntities[0].uuid)
-      return true
-    else
-      return false
-  else
-    return false
+  const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(queryCodeGetUuidFromOriginalName, `"${pageName}"`)
+  return !!result?.[0]?.uuid
 }
 
-// ページファイルが存在するかどうか
+export const isPageExistGetUuid = async (pageName: string): Promise<PageEntity["uuid"] | null> => {
+  const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(queryCodeGetUuidFromOriginalName, `"${pageName}"`)
+  return result?.[0]?.uuid ?? null
+}
+
 export const isPageFileExist = async (pageName: string): Promise<boolean> => {
-  const pageEntities = await advancedQuery(queryCodeGetFileFromOriginalName, `"${pageName}"`) as { file: PageEntity["file"] }[] | null
-  if (pageEntities && pageEntities.length > 0)
-    if (pageEntities[0].file)
-      return true
-    else
-      return false
-  else
-    return false
+  const result = await advancedQuery<{ file: PageEntity["file"] }[]>(queryCodeGetFileFromOriginalName, `"${pageName}"`)
+  return !!result?.[0]?.file
 }
 
 export const getCurrentPageExist = async (): Promise<boolean> => {
@@ -80,6 +58,6 @@ export const getCurrentPageExist = async (): Promise<boolean> => {
      [(= ?name ?current)]
      [?p :block/uuid ?uuid]]
   `
-  const result = await advancedQuery(query, ":current-page")
-  return result?.[0] || null
+  const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(query, ":current-page")
+  return !!result?.[0]
 }

@@ -151,6 +151,7 @@ export const createCalendar = async (targetDate: Date, preferredDateFormat: stri
     currentCalendarDate = targetDate // 更新
     const year = targetDate.getFullYear() //年を取得
     const month = targetDate.getMonth() + 1 //0から始まるため+1する
+    const today = new Date()
     const localizeMonthLong = localizeMonthString(targetDate, true) //月の文字列を取得
     const startOfMonthDay: Date = startOfMonth(targetDate) //月の最初の日を取得
     const ISO: boolean = logseq.settings!.weekNumberFormat === "ISO(EU) format" ? true : false //ISO(EU) formatかどうか
@@ -170,7 +171,7 @@ export const createCalendar = async (targetDate: Date, preferredDateFormat: stri
 
     const enableWeekNumber = logseq.settings!.booleanLcWeekNumber as boolean //週番号を表示するかどうか
     const formatYearMonthTargetDate: string = format(targetDate, "yyyy/MM")
-    const formatYearMonthThisMonth: string = format(new Date(), "yyyy/MM")
+    const formatYearMonthThisMonth: string = format(today, "yyyy/MM")
 
     //ここまでのデータを仮で、mainDivElementにすべて出力したい
     //tableで、一行目、二行目、三行目、四行目、五行目、六行目、七行目、八行目を作成する
@@ -197,16 +198,16 @@ export const createCalendar = async (targetDate: Date, preferredDateFormat: stri
     headerNavElement.appendChild(prevHeaderCell)
 
     // 月のセルを作成
-    const monthHeaderCell = createTableHeaderCell(localizeMonthLong + (isSameYear(targetDate, new Date()) ? "" : ` ${year}`), "cursor", formatYearMonthTargetDate, enableWeekNumber ? 4 : 3)
+    const monthHeaderCell = createTableHeaderCell(localizeMonthLong + (isSameYear(targetDate, today) ? "" : ` ${year}`), "cursor", formatYearMonthTargetDate, enableWeekNumber ? 4 : 3)
     monthHeaderCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(formatYearMonthTargetDate, shiftKey))
     monthHeaderCell.style.fontSize = "1.4em"
     headerNavElement.appendChild(monthHeaderCell)
     theadElement.appendChild(headerNavElement)
 
     // 今月に戻るボタン
-    const thisMonthButton = createButton(t("This month"), formatYearMonthThisMonth, () => {
+    const thisMonthButton = createButton("<>", formatYearMonthThisMonth, () => {
         removeCalendarAndNav()
-        createCalendar(new Date(), preferredDateFormat, innerElement)
+        createCalendar(today, preferredDateFormat, innerElement)
     })
     const thisMonthHeaderCell = createTableHeaderCell("", "", "", 2)
     thisMonthHeaderCell.appendChild(thisMonthButton)
