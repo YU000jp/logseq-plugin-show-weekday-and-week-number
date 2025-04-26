@@ -73,7 +73,10 @@ export const handleSettingsUpdate = () => {
       SettingKeys.weekNumberChangeToQfull,
       SettingKeys.booleanMonthlyJournal,
       SettingKeys.booleanQuarterlyJournal,
-      SettingKeys.booleanYearlyJournal
+      SettingKeys.booleanYearlyJournal,
+      SettingKeys.booleanWeeklyDeskMonthly,
+      SettingKeys.booleanWeeklyDeskQuarterly,
+      SettingKeys.booleanWeeklyDeskYearly
     ].some(key => oldSet[key] !== newSet[key])) {
       const boundaryKeys = [
         SettingKeys.booleanBoundariesAll,
@@ -92,7 +95,6 @@ export const handleSettingsUpdate = () => {
       }
 
       if ([
-        SettingKeys.booleanWeeklyJournal,
         SettingKeys.boundariesBottom,
         SettingKeys.booleanBoundariesShowMonth,
         SettingKeys.booleanBoundariesShowWeekNumber,

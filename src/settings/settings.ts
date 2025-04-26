@@ -690,7 +690,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
   {
     key: SettingKeys.headingBatchBoard,
     type: "heading",
-    title: "8. " + t("Dashboard configuration") + "🆕",
+    title: "8. " + t("Weekly-Desk (dashboard) configuration") + "🆕",
     default: null,
     // 各日記を、embedによって一括表示するダッシュボードです。
     // ダッシュボードはキャッシュされたページです。
@@ -741,6 +741,27 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     `,
   },
   {
+    key: SettingKeys.booleanWeeklyDeskMonthly,
+    title: t("Show Monthly view"),
+    type: "boolean",
+    default: true,
+    description: t("Show Monthly view in Weekly-Desk"),
+  },
+  {
+    key: SettingKeys.booleanWeeklyDeskQuarterly,
+    title: t("Show Quarterly view"),
+    type: "boolean",
+    default: true,
+    description: t("Show Quarterly view in Weekly-Desk"),
+  },
+  {
+    key: SettingKeys.booleanWeeklyDeskYearly,
+    title: t("Show Yearly view"),
+    type: "boolean",
+    default: true,
+    description: t("Show Yearly view in Weekly-Desk"),
+  },
+  {
     key: SettingKeys.showMemo,
     title: "+ " + t("Show the Memo section"),
     type: "enum",
@@ -771,5 +792,74 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     enumChoices: ["show", "collapsed", "false"],
     default: "Show",
     description: t("Reloading will reflect this."),
+  },
+
+
+  {
+    key: SettingKeys.headingDayTemplate,
+    type: "heading",
+    title: "9. " + t("Each day template configuration") + "🆕",
+    default: null,
+    description: `
+    Prototype: ⚠️
+    ${t("You can set the template for each day of the week.")}
+    ${t("Input the template name (default is blank)")}
+    `,
+  },
+  // 日曜日のテンプレート
+  {
+    key: SettingKeys.sundayTemplate,
+    title: t("Sunday template"),
+    type: "string",
+    default: "",
+    description: "",
+  },
+  // 月曜日のテンプレート
+  {
+    key: SettingKeys.mondayTemplate,
+    title: t("Monday template"),
+    type: "string",
+    default: "",
+    description: "",
+  },
+  // 火曜日のテンプレート
+  {
+    key: SettingKeys.tuesdayTemplate,
+    title: t("Tuesday template"),
+    type: "string",
+    default: "",
+    description: "",
+  },
+  // 水曜日のテンプレート
+  {
+    key: SettingKeys.wednesdayTemplate,
+    title: t("Wednesday template"),
+    type: "string",
+    default: "",
+    description: "",
+  },
+  // 木曜日のテンプレート
+  {
+    key: SettingKeys.thursdayTemplate,
+    title: t("Thursday template"),
+    type: "string",
+    default: "",
+    description: "",
+  },
+  // 金曜日のテンプレート
+  {
+    key: SettingKeys.fridayTemplate,
+    title: t("Friday template"),
+    type: "string",
+    default: "",
+    description: "",
+  },
+  // 土曜日のテンプレート
+  {
+    key: SettingKeys.saturdayTemplate,
+    title: t("Saturday template"),
+    type: "string",
+    default: "",
+    description: "",
   },
 ]

@@ -1,8 +1,10 @@
-import { LSPluginBaseInfo } from '@logseq/libs/dist/LSPlugin.user'
+import { LSPluginBaseInfo, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
+import { t } from 'logseq-l10n'
 import { clearPageBlocks, removeAllElements } from '../lib/lib'
-import { isPageExist } from '../lib/query/advancedQuery'
+import { getCurrentPageOriginalName, isPageExist } from '../lib/query/advancedQuery'
 import { SettingKeys } from '../settings/SettingKeys'
-import { keyAnotherJournal, keyReloadButton, keySettingsButton, keyToolbar, mainPageTitle, mainPageTitleLower, shortKey } from './constant'
+import { keyAnotherJournal, keyReloadButton, keySettingsButton, keyTemplateInsertButton, keyTemplateInsertSelect, keyToolbar, mainPageTitle, mainPageTitleLower, shortKey } from './constant'
+import { pageTemplate } from './embed/dayTemplates'
 import { generateEmbed } from './embed/generateBlock'
 import { registerLeftMenuItemsForBoard } from './leftMenuItems'
 import { registerPageBarButtonsForBoard } from './pageBarButtons'
@@ -194,5 +196,45 @@ const model = () =>
         [`cashBatch-${keyAnotherJournal}-reloadFlag`]: true,
       })
       logseq.App.pushState('page', { name: mainPageTitle })// ページを開く // (mainPageTitle + "/" + type)
+    },
+
+
+    [keyTemplateInsertButton]: () => {
+      if (processingButton) return
+      processingButton = true
+      setTimeout(() => processingButton = false, 100)
+      const select = parent.document.getElementById(keyTemplateInsertSelect) as HTMLSelectElement | null
+      if (select)
+        select.style.display = "block"
+    },
+
+    [keyTemplateInsertSelect]: async () => {
+      if (processingButton) return
+      processingButton = true
+      setTimeout(() => processingButton = false, 100)
+      const select = parent.document.getElementById(keyTemplateInsertSelect) as HTMLSelectElement | null
+      if (select) {
+        // selectを非表示にする
+        select.style.display = "none"
+
+        // select の value が空の場合は、テンプレートを挿入しない
+        if (select.value !== "") {
+          const templateName = logseq.settings![SettingKeys[select.value + "Template"]] as string || ""
+          if (templateName !== "") {
+            const result = await pageTemplate(templateName, select.value)
+            if (result) {
+              const currentPageName = await getCurrentPageOriginalName() as PageEntity["original-name"] | null
+              if (currentPageName) {
+                await pageTemplate(templateName, currentPageName as string)
+                logseq.UI.showMsg(t("The template inserted"), "info", { timeout: 5000 })
+              }
+            }
+          } else
+            logseq.UI.showMsg(t("The template not found") + " " + templateName, "info", { timeout: 5000 })
+        }
+
+        // selectの選択状態を解除する
+        select.selectedIndex = 0
+      }
     },
   })/* end_model */

@@ -7,6 +7,7 @@ import { clearBlocks, getRelativeDateString, getWeeklyNumberFromDate, getWeeklyN
 import { getPageBlocks, isPageFileExist } from "../../lib/query/advancedQuery"
 import { SettingKeys } from "../../settings/SettingKeys"
 import { mainPageTitle, mainPageTitleLower } from "../constant"
+import { dayTemplates } from "./dayTemplates"
 
 
 
@@ -214,6 +215,7 @@ const generateContentForMainPageContent = async (
             {
               content: `{{embed [[${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-Www" ? `${year}-${month}`
                 : `${year}/${month}`}]]}}`,
+              ...(logseq.settings![SettingKeys.booleanWeeklyDeskMonthly] ? { properties: { collapsed: true } } : {}),
             },
           ],
         },
@@ -222,7 +224,8 @@ const generateContentForMainPageContent = async (
           children: [
             {
               content: `{{embed [[${year}/Q${quarter}]]}}`,
-            },
+              ...(logseq.settings![SettingKeys.booleanWeeklyDeskQuarterly] ? { properties: { collapsed: true } } : {}),
+            }
           ],
         }] : []),
         {
@@ -230,7 +233,8 @@ const generateContentForMainPageContent = async (
           children: [
             {
               content: `{{embed [[${year}]]}}`,
-            },
+              ...(logseq.settings![SettingKeys.booleanWeeklyDeskYearly] ? { properties: { collapsed: true } } : {}),
+            }
           ],
         },
       )
@@ -289,42 +293,6 @@ const generateContentForMainPageContent = async (
   }, 50)
 
 }// end_generateContentForMainPageContent
-
-
-
-// テンプレートを挿入する ユーザー設定で、テンプレートを挿入する設定になっているときのみ
-let processingCheckPage = false
-const dayTemplates = (contentCheckTarget: { [key: string]: string[] }) => {
-  setTimeout(async () => {
-    if (processingCheckPage) return
-    processingCheckPage = true
-    // contentCheckTargetの各valueは、ページタイトルであり、そのページのコンテンツが存在するかチェックする
-    for (const [dayOfWeekKey, dates] of Object.entries(contentCheckTarget))
-      for (const date of dates)
-        if (await isPageFileExist(date) === false) { //ページが存在しない場合
-          // embedにカーソルを置いて行が作成された場合も、ファイルなしとして検出される
-          // 曜日ごとにテンプレートを適用する
-          const dayOfWeekTemplates: { [key: string]: string } = {
-            "0": "Sunday-Template", //Sun
-            "1": "Monday-Template",
-            "2": "Tuesday-Template",
-            "3": "Wednesday-Template",
-            "4": "Main-Template",
-            "5": "Friday-Template",
-            "6": "Saturday-Template",
-          }
-          const templateName = dayOfWeekTemplates[dayOfWeekKey]
-          if (await logseq.App.existTemplate(templateName)) {
-            const newBlock = await logseq.Editor.prependBlockInPage(date, "") as { uuid: BlockEntity["uuid"] } | null
-            if (newBlock)
-              await logseq.App.insertTemplate(newBlock.uuid, templateName)
-
-            await new Promise(resolve => setTimeout(resolve, 500)) // 0.5秒待機
-          }
-        }
-    processingCheckPage = false
-  }, 1500)
-}
 
 
 

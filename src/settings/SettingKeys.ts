@@ -92,4 +92,16 @@ export const SettingKeys = {
   showTodayTasks: "showTodayTasks",
   showScheduledTasks: "showScheduledTasks",
   showUnplannedTasks: "showUnplannedTasks",
+  headingDayTemplate: "headingDayTemplate",
+  sundayTemplate: "sundayTemplate",
+  mondayTemplate: "mondayTemplate",
+  tuesdayTemplate: "tuesdayTemplate",
+  wednesdayTemplate: "wednesdayTemplate",
+  thursdayTemplate: "thursdayTemplate",
+  fridayTemplate: "fridayTemplate",
+  saturdayTemplate: "saturdayTemplate",
+  booleanWeeklyDesk: "booleanWeeklyDesk",
+  booleanWeeklyDeskMonthly: "booleanWeeklyDeskMonthly",
+  booleanWeeklyDeskQuarterly: "booleanWeeklyDeskQuarterly",
+  booleanWeeklyDeskYearly: "booleanWeeklyDeskYearly"
 }

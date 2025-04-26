@@ -61,3 +61,16 @@ export const getCurrentPageExist = async (): Promise<boolean> => {
   const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(query, ":current-page")
   return !!result?.[0]
 }
+
+export const getCurrentPageOriginalName = async (): Promise<PageEntity["original-name"] | null> => {
+  const query = `
+    [:find (pull ?p [:block/original-name])
+     :in $ ?current
+     :where
+     [?p :block/name ?name]
+     [(= ?name ?current)]
+     [?p :block/original-name ?original-name]]
+  `
+  const result = await advancedQuery<{ originalName: PageEntity["original-name"] }[]>(query, ":current-page")
+  return result?.[0]?.["original-name"] ?? null
+}
