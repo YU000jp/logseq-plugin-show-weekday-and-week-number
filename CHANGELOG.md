@@ -1,3 +1,15 @@
+# [1.62.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.61.1...v1.62.0) (2025-04-27)
+
+
+### Bug Fixes
+
+* **bug:** Weekly-Desk: Remove the This Week section by CSS [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([0d36c52](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/0d36c52a07ec284c6a692ea9854b688273d0cb73))
+
+
+### Features
+
+* Weekly-Desk: Apply the template for Weekly, Monthly, Quarterly and Yearly [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([cef7e97](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/cef7e97280ca19e2ded64b909fd55f490fe12b0d))
+
 ## [1.61.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.61.0...v1.61.1) (2025-04-27)
 
 
