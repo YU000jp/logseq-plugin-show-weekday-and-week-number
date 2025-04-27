@@ -1,5 +1,5 @@
 import { BlockEntity, IBatchBlock, PageEntity } from "@logseq/libs/dist/LSPlugin"
-import { addDays, addMonths, format, formatDate, isSameMonth, isSaturday, isSunday, isToday, subDays, subMonths } from "date-fns"
+import { addDays, differenceInDays, format, formatDate, isSameMonth, isSaturday, isSunday, isToday, subDays } from "date-fns"
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat } from "../.."
 import { getHolidays } from "../../lib/holidays"
@@ -99,6 +99,11 @@ const generateContentForMainPageContent = async (
 
 
     const weeklyPageName = getWeeklyNumberString(year, weekString, quarter)
+    const monthlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-Www" ? `${year}-${month}`
+      : `${year}/${month}`}`
+    const quarterlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-qqq-Www" ? `${year}-Q${quarter}`
+      : `${year}/Q${quarter}`}`
+    const yearlyPageName = `${year}`
 
     // 月曜日を基準にした3週間分の日付配列を生成
     const dateArray = Array.from({ length: 21 }, (_, i) => i - 7) // -7から13までの配列（3週間分）
@@ -211,12 +216,6 @@ const generateContentForMainPageContent = async (
         })
       })
 
-      const monthlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-Www" ? `${year}-${month}`
-        : `${year}/${month}`}`
-      const quarterlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-qqq-Www" ? `${year}-Q${quarter}`
-        : `${year}/Q${quarter}`}`
-      const yearlyPageName = `${year}`
-
       // 月、四半期、年のブロックを追加
       children.push(
         {
@@ -278,19 +277,26 @@ const generateContentForMainPageContent = async (
 
     // バッチの2つ目を生成
     const dayOfWeekFirst = localizeDate(dayOfWeekFirstDate, { month: "long", day: "numeric" })
-    const dayOfWeekLast = localizeDate(dayOfWeekLastDate, { day: "numeric", ...(isSameMonth(dayOfWeekFirstDate, dayOfWeekLastDate) ? {} : { month: "long" }) })
+    const flagSameMonth = isSameMonth(dayOfWeekFirstDate, dayOfWeekLastDate)
+    const dayOfWeekLast = localizeDate(dayOfWeekLastDate, { day: "numeric", ...(flagSameMonth ? {} : { month: "long" }) })
     const batchSecondary = await batchSecond(
       today,
+      dayOfWeekFirstDate,
+      dayOfWeekLastDate,
       `📆 ${dayOfWeekFirst} – ${dayOfWeekLast}`,
       dateArray,
       preferredDateFormat,
       weeklyPageName,
       newBlockUuid,
       startOfWeek,
-      weekStartsOn
+      weekStartsOn,
+      monthlyPageName,
+      quarterlyPageName,
+      yearlyPageName,
+      flagSameMonth ? null : dayOfWeekLastDate
     )
-    if (batchSecondary.length > 0)
-      batch.push(...batchSecondary)
+
+    if (batchSecondary.length > 0) batch.push(...batchSecondary)
 
     setTimeout(() => {
       //その日のbatchをキャッシュとして保存
@@ -317,13 +323,19 @@ const generateContentForMainPageContent = async (
 // バッチの2つ目を生成
 const batchSecond = async (
   today: Date,
+  dayOfWeekFirstDate: Date,
+  dayOfWeekLastDate: Date,
   stringDateRange: string,
   dateArray: number[],
   preferredDateFormat: string,
   weeklyPageName: string,
   newBlockUuid: string,
   startOfWeek: Date,
-  weekStartsOn: 0 | 1
+  weekStartsOn: 0 | 1,
+  monthlyPageName: string,
+  quarterlyPageName: string,
+  yearlyPageName: string,
+  lastDateWhenincludeNextMonth: Date | null
 ) => {
   let batch: IBatchBlock[] = []
 
@@ -332,6 +344,11 @@ const batchSecond = async (
 
   // SCHEDULEDのブロックを追加
   if (logseq.settings![SettingKeys.showTasks] as string !== "false") {
+
+    // 今日の日付と比較して相対的な日付を求める (-14dのような形式にする)
+    const relativeDays = differenceInDays(today, dayOfWeekFirstDate) as number
+    const relativeDaysLast = differenceInDays(today, dayOfWeekLastDate) as number
+
     // dateArrayの日付リストを使って、SCHEDULEDのクエリーを設置
     batch.push({
       content: `## ${t("Tasks")}`,
@@ -339,127 +356,93 @@ const batchSecond = async (
       children: [
         // 今日のタスク
         {
-          content: `[:h3 "Today's tasks"]`,
-          children: [{
-            content: `
+          content: `
 #+BEGIN_QUERY
-{:title ["${localizeDate(today, { month: "long", day: "numeric" })}"]
- :query [:find (pull ?b [*])
-         :in $ ?today
-         :where
-         [?p :block/journal-day ?today]
-         [?b :block/page ?p]
-         [?b :block/marker ?marker]
-         [(contains? #{"TODO" "NOW" "DOING"} ?marker)]
-]
- :inputs [:today]
- :result-transform (fn [result] (sort-by (fn [r] (get r :block/marker)) result))
- :table-view? false
- :breadcrumb-show? false
- :collapsed? false
-}
+  {:title [[:h3 "Today's tasks"] ["${localizeDate(today, { month: "long", day: "numeric" })}"]]
+    :query [
+        :find (pull ?b [*])
+        :in $ ?today
+        :where
+          [?p :block/journal-day ?today]
+          [?b :block/page ?p]
+          [?b :block/marker ?marker]
+          [(contains? #{"TODO" "NOW" "DOING"} ?marker)]
+    ]
+  :inputs [:today]
+  :result-transform (fn [result] (sort-by (fn [r] (get r :block/marker)) result))
+  :table-view? false
+  :breadcrumb-show? false
+  :collapsed? ${logseq.settings![SettingKeys.showTodayTasks] === "collapsed" ? "true" : "false"}
+  }
 #+END_QUERY
               `,
-            ...(logseq.settings![SettingKeys.showTodayTasks] === "collapsed" ? { properties: { collapsed: true } } : {}),
-          }]
         },
         // 1週間分のスケジュール
         {
-          content: `[:h3 "Scheduled or deadline"]`,
-          children: [{
-            content: `
+          content: `
 #+BEGIN_QUERY
-{:title ["${stringDateRange}"] 
-      :query [:find (pull ?b [*])
-          :in $ ?start ?next
-          :where
+  {:title [[:h3 "Scheduled or deadline"] ["${stringDateRange}"]] 
+    :query [
+        :find (pull ?b [*])
+        :in $ ?start ?next
+        :where
           (or
             [?b :block/scheduled ?d]
             [?b :block/deadline ?d]
           )
           [(>= ?d ?start)]
           [(<= ?d ?next)]
-  ]
+      ]
   :result-transform (fn [result] (sort-by (fn [d] (get d :block/scheduled) ) result))
-  :inputs [:-7d :+2d]
-  :collapsed? false
-  :breadcrumb-show? false
+  :inputs [:${relativeDays}d :${relativeDaysLast}d]
   :table-view? false
-}
+  :breadcrumb-show? false
+    :collapsed? ${logseq.settings![SettingKeys.showScheduledTasks] === "collapsed" ? "true" : "false"}
+  }
 #+END_QUERY
               `,
-            ...(logseq.settings![SettingKeys.showScheduledTasks] === "collapsed" ? { properties: { collapsed: true } } : {}),
-          }]
         },
         // 未計画のTODO
         {
           content: `
 #+BEGIN_QUERY
-{:title [:h3 "☑ Unplanned"]
-:query [:find (pull ?b [*])
-:in $ ?day
-:where
-  [?p :block/journal-day ?d]
-  [(< ?d ?day)]
-  [?b :block/page ?p]
-  [?b :block/marker "TODO"]
-  (not [?b :block/scheduled _])
-]
-:result-transform (fn [result] (sort-by (fn [r] (get-in r [:block/page :block/journal-day])) result))
-:inputs [:today]
-:table-view? false
-:breadcrumb-show? false
-:collapsed? false
-}
+  {:title [[:h3 "☑ Unplanned"] ["${stringDateRange}"]]
+    :query [
+        :find (pull ?b [*])
+        :in $ ?start ?next
+        :where
+          [?p :block/journal-day ?d]
+          [(< ?d ?start)]
+          [(> ?d ?next)]
+          [?b :block/page ?p]
+          [?b :block/marker "TODO"]
+          (not [?b :block/scheduled _])
+    ]
+  :result-transform (fn [result] (sort-by (fn [r] (get-in r [:block/page :block/journal-day])) result))
+  :inputs [:${relativeDays}d :${relativeDaysLast}d]
+  :table-view? false
+  :breadcrumb-show? false
+  :collapsed? ${logseq.settings![SettingKeys.showUnplannedTasks] === "collapsed" ? "true" : "false"}
+  }
 #+END_QUERY
               `,
-          ...(logseq.settings![SettingKeys.showUnplannedTasks] === "collapsed" ? { properties: { collapsed: true } } : {}),
         }
       ]
     })
   } // end_if
 
 
-  // MonthlyとQuarte
-  // batchの最後尾に追加
-  if (logseq.settings!.showLinkedReferences as string !== "false") {
+  if (logseq.settings!.showLinkedReferences as string !== "false")
+    buildQuery(startOfWeek, weekStartsOn, dateArray, today, preferredDateFormat, weeklyPageName, monthlyPageName, quarterlyPageName, lastDateWhenincludeNextMonth, batch, stringDateRange)
 
-    const weeklyPageNameBefore = getWeeklyPageName(subDays(startOfWeek, 7), weekStartsOn)
-    const weeklyPageNameAfter = getWeeklyPageName(addDays(startOfWeek, 7), weekStartsOn)
 
-    // batchの最後尾に追加
-    batch.push({
-      content: `## ${t("Linked References")}`,
-      ...(logseq.settings![SettingKeys.showLinkedReferences] === "collapsed" ? { properties: { collapsed: true } } : {}),
-      children: [{
-        content:
-          // `{{query (and (or ${datesStr} [[${weeklyPageName}]]) (and (not [[${mainPageTitle}/${type}]]) (not [[${weeklyPageName}]]) ${datesStr2})))}}`
-          `
-#+BEGIN_QUERY
-{:title ["${stringDateRange} (+${t("Week number")})"]
- :query (and
-          (or ${dateArray.map((num) => {
-            const date = addDays(today, num)
-            return '"' + formatDate(date, preferredDateFormat) + '"'
-          }).join(" ")} "${weeklyPageNameBefore}" "${weeklyPageName}" "${weeklyPageNameAfter}")
-            (not (page "${mainPageTitle}"))
-          )
-:breadcrumb-show? false
-}
-#+END_QUERY
-            `
-      }]
-    })
-  }
-
-  //break
-  //} // end_switch
   // バッチを挿入
   await logseq.Editor.insertBatchBlock(newBlockUuid, batch, { before: true, sibling: true })
   return batch
 }
 
 
+// ページが存在しなかったらテンプレートを挿入する
 const checkAndPageTemplate = async (pageName: string, templateName: string | undefined) => {
   if (!templateName) return
   const isExist = await isPageFileExist(pageName) as boolean
@@ -472,6 +455,97 @@ const checkAndPageTemplate = async (pageName: string, templateName: string | und
     } else
       // テンプレートを適用できませんでした。
       logseq.UI.showMsg(t("Failed to apply template."), "warning", { timeout: 3000 })
-
   }
+}
+
+const buildQuery = (startOfWeek: Date, weekStartsOn: 0 | 1, dateArray: number[], today: Date, preferredDateFormat: string, weeklyPageName: string, monthlyPageName: string, quarterlyPageName: string, lastDateWhenincludeNextMonth: Date | null, batch: IBatchBlock[], stringDateRange: string) => {
+  const weeklyPageNameBefore = getWeeklyPageName(subDays(startOfWeek, 7), weekStartsOn)
+  const weeklyPageNameAfter = getWeeklyPageName(addDays(startOfWeek, 7), weekStartsOn)
+
+  // weekNumberFormatに基づく週番号フォーマットの種類
+  const userWeekNumberOptions = logseq.settings![SettingKeys.weekNumberOptions] as string
+  // 四半期のフォーマットを使用するかどうか
+  const flagUseQuarterly = userWeekNumberOptions === "YYYY/qqq/Www" || userWeekNumberOptions === "YYYY-qqq-Www"
+  // 区切り文字
+  const separator = userWeekNumberOptions.includes("/") ? "/" : "-"
+
+  // 日付参照の生成
+  const dateReferences = dateArray
+    .map(num => `"${formatDate(addDays(today, num), preferredDateFormat)}"`)
+    .join(" ")
+
+  // ページ参照の生成
+  const pageReferences = [
+    `"${weeklyPageNameBefore}"`,
+    `"${weeklyPageName}"`,
+    `"${weeklyPageNameAfter}"`,
+    `"${monthlyPageName}"`,
+    ...(flagUseQuarterly ? [
+      `"${quarterlyPageName}"`
+    ] : []),
+    // `"[[${yearlyPageName}]]"`,
+    // 次の月が含まれている場合の追加参照
+    ...(lastDateWhenincludeNextMonth ? (() => {
+      const nextMonthYear = format(lastDateWhenincludeNextMonth, 'yyyy')
+      const nextMonthMonth = format(lastDateWhenincludeNextMonth, 'MM')
+      const nextMonthQuarter = getWeeklyNumberFromDate(lastDateWhenincludeNextMonth, 0).quarter
+      const currentQuarter = getWeeklyNumberFromDate(today, 0).quarter
+      const currentYear = format(today, 'yyyy')
+
+      return [
+        // 月の参照
+        ...(separator === "-" ? [
+          `"${nextMonthYear}-${nextMonthMonth}"`
+        ] : [
+          `"${nextMonthYear}/${nextMonthMonth}"`
+        ]),
+        // 四半期の参照（flagUseQuarterlyがtrueの場合のみ、かつ異なる場合）
+        ...(flagUseQuarterly && nextMonthQuarter !== currentQuarter ? (
+          separator === "-" ? [
+            `"${nextMonthYear}-Q${nextMonthQuarter}"`
+          ] : [
+            `"${nextMonthYear}/Q${nextMonthQuarter}"`
+          ]
+        ) : []),
+        // 年の参照（異なる場合のみ）
+        // ...(nextMonthYear !== currentYear ? [
+        //   `"[[${nextMonthYear}]]"`
+        // ] : [])
+      ]
+    })() : [])
+  ].join(" ")
+
+  batch.push({
+    content: `## ${t("Linked References")}`,
+    children: [{
+      content: `
+#+BEGIN_QUERY
+  {:title ["${stringDateRange}"]
+    :query (and
+              (not (page "${mainPageTitle}"))
+              (or ${dateReferences})
+            )
+    :breadcrumb-show? false
+    :collapsed? ${logseq.settings![SettingKeys.showLinkedReferences] === "collapsed" ? "true" : "false"}
+  }
+#+END_QUERY
+        `,
+    },
+    {
+      // , ${t("Yearly")} Yearlyを入れると階層以下が含まれてしまう
+      content: `
+#+BEGIN_QUERY
+  {:title ["${t("Week number")}, ${t("Monthly")}, ${t("Quarterly")}"]
+    :query (and 
+              (not
+                  (page "${mainPageTitle}"))
+              (or ${pageReferences})
+            )
+    :breadcrumb-show? false
+    :collapsed? ${logseq.settings![SettingKeys.showLinkedReferences] === "collapsed" ? "true" : "false"}
+  }
+#+END_QUERY
+        `
+    }]
+  })
 }

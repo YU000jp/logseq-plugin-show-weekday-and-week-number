@@ -779,7 +779,7 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
   },
   {
     key: SettingKeys.showLinkedReferences,
-    title: "+ " + t("Show linked references section"),
+    title: "+ " + t("Show linked references query"),
     type: "enum",
     enumChoices: ["show", "collapsed", "false"],
     default: "Show",
@@ -793,8 +793,30 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     default: "Show",
     description: t("Reloading will reflect this."),
   },
-
-
+  {
+    key: SettingKeys.showTodayTasks,
+    title: "+ " + t("Show today tasks query"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
+  },
+  {
+    key: SettingKeys.showScheduledTasks,
+    title: "+ " + t("Show scheduled tasks query"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
+  },
+  {
+    key: SettingKeys.showUnplannedTasks,
+    title: "+ " + t("Show unplanned tasks query"),
+    type: "enum",
+    enumChoices: ["show", "collapsed", "false"],
+    default: "Show",
+    description: t("Reloading will reflect this."),
+  },
   {
     key: SettingKeys.headingDayTemplate,
     type: "heading",
