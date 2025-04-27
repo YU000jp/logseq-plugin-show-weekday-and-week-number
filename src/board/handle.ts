@@ -63,25 +63,26 @@ export const initializeBoard = () => {
   logseq.provideStyle(`
 #main-content-container {
     overflow-x: scroll;
-}
-#root div.cp__sidebar-main-content:has(div[id="${mainPageTitleLower}"]){
-    &:not(:has(div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block:nth-child(1)[data-collapsed~="{:db/id"])){
-        max-width: var(--ls-main-content-max-width-wide);
-        position: fixed;
-        top: 5em;
-        left: 530px;
-        overflow: scroll;
-        max-height: 90vh;
-        margin-right: 3em;
-    }
-    & :is(div.page-hierarchy, div.page-unlinked) {
-        display:none;
-    }
-    & div.ls-page-title span[data-ref="weekly-desk"] {
-        font-size: medium;
-    }
-    & div.ls-block[data-refs-self*='.thisweek'] {
-        display:none;
+    
+    & div.cp__sidebar-main-content:has(div[id="${mainPageTitleLower}"]){
+        &:not(:has(div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block:nth-child(1)[data-collapsed~="{:db/id"])){
+            max-width: var(--ls-main-content-max-width-wide);
+            position: fixed;
+            top: 5em;
+            left: 530px;
+            overflow: scroll;
+            max-height: 90vh;
+            margin-right: 3em;
+        }
+        & :is(div.page-hierarchy, div.page-unlinked) {
+            display:none;
+        }
+        & div.ls-page-title span[data-ref="weekly-desk"] {
+            font-size: medium;
+        }
+        & div.ls-block[data-refs-self*='.thisweek'] {
+            display:none;
+        }
     }
 }
 
@@ -97,22 +98,43 @@ div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-
         overflow:scroll;
         max-height: 90vh;
         z-index: 3;
+        & div.inline { 
+              overfllow: auto;
+              & div.embed.embed-page {
+                  font-size: 0.83em;
+                  width: max-content;
+                  min-width: 300px;
+                  min-height: 300px;
+                  max-height: 400px;
+                  overflow: auto;
+              }
+        }
     }
     &:not(:nth-child(1)) {
         width: auto;
         min-width:500px;
+        & div.inline { 
+              overfllow: auto;
+              & div.embed.embed-page {
+                  font-size: 0.86em;
+                  min-height: 300px;
+                  max-height: 800px;
+                  overflow: auto;
+              }
+        }
     }
     &:nth-last-child {
         clear: both;
     }
 }
 
-#root main.ls-left-sidebar-open div.cp__sidebar-main-content:has(div[id="${mainPageTitleLower}"]):not(:has(div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block:nth-child(1)[data-collapsed~="{:db/id"])){
-    left: calc(var(--ls-left-sidebar-width) + 530px);
-}
-
-#root main.ls-left-sidebar-open div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block:nth-child(1):not([data-refs="[]"]) {
-    left: calc(var(--ls-left-sidebar-width) + 0.2em);
+#root main.ls-left-sidebar-open {
+    & div.cp__sidebar-main-content:has(div[id="${mainPageTitleLower}"]):not(:has(div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block:nth-child(1)[data-collapsed~="{:db/id"])){
+        left: calc(var(--ls-left-sidebar-width) + 530px);
+    }
+    & div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block:nth-child(1):not([data-refs="[]"]) {
+        left: calc(var(--ls-left-sidebar-width) + 0.2em);
+    }
 }
     `)
 
