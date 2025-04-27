@@ -1,6 +1,6 @@
 import { BlockEntity, LSPluginBaseInfo, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
 import { t } from 'logseq-l10n'
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2' //https://sweetalert2.github.io/
 import { clearPageBlocks, removeAllElements } from '../lib/lib'
 import { getCurrentPageOriginalName, isPageExist } from '../lib/query/advancedQuery'
 import { SettingKeys } from '../settings/SettingKeys'
