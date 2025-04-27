@@ -377,21 +377,18 @@ const batchSecond = async (
 #+END_QUERY
               `,
         },
-        // 1週間分のスケジュール
+        // スケジュール
         {
           content: `
 #+BEGIN_QUERY
-  {:title [[:h3 "Scheduled or deadline"] ["${stringDateRange}"]] 
+  {:title [[:h3 "Scheduled"] ["${stringDateRange}"]] 
     :query [
         :find (pull ?b [*])
         :in $ ?start ?next
         :where
-          (or
             [?b :block/scheduled ?d]
-            [?b :block/deadline ?d]
-          )
-          [(>= ?d ?start)]
-          [(<= ?d ?next)]
+            [(>= ?d ?start)]
+            [(<= ?d ?next)]
       ]
   :result-transform (fn [result] (sort-by (fn [d] (get d :block/scheduled) ) result))
   :inputs [:${relativeDays}d :${relativeDaysLast}d]
@@ -401,6 +398,28 @@ const batchSecond = async (
   }
 #+END_QUERY
               `,
+        },
+        // 締め切り
+        {
+          content: `
+        #+BEGIN_QUERY
+          {:title [[:h3 "Deadline"] ["${stringDateRange}"]] 
+            :query [
+                :find (pull ?b [*])
+                :in $ ?start ?next
+                :where
+                    [?b :block/deadline ?d]
+                    [(>= ?d ?start)]
+                    [(<= ?d ?next)]
+              ]
+          :result-transform (fn [result] (sort-by (fn [d] (get d :block/scheduled) ) result))
+          :inputs [:${relativeDays}d :${relativeDaysLast}d]
+          :table-view? false
+          :breadcrumb-show? false
+            :collapsed? ${logseq.settings![SettingKeys.showScheduledTasks] === "collapsed" ? "true" : "false"}
+          }
+        #+END_QUERY
+                      `,
         },
         // 未計画のTODO
         {
@@ -490,7 +509,7 @@ const buildQuery = (startOfWeek: Date, weekStartsOn: 0 | 1, dateArray: number[],
       const nextMonthMonth = format(lastDateWhenincludeNextMonth, 'MM')
       const nextMonthQuarter = getWeeklyNumberFromDate(lastDateWhenincludeNextMonth, 0).quarter
       const currentQuarter = getWeeklyNumberFromDate(today, 0).quarter
-      const currentYear = format(today, 'yyyy')
+      //const currentYear = format(today, 'yyyy')
 
       return [
         // 月の参照
