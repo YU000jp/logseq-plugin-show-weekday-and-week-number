@@ -103,5 +103,7 @@ export const SettingKeys = {
   booleanWeeklyDesk: "booleanWeeklyDesk",
   booleanWeeklyDeskMonthly: "booleanWeeklyDeskMonthly",
   booleanWeeklyDeskQuarterly: "booleanWeeklyDeskQuarterly",
-  booleanWeeklyDeskYearly: "booleanWeeklyDeskYearly"
+  booleanWeeklyDeskYearly: "booleanWeeklyDeskYearly",
+  additionalTemplates: "additionalTemplates",
+  enableIconEachDayTemplate: "enableIconEachDayTemplate",
 }

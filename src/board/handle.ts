@@ -8,7 +8,7 @@ import { keyAnotherJournal, keyReloadButton, keySettingsButton, keyTemplateInser
 import { pageTemplate } from './embed/dayTemplates'
 import { generateEmbed } from './embed/generateBlock'
 import { registerLeftMenuItemsForBoard } from './leftMenuItems'
-import { registerPageBarButtonsForBoard } from './pageBarButtons'
+import { registerPageBarButtonsForBoard, updateTemplateInsertButton } from './pageBarButtons'
 
 // ページを開いたらフラグを立てたままにする
 let isOpeningPageName = ""
@@ -151,6 +151,12 @@ const settingsUpdateListener = () =>
       })
     }
 
+
+    // additionalTemplates が変更された場合
+    if (oldSet[SettingKeys.additionalTemplates] !== newSet[SettingKeys.additionalTemplates]) {
+      // ページバーのテンプレート挿入用ボタンを更新する
+      updateTemplateInsertButton()
+    }
   })
 
 // ボタン処理中フラグ
@@ -220,8 +226,12 @@ const model = () =>
 
         // select の value が空の場合は、テンプレートを挿入しない
         if (select.value !== "") {
-          const templateName = logseq.settings![SettingKeys[select.value + "Template"]] as string || ""
-          if (templateName !== "") {
+          // select.valueが sunday..saturday など曜日名のいずれかの場合
+          const templateName = (select.value === "sunday" || select.value === "monday" || select.value === "tuesday" || select.value === "wednesday" || select.value === "thursday" || select.value === "friday" || select.value === "saturday")
+            ? logseq.settings![SettingKeys[select.value + "Template"]] as string || ""
+            : select.value || ""
+          if (templateName !== ""
+            && await logseq.App.existTemplate(templateName)) {
             logseq.showMainUI()
             // 現在のページの名前を取得する
             const currentPageName = await getCurrentPageOriginalName() as PageEntity["original-name"] | null
@@ -260,7 +270,7 @@ const model = () =>
             }
             logseq.hideMainUI({ restoreEditingCursor: false })
           } else
-            logseq.UI.showMsg(t("Template not found") + " " + templateName, "info", { timeout: 5000 })
+            logseq.UI.showMsg(t("Template not found") + ": " + templateName, "info", { timeout: 5000 })
         }
 
         // selectの選択状態を解除する

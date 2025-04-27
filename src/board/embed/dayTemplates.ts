@@ -55,8 +55,8 @@ export const pageTemplate = async (templateName: string, pageName: string): Prom
     console.error("Failed to insert template" + " " + templateName)
     return false
   } else {
-    logseq.UI.showMsg(t("Template not found") + " " + templateName, "info", { timeout: 5000 })
-    console.error(t("Template not found") + " " + templateName)
+    logseq.UI.showMsg(t("Template not found") + ": " + templateName, "info", { timeout: 5000 })
+    console.error(t("Template not found") + ": " + templateName)
     return false
   }
 }

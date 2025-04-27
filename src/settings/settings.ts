@@ -862,4 +862,27 @@ export const settingsTemplate = (userLanguage): SettingSchemaDesc[] => [
     default: "",
     description: "",
   },
+  // textareaで追加のテンプレート名を複数入力する(改行で区切る)
+  {
+    key: SettingKeys.additionalTemplates,
+    title: t("Additional templates"),
+    type: "string",
+    default: "",
+    inputAs: "textarea",
+    // これらの項目は、ページバーのselectにのみ追加される
+    description: `
+    ${t("Input the template name (default is blank)")}
+    ${t("Separate by line breaks")}
+    ${t("The template name will be added to the select in the page bar.")}
+    `,
+  },
+  // テンプレート挿入アイコンを設置(ページバーのところに)
+  {
+    key: SettingKeys.enableIconEachDayTemplate,
+    title: t("Enable icon each day template (page bar icon)"),
+    type: "boolean",
+    default: false,
+    // プラグインを再起動したら、ページバーにアイコンが反映される
+    description: t("After restarting this plugin, the icon will be reflected in the page bar."),
+  },
 ]
