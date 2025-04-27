@@ -1,5 +1,6 @@
-import { LSPluginBaseInfo, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
+import { BlockEntity, LSPluginBaseInfo, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
 import { t } from 'logseq-l10n'
+import Swal from 'sweetalert2'
 import { clearPageBlocks, removeAllElements } from '../lib/lib'
 import { getCurrentPageOriginalName, isPageExist } from '../lib/query/advancedQuery'
 import { SettingKeys } from '../settings/SettingKeys'
@@ -221,16 +222,45 @@ const model = () =>
         if (select.value !== "") {
           const templateName = logseq.settings![SettingKeys[select.value + "Template"]] as string || ""
           if (templateName !== "") {
-            const result = await pageTemplate(templateName, select.value)
-            if (result) {
-              const currentPageName = await getCurrentPageOriginalName() as PageEntity["original-name"] | null
-              if (currentPageName) {
-                await pageTemplate(templateName, currentPageName as string)
-                logseq.UI.showMsg(t("The template inserted"), "info", { timeout: 5000 })
+            logseq.showMainUI()
+            // 現在のページの名前を取得する
+            const currentPageName = await getCurrentPageOriginalName() as PageEntity["original-name"] | null
+            if (currentPageName) {
+              // confirmでユーザーに確認してから実行
+              // ページのブロックをすべて削除し、テンプレートに置き換えます。
+              const userConfirm = await Swal.fire({
+                title: t("Are you sure you want to insert the template?"),
+                text: `
+                ${t("All blocks will be deleted and replaced with the template.")}
+                ${t("Current page name")}: [[${currentPageName}]]
+                ${t("Template name")}: ${templateName}
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: t("Yes"),
+                cancelButtonText: t("No"),
+                theme: "auto",
+              })
+              if (userConfirm.isConfirmed) {
+                await logseq.Editor.exitEditingMode(false) // 編集モードを終了する
+                // ページのブロックを取得する
+                const blocks = await logseq.Editor.getPageBlocksTree(currentPageName as string) as BlockEntity[] | null
+                if (blocks) {
+                  // ブロックを削除する
+                  for (const block of blocks)
+                    await logseq.Editor.removeBlock(block.uuid)
+                  await new Promise(resolve => setTimeout(resolve, 100))// 0.1秒待つ
+                  // テンプレートを挿入する
+                  const result = await pageTemplate(templateName, currentPageName as string)
+                  // テンプレートを挿入したことをユーザーに知らせる
+                  if (result)
+                    logseq.UI.showMsg(t("Template inserted"), "info", { timeout: 5000 })
+                }
               }
             }
+            logseq.hideMainUI({ restoreEditingCursor: false })
           } else
-            logseq.UI.showMsg(t("The template not found") + " " + templateName, "info", { timeout: 5000 })
+            logseq.UI.showMsg(t("Template not found") + " " + templateName, "info", { timeout: 5000 })
         }
 
         // selectの選択状態を解除する

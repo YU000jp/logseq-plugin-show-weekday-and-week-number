@@ -34,7 +34,7 @@ export const dayTemplates = (contentCheckTarget: { [key: string]: string[] }) =>
           }
         }
     if (templateInserted)
-      logseq.UI.showMsg(t("The template inserted"), "info", { timeout: 5000 })
+      logseq.UI.showMsg(t("Template inserted"), "info", { timeout: 5000 })
     processingCheckPage = false
   }, 1500)
 }
@@ -42,13 +42,21 @@ export const dayTemplates = (contentCheckTarget: { [key: string]: string[] }) =>
 // ページにテンプレートを挿入する
 export const pageTemplate = async (templateName: string, pageName: string): Promise<boolean> => {
   if (await logseq.App.existTemplate(templateName)) {
-    const newBlock = await logseq.Editor.prependBlockInPage(pageName, "") as { uuid: BlockEntity["uuid"] } | null
-    if (newBlock)
-      await logseq.App.insertTemplate(newBlock.uuid, templateName)
-
-    await new Promise(resolve => setTimeout(resolve, 500))
-    return true
-  } else
-    logseq.UI.showMsg(t("The template not found") + " " + templateName, "info", { timeout: 5000 })
-  return false
+    const tempBlock = await logseq.Editor.appendBlockInPage(pageName, "") as { uuid: BlockEntity["uuid"] } | null
+    if (tempBlock) {
+      const newBlock = await logseq.Editor.insertBlock(tempBlock.uuid, "", { before: false, sibling: true, focus: false })
+      if (newBlock) {
+        await logseq.App.insertTemplate(newBlock.uuid, templateName)
+        await new Promise(resolve => setTimeout(resolve, 500))
+        await logseq.Editor.removeBlock(tempBlock.uuid)
+        return true
+      }
+    }
+    console.error("Failed to insert template" + " " + templateName)
+    return false
+  } else {
+    logseq.UI.showMsg(t("Template not found") + " " + templateName, "info", { timeout: 5000 })
+    console.error(t("Template not found") + " " + templateName)
+    return false
+  }
 }
