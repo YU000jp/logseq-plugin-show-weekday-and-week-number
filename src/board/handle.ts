@@ -80,6 +80,9 @@ export const initializeBoard = () => {
     & div.ls-page-title span[data-ref="weekly-desk"] {
         font-size: medium;
     }
+    & div.ls-block[data-refs-self*='.thisweek'] {
+        display:none;
+    }
 }
 
 div[id="${mainPageTitleLower}"]>div.content>div.blocks-container>div>div>div.ls-block {
