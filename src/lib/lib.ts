@@ -132,12 +132,13 @@ export const createLinkMonthlyLink = (linkString: string, pageName: string, elem
 }
 
 export const openPageFromPageName = async (pageName: string, shiftKey: boolean) => {
-  const pageUuid = await isPageExistGetUuid(pageName) as PageEntity["uuid"] | null
-  if (pageUuid)
-    if (shiftKey === true)
+  if (shiftKey === true) {
+    const pageUuid = await isPageExistGetUuid(pageName) as PageEntity["uuid"] | null
+    if (pageUuid)
       logseq.Editor.openInRightSidebar(pageUuid) //ページが存在しない場合は開かない
-    else
-      logseq.App.pushState('page', { name: pageName })
+  }
+  else
+    logseq.App.pushState('page', { name: pageName })
 }
 
 export const removeProvideStyle = (className: string) => {
