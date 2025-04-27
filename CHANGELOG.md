@@ -1,3 +1,10 @@
+## [1.61.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.61.0...v1.61.1) (2025-04-27)
+
+
+### Bug Fixes
+
+* **bug:** Cannot open the page ([9feaa5d](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/9feaa5daad4d56a812f73f7d5aa74f819d148ac3))
+
 # [1.61.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.60.4...v1.61.0) (2025-04-27)
 
 
