@@ -1,3 +1,15 @@
+# [1.63.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.62.0...v1.63.0) (2025-04-27)
+
+
+### Bug Fixes
+
+* **big:** Weekly Desk: query date range [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([238c373](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/238c37389b2bd042ff5bec21089b9c30993571ae))
+
+
+### Features
+
+* Weekly-Desk: Adjusting the size of embeds [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([91e2666](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/91e266604b78ab7e26f1e5ce1435803b45122adb))
+
 # [1.62.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.61.1...v1.62.0) (2025-04-27)
 
 
