@@ -24,7 +24,8 @@
         "date-fns": "^4.1.0",
         "date-holidays": "^3.24.2",
         "logseq-l10n": "^0.2.0",
-        "lunar-typescript": "^1.7.9"
+        "lunar-typescript": "^1.7.9",
+        "sweetalert2": "^11.19.1"
     },
     "devDependencies": {
         "@semantic-release/changelog": "^6.0.3",
