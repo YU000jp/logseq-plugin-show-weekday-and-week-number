@@ -1,3 +1,17 @@
+# [1.61.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.60.4...v1.61.0) (2025-04-27)
+
+
+### Bug Fixes
+
+* **bug:** For a bug that prevents the monthly page from opening [#156](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/156) ([fa8b8c7](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/fa8b8c77e486d821865691414ab15fa91c1071b6))
+
+
+### Features
+
+* **Add:** Each day template [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([456992e](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/456992ea6025efadbe74365210cd822f7d2396f9))
+* **Another Journal:** prototype [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([ece3b24](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/ece3b24d7429993bb72c57347539d7e221d52751))
+* **Quarterly Journal:** Allow custom date format for all the journals [#157](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/157) ([0905d5f](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/0905d5f2e9b7115ae951ea5744518661cecc1d57))
+
 ## [1.60.4](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.60.3...v1.60.4) (2025-04-13)
 
 
