@@ -431,8 +431,8 @@ const batchSecond = async (
         :in $ ?start ?next
         :where
           [?p :block/journal-day ?d]
-          [(< ?d ?start)]
-          [(> ?d ?next)]
+          [(<= ?d ?start)]
+          [(>= ?d ?next)]
           [?b :block/page ?p]
           [?b :block/marker "TODO"]
           (not [?b :block/scheduled _])
