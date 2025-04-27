@@ -7,7 +7,7 @@ import { clearBlocks, getRelativeDateString, getWeeklyNumberFromDate, getWeeklyN
 import { getPageBlocks, isPageFileExist } from "../../lib/query/advancedQuery"
 import { SettingKeys } from "../../settings/SettingKeys"
 import { mainPageTitle, mainPageTitleLower } from "../constant"
-import { dayTemplates } from "./dayTemplates"
+import { dayTemplates, pageTemplate } from "./dayTemplates"
 
 
 
@@ -120,6 +120,10 @@ const generateContentForMainPageContent = async (
       },
     )
 
+    setTimeout(async () => {
+      // 週番号ページのファイルが存在するかどうかチェックし、ページが存在しなかったらテンプレートを挿入する
+      await checkAndPageTemplate(weeklyPageName, logseq.settings![SettingKeys.weeklyJournalTemplateName] as string | undefined)
+    }, 50)
 
     if (logseq.settings![SettingKeys.show7days] as string !== "false") {
       // const weekFirstDate = getWeekStartFromWeekNumber(year, Number(weekString), weekStartsOn, isIso ? true : false) as Date
@@ -207,23 +211,28 @@ const generateContentForMainPageContent = async (
         })
       })
 
+      const monthlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-Www" ? `${year}-${month}`
+        : `${year}/${month}`}`
+      const quarterlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-qqq-Www" ? `${year}-Q${quarter}`
+        : `${year}/Q${quarter}`}`
+      const yearlyPageName = `${year}`
+
       // 月、四半期、年のブロックを追加
       children.push(
         {
           content: `#### ${t("Monthly")}`,
           children: [
             {
-              content: `{{embed [[${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-Www" ? `${year}-${month}`
-                : `${year}/${month}`}]]}}`,
+              content: `{{embed [[${monthlyPageName}]]}}`,
               ...(logseq.settings![SettingKeys.booleanWeeklyDeskMonthly] ? { properties: { collapsed: true } } : {}),
             },
           ],
         },
-        ...(logseq.settings![SettingKeys.weekNumberOptions] === "YYYY/qqq/Www" ? [{
+        ...(logseq.settings![SettingKeys.weekNumberOptions] === "YYYY/qqq/Www" || logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-qqq-Www" ? [{
           content: `#### ${t("Quarterly")}`,
           children: [
             {
-              content: `{{embed [[${year}/Q${quarter}]]}}`,
+              content: `{{embed [[${quarterlyPageName}]]}}`,
               ...(logseq.settings![SettingKeys.booleanWeeklyDeskQuarterly] ? { properties: { collapsed: true } } : {}),
             }
           ],
@@ -232,12 +241,21 @@ const generateContentForMainPageContent = async (
           content: `#### ${t("Yearly")}`,
           children: [
             {
-              content: `{{embed [[${year}]]}}`,
+              content: `{{embed [[${yearlyPageName}]]}}`,
               ...(logseq.settings![SettingKeys.booleanWeeklyDeskYearly] ? { properties: { collapsed: true } } : {}),
             }
           ],
         },
       )
+
+      setTimeout(async () => {
+        // 年ページのファイルが存在するかどうかチェックし、ページが存在しなかったらテンプレートを挿入する
+        await checkAndPageTemplate(yearlyPageName, logseq.settings![SettingKeys.yearlyJournalTemplateName] as string | undefined)
+        // 月ページのファイルが存在するかどうかチェックし、ページが存在しなかったらテンプレートを挿入する
+        await checkAndPageTemplate(monthlyPageName, logseq.settings![SettingKeys.monthlyJournalTemplateName] as string | undefined)
+        // 四半期ページのファイルが存在するかどうかチェックし、ページが存在しなかったらテンプレートを挿入する
+        await checkAndPageTemplate(quarterlyPageName, logseq.settings![SettingKeys.quarterlyJournalTemplateName] as string | undefined)
+      }, 300)
 
       // batchの先頭に追加 
       batch.unshift({
@@ -441,3 +459,19 @@ const batchSecond = async (
   return batch
 }
 
+
+const checkAndPageTemplate = async (pageName: string, templateName: string | undefined) => {
+  if (!templateName) return
+  const isExist = await isPageFileExist(pageName) as boolean
+  if (isExist === false) { // ページが存在しなかったらテンプレートを挿入する
+    const result = await pageTemplate(templateName, pageName) as boolean
+    // ユーザー通知
+    if (result) {
+      //  ページが存在しなかったので、テンプレートを適用します。
+      logseq.UI.showMsg(t("Page does not exist. Apply template."), "info", { timeout: 3000 })
+    } else
+      // テンプレートを適用できませんでした。
+      logseq.UI.showMsg(t("Failed to apply template."), "warning", { timeout: 3000 })
+
+  }
+}
