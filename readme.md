@@ -1,13 +1,10 @@
 # Logseq Plugin: *Show weekday and week-number* 📆
 
 - Enhance journal functions of Logseq
-  1. Show weekday and week number beside journal titles.
-  1. **Monthly Calendar** in left sidebar or **2 lines mini-Calendar**
-  1. Breadcrumb of journal links
-     - "Weekly Journal" feature..etc
 
-> [!WARNING]
-This plugin does not work with Logseq db version now.
+> [!NOTE]
+> - This plugin does NOT work with Logseq db version
+> - Compatible with: Logseq v0.9.x (File system version)
 
 <div align="right">
 
@@ -15,14 +12,38 @@ This plugin does not work with Logseq db version now.
 [![Downloads](https://img.shields.io/github/downloads/YU000jp/logseq-plugin-show-weekday-and-week-number/total.svg)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/releases) Published 20230526 <a href="https://www.buymeacoffee.com/yu000japan"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a pizza&emoji=🍕&slug=yu000japan&button_colour=FFDD00&font_colour=000000&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff" /></a>
 </div>
 
-## Feature Options
+## 🎯 Key Features
 
-### Daily Journal Details
+### 🗓️ Enhanced Daily Journals
+- Display weekday and week numbers beside date titles
+- Fully customizable display options in plugin settings
 
-> From: https://discuss.logseq.com/t/show-week-day-and-week-number/12685/1
-- The week number for that week will be generated. Like below
-  1. ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/f47b8948-5e7a-4e16-a5ae-6966672742b1)
-  1. ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/ee97c455-714e-45d2-9f9f-905798e298b4)
+### 📅 Smart Calendar
+- **2-line Mini Calendar**: Compact and efficient design
+   - Easy week switching with `↑`/`↓` keys
+   - Direct links to Monthly Journal (`[[2024/05]]`) and Weekly Journal (`[[2024/Q2/W19]]`)
+- **Monthly Calendar** (left sidebar) 🆕
+   - Holiday highlighting support
+   - Page existence indicator
+
+### 📖 Extended Journal Features
+- **Weekly/Monthly/Quarterly/Yearly Journals** with automatic template application
+- **Navigation Breadcrumb** for easy journal access 🆕
+
+### 🛠️ Customizable Display Options
+- Flexible configuration for weekday and week number displays
+- Slash commands for quick week number insertion
+   > [Details here](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Slash-Command)
+
+---
+
+### 📌 Detailed Feature Descriptions
+
+#### Daily Journal Details
+- Display weekday and week numbers beside date titles
+- Example:
+
+   ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/f47b8948-5e7a-4e16-a5ae-6966672742b1)
 
 ### Journal Boundaries Calendar 🗓️
 
@@ -70,12 +91,19 @@ Sample:
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-Install from Logseq Marketplace
-  - Press [`---`] on the top right toolbar to open [`Plugins`]. Select `Marketplace`. Type `Show` in the search field, select it from the search results and install.
+### 1. Installation
+- Via Logseq Marketplace
+- Search for: `Show weekday`
 
-   ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/1cecf136-0843-43c9-a315-ba96eb9b34f3)
+### 2. Initial Setup and Settings (Important)
+1. Select week number format in plugin settings:
+   - Choose either `US format` or `ISO format`
+   > [Details about week number format](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Week-number-format)
+2. Optional Settings:
+   - Enable/disable features as needed
+   - Customize display options in plugin settings
 
 ### Usage
 
