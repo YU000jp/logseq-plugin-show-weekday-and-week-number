@@ -81,7 +81,7 @@ Sample:
 
 ### Quarterly Journal / Yearly Journal 🆕
 
-> Note: Quartely Journal is only valid if the page title format for Weekly Journal is set to `yyyy/qqq/Www`.
+> Note: Quartely Journal is only valid if the page title format for Weekly Journal is set to `yyyy/qqq/Www` or `yyyy-qqq-Www`.
 - Access from the hierarchical link of the Monthly or Weekly journal. The page will be generated and the template will be applied.
 
 ### Slash Command for week-number
