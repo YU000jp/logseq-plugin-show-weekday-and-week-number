@@ -15,8 +15,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 ## 🎯 What This Plugin Does
 
 ### 1️⃣ Enhanced Daily Journals
-- Adds weekday and week numbers to your dates (e.g., January 1, 2024 (Mon) W1)
-- Fully customizable display format
+- The weekday and week number are displayed next to the date. The display content is fully customizable to suit your preferences.
 
 ### 2️⃣ Smart Calendar Features
 - **Compact 2-line Calendar**
