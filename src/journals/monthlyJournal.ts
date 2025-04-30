@@ -3,8 +3,8 @@ import { startOfMonth } from 'date-fns'; //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { refreshCalendar } from '../calendar/left-calendar'
 import { monthlyJournalCreateNav } from './nav'
-import { callMiniCalendar } from './weeklyJournal'
 import { journalInsertTemplate } from './utils'
+import { callMiniCalendar } from './weeklyJournal'
 
 
 let processingMonthlyJournal: boolean = false

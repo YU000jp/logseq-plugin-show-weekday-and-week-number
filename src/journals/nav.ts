@@ -1,4 +1,4 @@
-import { addMonths, addWeeks, eachDayOfInterval, format, getWeeksInMonth, isSameMonth, subMonths, subWeeks } from "date-fns"
+import { addWeeks, eachDayOfInterval, format, getWeeksInMonth, isSameMonth, subWeeks } from "date-fns"
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat } from ".."
 import { getWeeklyNumberFromDate, localizeDayOfWeekDayString, localizeMonthString, openPageFromPageName } from "../lib/lib"

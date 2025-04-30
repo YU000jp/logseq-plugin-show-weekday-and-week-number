@@ -1,10 +1,10 @@
-import { BlockUUID, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday, isToday, isWednesday, startOfISOWeek, startOfWeek } from 'date-fns' //https://date-fns.org/
+import { PageEntity } from '@logseq/libs/dist/LSPlugin.user'
+import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday, isToday, isWednesday, startOfISOWeek, startOfWeek } from 'date-fns'; //https://date-fns.org/
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
 import { holidaysWorld, lunarString } from '../lib/holidays'
 import { DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor } from '../lib/lib'
-import { advancedQuery, getCurrentPageJournalDay, doesPageExist, doesPageFileExist, queryCodeGetFileFromOriginalName, findPageUuid } from '../lib/query/advancedQuery'
+import { doesPageExist, doesPageFileExist, findPageUuid, getCurrentPageJournalDay } from '../lib/query/advancedQuery'
 
 
 let processingFoundBoundaries: boolean = false
