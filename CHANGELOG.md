@@ -1,3 +1,10 @@
+## [1.63.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.0...v1.63.1) (2025-04-30)
+
+
+### Performance Improvements
+
+* **ref:** Improved processing performance through the use of queries ([113e3e3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/113e3e367ad4f9be0521f31850f959142c0d2ac5))
+
 # [1.63.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.62.0...v1.63.0) (2025-04-27)
 
 
