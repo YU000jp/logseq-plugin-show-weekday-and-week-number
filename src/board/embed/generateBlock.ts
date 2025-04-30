@@ -4,7 +4,7 @@ import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat } from "../.."
 import { getHolidays } from "../../lib/holidays"
 import { clearBlocks, getRelativeDateString, getWeeklyNumberFromDate, getWeeklyNumberString, getWeekStartFromWeekNumber, getWeekStartOn, hideElementBySelector, localizeDate } from '../../lib/lib'
-import { getPageBlocks, isPageFileExist } from "../../lib/query/advancedQuery"
+import { doesPageFileExist, getPageBlocks } from "../../lib/query/advancedQuery"
 import { SettingKeys } from "../../settings/SettingKeys"
 import { mainPageTitle, mainPageTitleLower } from "../constant"
 import { dayTemplates, pageTemplate } from "./dayTemplates"
@@ -196,7 +196,7 @@ const generateContentForMainPageContent = async (
             block.children = [{ content: `{{embed [[${dateFormatString}]]}}` }]
           else
             if (logseq.settings![SettingKeys.show7daysNotExist] as string === "Put those links") {
-              if (await isPageFileExist(dateFormatString))
+              if (await doesPageFileExist(dateFormatString))
                 block.children = [{ content: `{{embed [[${dateFormatString}]]}}` }]
               else
                 block.children = [{ content: `[[${dateFormatString}]]` }]
@@ -335,7 +335,7 @@ const batchSecond = async (
   monthlyPageName: string,
   quarterlyPageName: string,
   yearlyPageName: string,
-  lastDateWhenincludeNextMonth: Date | null
+  lastDateWhenNextMonth: Date | null
 ) => {
   let batch: IBatchBlock[] = []
 
@@ -452,7 +452,7 @@ const batchSecond = async (
 
 
   if (logseq.settings!.showLinkedReferences as string !== "false")
-    buildQuery(startOfWeek, weekStartsOn, dateArray, today, preferredDateFormat, weeklyPageName, monthlyPageName, quarterlyPageName, lastDateWhenincludeNextMonth, batch, stringDateRange)
+    buildQuery(startOfWeek, weekStartsOn, dateArray, today, preferredDateFormat, weeklyPageName, monthlyPageName, quarterlyPageName, lastDateWhenNextMonth, batch, stringDateRange)
 
 
   // バッチを挿入
@@ -464,7 +464,7 @@ const batchSecond = async (
 // ページが存在しなかったらテンプレートを挿入する
 const checkAndPageTemplate = async (pageName: string, templateName: string | undefined) => {
   if (!templateName) return
-  const isExist = await isPageFileExist(pageName) as boolean
+  const isExist = await doesPageFileExist(pageName) as boolean
   if (isExist === false) { // ページが存在しなかったらテンプレートを挿入する
     const result = await pageTemplate(templateName, pageName) as boolean
     // ユーザー通知

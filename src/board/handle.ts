@@ -2,7 +2,7 @@ import { BlockEntity, LSPluginBaseInfo, PageEntity } from '@logseq/libs/dist/LSP
 import { t } from 'logseq-l10n'
 import Swal from 'sweetalert2' //https://sweetalert2.github.io/
 import { clearPageBlocks, removeAllElements } from '../lib/lib'
-import { getCurrentPageOriginalName, isPageExist } from '../lib/query/advancedQuery'
+import { getCurrentPageOriginalName, doesPageExist } from '../lib/query/advancedQuery'
 import { SettingKeys } from '../settings/SettingKeys'
 import { keyAnotherJournal, keyReloadButton, keySettingsButton, keyTemplateInsertButton, keyTemplateInsertSelect, keyToolbar, mainPageTitle, mainPageTitleLower, shortKey } from './constant'
 import { pageTemplate } from './embed/dayTemplates'
@@ -195,7 +195,7 @@ const model = () =>
       if (processingButton) return
       processingButton = true
       setTimeout(() => processingButton = false, 100)
-      if (await isPageExist(mainPageTitle) as boolean)
+      if (await doesPageExist(mainPageTitle) as boolean)
         logseq.App.pushState('page', { name: mainPageTitle })// ページを開く
       else {
         await logseq.Editor.createPage(mainPageTitle, { public: false }, { createFirstBlock: false })

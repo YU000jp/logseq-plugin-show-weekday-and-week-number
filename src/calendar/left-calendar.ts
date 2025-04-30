@@ -1,13 +1,13 @@
-import { LSPluginBaseInfo, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { LSPluginBaseInfo } from "@logseq/libs/dist/LSPlugin.user"
 import { addDays, Day, eachDayOfInterval, getISOWeek, getWeek, isSameDay, isSameISOWeek, isSameMonth, isSameWeek, isSameYear, isToday, startOfISOWeek, startOfMonth, startOfWeek } from "date-fns"
 import { format } from "date-fns/format"
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage, pluginName } from ".."
 import { holidaysWorld, lunarString } from "../lib/holidays"
 import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, removeElementById, userColor } from "../lib/lib"
+import { doesPageExist } from "../lib/query/advancedQuery"
 import { isEssentialSettingsAltered } from "../settings/onSettingsChanged"
 import { openPageToSingleDay } from "./boundaries"
-import { advancedQuery, isPageExist, queryCodeGetUuidFromOriginalName } from "../lib/query/advancedQuery"
 
 export const keyLeftCalendarContainer = "left-calendar-container"
 
@@ -264,7 +264,7 @@ export const createCalendar = async (targetDate: Date, preferredDateFormat: stri
                 if (logseq.settings!.booleanWeeklyJournal === true) {
                     weekNumberCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(pageName, shiftKey))
                     weekNumberCell.classList.add("cursor")
-                    if (await isPageExist(pageName) as boolean)
+                    if (await doesPageExist(pageName) as boolean)
                         weekNumberCell.style.textDecoration = "underline"
                     weekNumberCell.title = pageName
                 }
@@ -355,7 +355,7 @@ const checkDay = async (dayDate: Date, month: number, dayCell: HTMLElement, pref
         setTimeout(async () => {
             const pageName = format(dayDate, preferredDateFormat)
             if (pageName)
-                if (await isPageExist(pageName) as boolean)
+                if (await doesPageExist(pageName) as boolean)
                     dayCell.style.textDecoration = "underline"
         }, 1)
 

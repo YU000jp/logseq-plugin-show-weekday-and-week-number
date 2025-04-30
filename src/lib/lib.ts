@@ -3,7 +3,7 @@ import { addDays, addWeeks, format, getISOWeek, getISOWeekYear, getWeek, getWeek
 import { t } from "logseq-l10n"
 import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
 import { SettingKeys } from "../settings/SettingKeys"
-import { getPageBlocks, isPageExist, isPageExistGetUuid } from "./query/advancedQuery"
+import { getPageBlocks, doesPageExist, findPageUuid } from "./query/advancedQuery"
 
 
 export const shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as DayShortCode[]
@@ -133,7 +133,7 @@ export const createLinkMonthlyLink = (linkString: string, pageName: string, elem
 
 export const openPageFromPageName = async (pageName: string, shiftKey: boolean) => {
   if (shiftKey === true) {
-    const pageUuid = await isPageExistGetUuid(pageName) as PageEntity["uuid"] | null
+    const pageUuid = await findPageUuid(pageName) as PageEntity["uuid"] | null
     if (pageUuid)
       logseq.Editor.openInRightSidebar(pageUuid) //ページが存在しない場合は開かない
   }

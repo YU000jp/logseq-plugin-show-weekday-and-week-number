@@ -1,11 +1,12 @@
-import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, subDays, subWeeks } from 'date-fns'; //https://date-fns.org/
+import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
+import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib/lib'
 import { weeklyJournalCreateNav } from './nav'
-import CSSThisWeekPopup from "./weeklyEmbed.css?inline"; //CSSをインラインで読み込む
+import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
+import { findPageUuid } from '../lib/query/advancedQuery'
 let processingFoundBoundaries: boolean = false
 let processingWeeklyJournal: boolean = false
 export const keyThisWeekPopup = "weeklyEmbed"
@@ -73,22 +74,17 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
         }, 300)
 
     // もしページが存在しなかったら作成する
-    const pageEntity = await logseq.Editor.getPage(
-        match[0],
-        { includeChildren: true }) as {
-            title: string,
-            uuid: BlockEntity["uuid"]
-        } | null
-    if (pageEntity) {
+    const pageUuid = await findPageUuid(match[0]) as PageEntity["uuid"] | null
+    if (pageUuid) {
         // ページが存在した場合
-        const pageBlockTree = await logseq.Editor.getPageBlocksTree(pageEntity.uuid) as { content: BlockEntity["content"] }[] | null
+        const pageBlockTree = await logseq.Editor.getPageBlocksTree(pageUuid) as { content: BlockEntity["content"] }[] | null
         if (pageBlockTree) {
             //コンテンツがある場合は処理を中断する
             if (pageBlockTree.find((block) => block.content !== null)) // block.contentが空ではないブロックがひとつでもあったら処理を中断する
                 return
 
             await new Promise(async (resolve) => {
-                await weeklyJournalCreateContent(weekStart, weekEnd, pageEntity.uuid)
+                await weeklyJournalCreateContent(weekStart, weekEnd, pageUuid)
                 resolve("Done")
             })
         }

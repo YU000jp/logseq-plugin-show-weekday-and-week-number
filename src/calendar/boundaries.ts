@@ -4,7 +4,7 @@ import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
 import { holidaysWorld, lunarString } from '../lib/holidays'
 import { DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor } from '../lib/lib'
-import { advancedQuery, isPageExist, isPageFileExist, queryCodeGetFileFromOriginalName } from '../lib/query/advancedQuery'
+import { advancedQuery, getCurrentPageJournalDay, doesPageExist, doesPageFileExist, queryCodeGetFileFromOriginalName, findPageUuid } from '../lib/query/advancedQuery'
 
 
 let processingFoundBoundaries: boolean = false
@@ -68,7 +68,7 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
       targetDate = today
     else
       if (targetElementName === 'is-journals') {
-        const { journalDay } = await logseq.Editor.getCurrentPage() as { journalDay: PageEntity["journalDay"] }
+        const journalDay = await getCurrentPageJournalDay() as PageEntity["journalDay"] | null
         if (!journalDay) {
           console.error('journalDay is undefined')
           processingFoundBoundaries = false
@@ -276,7 +276,7 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
 
 // 日誌のページが存在するかどうかのインディケーターを表示する
 const indicator = async (targetPageName: string, dayOfMonthElement: HTMLSpanElement) => {
-  if (await isPageFileExist(targetPageName) === true) {
+  if (await doesPageFileExist(targetPageName) === true) {
     const indicatorElement = createElementWithClass('span', 'indicator')
     indicatorElement.innerText = "●"
     indicatorElement.title = t("Page exists")
@@ -314,14 +314,14 @@ const getWeekOffsetDays = (flagShowNextWeek: boolean): number[] =>
 export function openPageToSingleDay(pageName: string): (this: HTMLSpanElement, ev: MouseEvent) => any {
   return async (event) => {
     if (event.shiftKey) {//Shiftキーを押しながらクリックした場合は、サイドバーでページを開く
-      const page = await logseq.Editor.getPage(pageName, { includeChildren: false }) as { uuid: BlockUUID } | null
-      if (page)
-        logseq.Editor.openInRightSidebar(page.uuid)//ページが存在しない場合は開かない
+      const pageUuid = await findPageUuid(pageName) as PageEntity["uuid"] | null
+      if (pageUuid)
+        logseq.Editor.openInRightSidebar(pageUuid)//ページが存在しない場合は開かない
     } else
       //Shiftキーを押さずにクリックした場合は、ページを開く
       if (logseq.settings!.booleanNoPageFoundCreatePage === true)
         //ページが存在しない場合は作成しない
-        if (await isPageExist(pageName) as boolean)
+        if (await doesPageExist(pageName) as boolean)
           logseq.App.pushState('page', { name: pageName })//ページが存在する場合は開く
         else
           logseq.UI.showMsg(t("Page not found"), "warning", { timeout: 3000 })//ページが存在しない場合は警告を表示する

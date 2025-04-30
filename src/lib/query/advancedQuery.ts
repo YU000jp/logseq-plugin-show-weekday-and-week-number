@@ -34,17 +34,17 @@ export const queryCodeGetJournalDayFromOriginalName = createBaseQuery("journal-d
 export const queryCodeGetFileFromOriginalName = createBaseQuery("file")
 export const queryCodeGetUuidFromOriginalName = createBaseQuery("uuid")
 
-export const isPageExist = async (pageName: string): Promise<boolean> => {
+export const doesPageExist = async (pageName: string): Promise<boolean> => {
   const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(queryCodeGetUuidFromOriginalName, `"${pageName}"`)
   return !!result?.[0]?.uuid
 }
 
-export const isPageExistGetUuid = async (pageName: string): Promise<PageEntity["uuid"] | null> => {
+export const findPageUuid = async (pageName: string): Promise<PageEntity["uuid"] | null> => {
   const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(queryCodeGetUuidFromOriginalName, `"${pageName}"`)
   return result?.[0]?.uuid ?? null
 }
 
-export const isPageFileExist = async (pageName: string): Promise<boolean> => {
+export const doesPageFileExist = async (pageName: string): Promise<boolean> => {
   const result = await advancedQuery<{ file: PageEntity["file"] }[]>(queryCodeGetFileFromOriginalName, `"${pageName}"`)
   return !!result?.[0]?.file
 }
@@ -74,3 +74,31 @@ export const getCurrentPageOriginalName = async (): Promise<PageEntity["original
   const result = await advancedQuery<{ originalName: PageEntity["original-name"] }[]>(query, ":current-page")
   return result?.[0]?.["original-name"] ?? null
 }
+
+
+export const getCurrentPageJournalDay = async (): Promise<PageEntity["journalDay"] | null> => {
+  const query = `
+    [:find (pull ?p [:block/journal-day])
+     :in $ ?current
+     :where
+     [?p :block/name ?name]
+     [(= ?name ?current)]
+     [?p :block/journal-day ?journal]]
+  `
+  const result = await advancedQuery<{ "journal-day": PageEntity["journalDay"] }[]>(query, ":current-page")
+  return result?.[0]?.["journal-day"] ?? null
+}
+
+export const getCurrentPageUuid = async (): Promise< PageEntity["uuid"] | null> => {
+  const query = `
+    [:find (pull ?p [:block/uuid])
+     :in $ ?current
+     :where
+     [?p :block/name ?name]
+     [(= ?name ?current)]
+     [?p :block/uuid ?uuid]]
+  `
+  const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(query, ":current-page")
+  return result?.[0]?.uuid ?? null
+}
+

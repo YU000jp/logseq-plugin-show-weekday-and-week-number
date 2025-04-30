@@ -1,15 +1,18 @@
-import "@logseq/libs" //https://plugins-doc.logseq.com/
-import { EntityID, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { setup as l10nSetup, t } from "logseq-l10n" //https://github.com/sethyuan/logseq-l10n
+import "@logseq/libs"; //https://plugins-doc.logseq.com/
+import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { setup as l10nSetup, t } from "logseq-l10n"; //https://github.com/sethyuan/logseq-l10n
+import { shortKey } from "./board/constant"
+import { initializeBoard } from "./board/handle"
 import { boundariesProcess, removeBoundaries } from "./calendar/boundaries"
 import { keyLeftCalendarContainer, loadLeftCalendar, refreshCalendarCheckSameMonth } from "./calendar/left-calendar"
 import { dailyJournalDetails, observer, observerMain, removeTitleQuery } from "./dailyJournalDetails"
-import { getHolidaysBundle } from "./lib/holidays"
 import { currentPageIsMonthlyJournal } from "./journals/monthlyJournal"
 import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal, weeklyEmbed } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
+import { getHolidaysBundle } from "./lib/holidays"
 import { getDateFromJournalDay, removeAllElements, removeElementById } from "./lib/lib"
+import { advancedQuery, getCurrentPageUuid, queryCodeGetJournalDayFromOriginalName } from "./lib/query/advancedQuery"
 import fileMainCSS from "./main.css?inline"
 import { mapLanguageCodeToCountry } from "./settings/languageCountry"
 import { notice } from "./settings/notice"
@@ -35,9 +38,6 @@ import tr from "./translations/tr.json"
 import uk from "./translations/uk.json"
 import zhCN from "./translations/zh-CN.json"
 import zhHant from "./translations/zh-Hant.json"
-import { advancedQuery, queryCodeGetJournalDayFromOriginalName } from "./lib/query/advancedQuery"
-import { initializeBoard } from "./board/handle"
-import { shortKey } from "./board/constant"
 
 // プラグイン名(小文字タイプ)
 export const pluginNameCut = "show-weekday-and-week-number"
@@ -171,7 +171,7 @@ const main = async () => {
       && logseq.settings!.booleanBoundaries === true) {
       const weekBoundaries = parent.document.getElementById("weekBoundaries") as HTMLDivElement | null
       if (weekBoundaries) weekBoundaries.remove()
-      if ((await logseq.Editor.getCurrentPage() as { id: EntityID } | null) !== null)
+      if (await getCurrentPageUuid())
         //page only
         //div.is-journals
         setTimeout(() => invokeBoundaryHandler("is-journals"), 10)
@@ -206,7 +206,7 @@ const main = async () => {
   // ボード機能のセットアップ
   // メニュー用のボタンを設置する
   initializeBoard()//ページ読み込み時に実行コールバック
- 
+
 
 
   // プラグインオフ時に実行
@@ -223,7 +223,7 @@ const main = async () => {
 
     // Left Calendarのcontainerを取り除く
     removeElementById(keyLeftCalendarContainer)
-    
+
     // ボード機能のメニューを取り除く
     removeAllElements(`.${shortKey}--nav-header`)
 

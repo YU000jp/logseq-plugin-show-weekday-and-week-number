@@ -1,5 +1,5 @@
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { isPageFileExist } from "../../lib/query/advancedQuery"
+import { doesPageFileExist } from "../../lib/query/advancedQuery"
 import { SettingKeys } from "../../settings/SettingKeys"
 import { t } from "logseq-l10n"
 
@@ -15,7 +15,7 @@ export const dayTemplates = (contentCheckTarget: { [key: string]: string[] }) =>
     // contentCheckTargetの各valueは、ページタイトルであり、そのページのコンテンツが存在するかチェックする
     for (const [dayOfWeekKey, dates] of Object.entries(contentCheckTarget))
       for (const date of dates)
-        if (await isPageFileExist(date) === false) { //ページが存在しない場合
+        if (await doesPageFileExist(date) === false) { //ページが存在しない場合
           // embedにカーソルを置いて行が作成された場合も、ファイルなしとして検出される
           // 曜日ごとにテンプレートを適用する
           const dayOfWeekTemplates: { [key: string]: string } = {
