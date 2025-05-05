@@ -293,14 +293,11 @@ const applyWeekendColor = (dayCell: HTMLElement, day: DayShortCode) => {
 
 
 //次の週を表示するかどうかの判定
-const checkIfNextWeekVisible = (weekStartsOn: number, isDayThursday: boolean, isDayFriday: boolean, isDaySaturday: boolean, targetDate: Date): boolean =>
-  //日曜日始まり、木曜、金曜、土曜がtargetDateの場合
-  (weekStartsOn === 0 && (isDayThursday || isDayFriday || isDaySaturday))
-    //月曜日始まり、金曜、土曜、日曜がtargetDateの場合
-    || (weekStartsOn === 1 && (isDayFriday || isDaySaturday || isSunday(targetDate)))
-    //土曜日始まり、水曜、木曜、金曜がtargetDateの場合
-    || (weekStartsOn === 6 && (isWednesday(targetDate) || isDayThursday || isDayFriday))
-    ? true : false
+const checkIfNextWeekVisible = (weekStartsOn: number, isDayThursday: boolean, isDayFriday: boolean, isDaySaturday: boolean, targetDate: Date): boolean => {
+  if (weekStartsOn === 0) return isDayThursday || isDayFriday || isDaySaturday;
+  if (weekStartsOn === 1) return isDayFriday || isDaySaturday || isSunday(targetDate);
+  return isWednesday(targetDate) || isDayThursday || isDayFriday;
+}
 
 
 //どの週を表示するか

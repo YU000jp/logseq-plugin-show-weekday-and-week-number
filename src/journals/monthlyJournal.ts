@@ -20,8 +20,8 @@ export const currentPageIsMonthlyJournal = async (titleElement: HTMLElement, mat
     return//一度だけ処理を行う
 
   processingMonthlyJournal = true//処理中フラグを立てる ここからreturnする場合は必ずfalseにすること
+  setTimeout(() => processingMonthlyJournal = false, 100)
   titleElement.dataset.monthlyJournalChecked = year + "/" + month
-  setTimeout(() => processingMonthlyJournal = false, 10)
 
   const monthStartDay = startOfMonth(new Date(year, month - 1, 1)) //月初の日付
 

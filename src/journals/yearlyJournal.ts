@@ -15,8 +15,8 @@ export const currentPageIsYearlyJournal = async (titleElement: HTMLElement, matc
             return//一度だけ処理を行う
 
       processingYearlyJournal = true//処理中フラグを立てる ここからreturnする場合は必ずfalseにすること
+      setTimeout(() => processingYearlyJournal = false, 100)
       titleElement.dataset.yearlyJournalChecked = year.toString() //処理済みフラグを立てる
-      setTimeout(() => processingYearlyJournal = false, 10)
 
       const monthStartDay = startOfYear(new Date(year, 0, 1)) //月初の日付
 

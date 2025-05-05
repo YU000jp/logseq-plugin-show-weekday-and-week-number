@@ -18,8 +18,8 @@ export const currentPageIsQuarterlyJournal = async (titleElement: HTMLElement, m
             return//一度だけ処理を行う
 
       processingQuarterlyJournal = true//処理中フラグを立てる ここからreturnする場合は必ずfalseにすること
+      setTimeout(() => processingQuarterlyJournal = false, 100)
       titleElement.dataset.quarterlyJournalChecked = year + "/" + month //処理済みのマーク
-      setTimeout(() => processingQuarterlyJournal = false, 10)
 
       const monthStartDay = startOfMonth(new Date(year, month - 1, 1)) //月初の日付
 

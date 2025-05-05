@@ -93,8 +93,8 @@ const createButton = (text: string, title: string, onClick: () => void): HTMLBut
     return button
 }
 
-const createTableCell = (text: string, className: string = "", title: string = "", colSpan: number = 1): HTMLTableCellElement => {
-    const cell = document.createElement("td")
+const createTableCell = (text: string, className: string = "", title: string = "", colSpan: number = 1, type: 'td' | 'th' = 'td'): HTMLTableCellElement => {
+    const cell = document.createElement(type) as HTMLTableCellElement;
     cell.textContent = text
     cell.className = className
     cell.title = title
@@ -103,12 +103,7 @@ const createTableCell = (text: string, className: string = "", title: string = "
 }
 
 const createTableHeaderCell = (text: string, className: string = "", title: string = "", colSpan: number = 1): HTMLTableCellElement => {
-    const cell = document.createElement("th")
-    cell.textContent = text
-    cell.className = className
-    cell.title = title
-    cell.colSpan = colSpan
-    return cell
+    return createTableCell(text, className, title, colSpan, 'th');
 }
 
 const createDayCell = async (
