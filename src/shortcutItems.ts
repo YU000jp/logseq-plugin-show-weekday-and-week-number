@@ -1,6 +1,7 @@
 import { AppUserConfigs, BlockEntity, IBatchBlock } from "@logseq/libs/dist/LSPlugin"
 import { getQuarterFromWeekNumber, getWeeklyNumberFromDate, getWeeklyNumberString } from "./lib/lib"
 import { addMonths, addWeeks, addYears, endOfYear, format, startOfMonth, } from "date-fns"
+import { separate } from "./journals/nav"
 
 export const loadShortcutItems = () => {
 
@@ -102,32 +103,32 @@ const currentDayOfWeek = () => logseq.Editor.registerSlashCommand("Current day o
 })
 
 
-const currentMonth = () => logseq.Editor.registerSlashCommand("Current month: [[yyyy/MM]]", async () => {
+const currentMonth = () => logseq.Editor.registerSlashCommand("Current month", async () => {
     //今日の日付から年と月を取得
     const date = new Date()
-    logseq.Editor.insertAtEditingCursor(` [[${format(date, "yyyy/MM")}]] `)
+    logseq.Editor.insertAtEditingCursor(` [[${format(date, `yyyy${separate()}MM`)}]] `)
 })
 
-const nextMonth = () => logseq.Editor.registerSlashCommand("Next month: [[yyyy/MM]]", async () => {
+const nextMonth = () => logseq.Editor.registerSlashCommand("Next month", async () => {
     //月初めの日付を取得
     //1か月を足す
     const date = addMonths(startOfMonth(new Date()), 1)
-    logseq.Editor.insertAtEditingCursor(` [[${format(date, "yyyy/MM")}]] `)
+    logseq.Editor.insertAtEditingCursor(` [[${format(date, `yyyy${separate()}MM`)}]] `)
 
 })
 
-const currentYear = () => logseq.Editor.registerSlashCommand("Current year: [[yyyy]]", async () => {
+const currentYear = () => logseq.Editor.registerSlashCommand("Current year", async () => {
     const year = new Date().getFullYear()
     logseq.Editor.insertAtEditingCursor(` [[${year}]] `)
 })
 
-const nextYear = () => logseq.Editor.registerSlashCommand("Next year: [[yyyy]]", async () => {
+const nextYear = () => logseq.Editor.registerSlashCommand("Next year", async () => {
     const year = addYears(new Date(), 1)
     logseq.Editor.insertAtEditingCursor(` [[${format(year, "yyyy")}]] `)
 })
 
-const nextYearMOnth = () => logseq.Editor.registerSlashCommand("A year later: [[yyyy/MM]]", async () => {
+const nextYearMOnth = () => logseq.Editor.registerSlashCommand("A year later", async () => {
     //月初めの日付を取得
     let date = addYears(new Date(), 1)
-    logseq.Editor.insertAtEditingCursor(` [[${format(date, "yyyy/MM")}]] `)
+    logseq.Editor.insertAtEditingCursor(` [[${format(date, `yyyy${separate()}MM`)}]] `)
 })

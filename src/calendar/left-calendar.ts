@@ -8,6 +8,7 @@ import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString
 import { doesPageExist } from "../lib/query/advancedQuery"
 import { isEssentialSettingsAltered } from "../settings/onSettingsChanged"
 import { openPageToSingleDay } from "./boundaries"
+import { separate } from "../journals/nav"
 
 export const keyLeftCalendarContainer = "left-calendar-container"
 
@@ -164,9 +165,10 @@ export const createCalendar = async (targetDate: Date, preferredDateFormat: stri
     //一行目は曜日名 (ローカライズ)
     const dayOfWeekArray: string[] = eachDays.slice(0, 7).map(date => localizeDayOfWeekString(date, false))
 
+    const formatSeparate = separate() as "/" | "-"
     const enableWeekNumber = logseq.settings!.booleanLcWeekNumber as boolean //週番号を表示するかどうか
-    const formatYearMonthTargetDate: string = format(targetDate, "yyyy/MM")
-    const formatYearMonthThisMonth: string = format(today, "yyyy/MM")
+    const formatYearMonthTargetDate: string = format(targetDate, `yyyy${formatSeparate}MM`)
+    const formatYearMonthThisMonth: string = format(today, `yyyy${formatSeparate}MM`)
 
     //ここまでのデータを仮で、mainDivElementにすべて出力したい
     //tableで、一行目、二行目、三行目、四行目、五行目、六行目、七行目、八行目を作成する

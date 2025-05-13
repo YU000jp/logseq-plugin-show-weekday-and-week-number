@@ -1,10 +1,11 @@
 import { PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday, isToday, isWednesday, startOfISOWeek, startOfWeek } from 'date-fns'; //https://date-fns.org/
+import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday, isToday, isWednesday, startOfISOWeek, startOfWeek } from 'date-fns' //https://date-fns.org/
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
 import { holidaysWorld, lunarString } from '../lib/holidays'
 import { DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor } from '../lib/lib'
 import { doesPageExist, doesPageFileExist, findPageUuid, getCurrentPageJournalDay } from '../lib/query/advancedQuery'
+import { separate } from '../journals/nav'
 
 
 let processingFoundBoundaries: boolean = false
@@ -134,7 +135,7 @@ const daySideMonth = (date: Date, boundariesInner: HTMLDivElement, monthDuplicat
     && dateShowMonth.getFullYear() === monthDuplicate.getFullYear()) {
     sideMonthElement.style.visibility = 'hidden'
   } else {
-    const monthString: string = format(dateShowMonth, "yyyy/MM")
+    const monthString: string = format(dateShowMonth, `yyyy${separate()}MM`)
     // monthStringが正しくない場合は、非表示
     if (monthString.length === 7) {
       sideMonthElement.title = monthString
@@ -294,9 +295,9 @@ const applyWeekendColor = (dayCell: HTMLElement, day: DayShortCode) => {
 
 //次の週を表示するかどうかの判定
 const checkIfNextWeekVisible = (weekStartsOn: number, isDayThursday: boolean, isDayFriday: boolean, isDaySaturday: boolean, targetDate: Date): boolean => {
-  if (weekStartsOn === 0) return isDayThursday || isDayFriday || isDaySaturday;
-  if (weekStartsOn === 1) return isDayFriday || isDaySaturday || isSunday(targetDate);
-  return isWednesday(targetDate) || isDayThursday || isDayFriday;
+  if (weekStartsOn === 0) return isDayThursday || isDayFriday || isDaySaturday
+  if (weekStartsOn === 1) return isDayFriday || isDaySaturday || isSunday(targetDate)
+  return isWednesday(targetDate) || isDayThursday || isDayFriday
 }
 
 

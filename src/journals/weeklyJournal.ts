@@ -1,12 +1,12 @@
 import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, subDays, subWeeks } from 'date-fns'; //https://date-fns.org/
+import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib/lib'
 import { findPageUuid } from '../lib/query/advancedQuery'
-import { weeklyJournalCreateNav } from './nav'
-import CSSThisWeekPopup from "./weeklyEmbed.css?inline"; //CSSをインラインで読み込む
+import { separate, weeklyJournalCreateNav } from './nav'
+import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
 let processingFoundBoundaries: boolean = false
 let processingWeeklyJournal: boolean = false
 export const keyThisWeekPopup = "weeklyEmbed"
@@ -210,8 +210,9 @@ const weeklyJournalCreateContent = async (
 
 const generatePageTagsArray = (weekStart: Date, weekEnd: Date) => {
     let pageTagsPropertyArray: string[] = []
-    const printMonthLink = format(weekStart, "yyyy/MM")
-    const printMonthLink2 = format(weekEnd, "yyyy/MM")
+    const formatSeparate = separate() as "/" | "-"
+    const printMonthLink = format(weekStart, `yyyy${formatSeparate}MM`)
+    const printMonthLink2 = format(weekEnd, `yyyy${formatSeparate}MM`)
     if (printMonthLink !== printMonthLink2)
         pageTagsPropertyArray.unshift(printMonthLink2)
     pageTagsPropertyArray.unshift(printMonthLink)

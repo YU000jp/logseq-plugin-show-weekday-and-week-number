@@ -18,18 +18,17 @@ export const createNavLink = (text: string, pageName: string) => {
 
 export const createNavLinkWeekNumber = (day: Date, ISO: boolean, configWeekNumberFormat: string) => {
 
+      const formatSeparate = separate() as "/" | "-"
       const monthFirstWeekNumber: {
             year: number
             weekString: string
             quarter: number
       } = getWeeklyNumberFromDate(day, ISO ? 1 : 0)
 
-      // weekNumberFormat ["YYYY-Www", "YYYY/qqq/Www", "YYYY/Www"]
-      const linkString = configWeekNumberFormat === "YYYY-Www" ? // fix a bug https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/pull/163
-            `${monthFirstWeekNumber.year}-W${monthFirstWeekNumber.weekString}`
-            : configWeekNumberFormat === "YYYY/qqq/Www" ?
-                  `${monthFirstWeekNumber.year}/Q${monthFirstWeekNumber.quarter}/W${monthFirstWeekNumber.weekString}`
-                  : `${monthFirstWeekNumber.year}/W${monthFirstWeekNumber.weekString}`
+      // weekNumberFormat ["YYYY-Www", "YYYY/qqq/Www", "YYYY/Www"] https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/pull/163
+      const linkString = (configWeekNumberFormat === "YYYY/qqq/Www" || configWeekNumberFormat === "YYYY-qqq-Www") ?
+            `${monthFirstWeekNumber.year}${formatSeparate}Q${monthFirstWeekNumber.quarter}${formatSeparate}W${monthFirstWeekNumber.weekString}`
+            : `${monthFirstWeekNumber.year}${formatSeparate}W${monthFirstWeekNumber.weekString}`
 
       const monthFirstWeekNumberLink = createNavLink(monthFirstWeekNumber.weekString, linkString)
       monthFirstWeekNumberLink.title = linkString
@@ -60,12 +59,12 @@ const createQuarterLinks = (navElement: HTMLElement, year: number, currentQuarte
                   quarterLink.style.textDecoration = "underline"
                   navElement.appendChild(quarterLink)
             } else
-                  navElement.appendChild(createNavLink(`Q${i}`, `${year}/Q${i}`))
+                  navElement.appendChild(createNavLink(`Q${i}`, `${year}${separate()}Q${i}`))
 }
 
 const createMonthLinks = (navElement: HTMLElement, year: number, startMonth: number, endMonth: number) => {
       for (let i = startMonth; i <= endMonth; i++) {
-            const monthLink = createNavLink(localizeMonthString(new Date(year, i - 1, 1), false), `${year}/${i.toString().padStart(2, "0")}`)
+            const monthLink = createNavLink(localizeMonthString(new Date(year, i - 1, 1), false), `${year}${separate()}${i.toString().padStart(2, "0")}`)
             if (startMonth <= i && i <= endMonth)
                   monthLink.style.fontWeight = "bold"
             navElement.appendChild(monthLink)
@@ -100,7 +99,7 @@ const createCommonNav = async (pageRelative: HTMLDivElement, navElement: HTMLEle
       // span ">",{sm:true}
       navElement.appendChild(spanFreeSpace(">", { sm: true }))
 
-      if (logseq.settings!.weekNumberOptions === "YYYY/qqq/Www" && quarter !== undefined) {
+      if ((logseq.settings!.weekNumberOptions === "YYYY/qqq/Www" || logseq.settings!.weekNumberOptions === "YYYY-qqq-Www") && quarter !== undefined) {
             // Quarter
             createQuarterLinks(navElement, year, quarter)
             // span ">",{sm:true}
@@ -178,6 +177,8 @@ export const yearlyJournalCreateNav = async (
       return Promise.resolve(true)
 }
 
+export const separate = (): "/" | "-" => (logseq.settings!.weekNumberOptions === "YYYY/qqq/Www" || logseq.settings!.weekNumberOptions === "YYYY/Www") ? "/" : "-"
+
 // WeeklyJournal用ナビゲーションを作成する
 export const weeklyJournalCreateNav = async (
       ISO: boolean,
@@ -189,32 +190,35 @@ export const weeklyJournalCreateNav = async (
       nextWeekStart: Date,
 ): Promise<boolean> => {
 
+      const formatSeparate = separate() as "/" | "-"
       const pageRelative = await getPageRelativeElement()
       if (!pageRelative) return Promise.resolve(false)
 
       pageRelative.dataset.weeklyJournalNav = "true"
       const navElement = createNavElement("journalNav")
+      const preferredDateFormat = await getConfigPreferredDateFormat()
 
       // Year
       const thisYearNavLink = createNavLink(yearString, yearString)
       thisYearNavLink.style.textDecoration = "underline"
       navElement.appendChild(thisYearNavLink)
 
-      if (logseq.settings!.weekNumberOptions === "YYYY/qqq/Www") {
+      if (logseq.settings!.weekNumberOptions === "YYYY/qqq/Www" || logseq.settings!.weekNumberOptions === "YYYY-qqq-Www") {
             const { quarter } = getWeeklyNumberFromDate(weekStart, ISO ? 1 : 0)
-            const putSpanQuarterMark = createNavLink(`Q${quarter}`, `${yearString}/Q${quarter}`)
+            const putSpanQuarterMark = createNavLink(`Q${quarter}`, `${yearString}${formatSeparate}Q${quarter}`)
             putSpanQuarterMark.style.textDecoration = "underline"
             navElement.appendChild(putSpanQuarterMark)
       }
 
       // WeekStartの月
-      const thisMonthNavLink = createNavLink(localizeMonthString(weekStart, true), format(weekStart, "yyyy/MM"))
+      const monthFormat = `yyyy${formatSeparate}MM`
+      const thisMonthNavLink = createNavLink(localizeMonthString(weekStart, true), format(weekStart, monthFormat))
       thisMonthNavLink.style.textDecoration = "underline"
       navElement.appendChild(thisMonthNavLink)
 
       // WeekEndの月
       if (!isSameMonth(weekStart, weekEnd))
-            navElement.appendChild(createNavLink(localizeMonthString(weekEnd, true), format(weekEnd, "yyyy/MM")))
+            navElement.appendChild(createNavLink(localizeMonthString(weekEnd, true), format(weekEnd, monthFormat)))
 
       // span ">",{sm:true}
       navElement.appendChild(spanFreeSpace(">", { sm: true }))
@@ -234,7 +238,7 @@ export const weeklyJournalCreateNav = async (
 
       // day
       for (const day of eachDayOfInterval({ start: weekStart, end: weekEnd }))
-            navElement.appendChild(createNavLink(localizeDayOfWeekDayString(day), format(day, await getConfigPreferredDateFormat())))
+            navElement.appendChild(createNavLink(localizeDayOfWeekDayString(day), format(day, preferredDateFormat)))
 
       pageRelative.insertBefore(navElement, pageRelative.firstChild)
       return Promise.resolve(true)

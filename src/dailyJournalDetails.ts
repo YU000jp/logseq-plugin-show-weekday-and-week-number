@@ -4,6 +4,7 @@ import { HolidayUtil, Lunar } from "lunar-typescript"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage, fetchJournalTitles } from "."
 import { exportHolidaysBundle } from "./lib/holidays"
 import { createLinkMonthlyLink, createSettingButton, getRelativeDateString, getDayOfWeekName, getQuarterFromWeekNumber, getRelativeTimeHtml, getWeeklyNumberFromDate, getWeeklyNumberString, getWeekNumberHtml, localizeMonthString, openPageFromPageName, userColor } from "./lib/lib"
+import { separate } from "./journals/nav"
 
 // プロセス中かどうかを判定するフラグ
 let processingBehind: boolean = false
@@ -30,8 +31,8 @@ export const dailyJournalDetails = async (dayDate: Date, titleElement: HTMLEleme
 
   // 日付のバリデーション
   if (!(dayDate instanceof Date) || isNaN(dayDate.getTime())) {
-    console.error("Invalid date provided to dailyJournalDetails:", dayDate);
-    return;
+    console.error("Invalid date provided to dailyJournalDetails:", dayDate)
+    return
   }
 
   const baseLineElement: HTMLSpanElement = createBaseLineElement(dayDate)
@@ -57,8 +58,8 @@ export const dailyJournalDetails = async (dayDate: Date, titleElement: HTMLEleme
 const createBaseLineElement = (journalDate: Date): HTMLSpanElement => {
   // 日付のバリデーション
   if (!(journalDate instanceof Date) || isNaN(journalDate.getTime())) {
-    console.error("Invalid date provided to createBaseLineElement:", journalDate);
-    return createSpanElement("showWeekday", "");
+    console.error("Invalid date provided to createBaseLineElement:", journalDate)
+    return createSpanElement("showWeekday", "")
   }
 
   const dayOfWeekName = getDayOfWeekName(journalDate)
@@ -75,7 +76,7 @@ const createBaseLineElement = (journalDate: Date): HTMLSpanElement => {
   return dateInfoElement
 }
 
-const addHolidayInfo = async(dayDate: Date, baseLineElement: HTMLSpanElement) => {
+const addHolidayInfo = async (dayDate: Date, baseLineElement: HTMLSpanElement) => {
   const userLanguage = await getConfigPreferredLanguage()
   if (userLanguage === "zh-Hant" || userLanguage === "zh-CN") {
     if (logseq.settings!.booleanUnderLunarCalendar || logseq.settings!.underHolidaysAlert) {
@@ -180,7 +181,7 @@ export const enableWeekNumber = (journalDate: Date, weekStartsOn: 0 | 1): string
 }
 
 const enableMonthlyJournalLink = (journalDate: Date, dateInfoElement: HTMLSpanElement) => {
-  const formatDateString: string = format(journalDate, "yyyy/MM")
+  const formatDateString: string = format(journalDate, `yyyy${separate()}MM`)
   dateInfoElement.appendChild(createLinkMonthlyLink(
     localizeMonthString(journalDate, true)
     , formatDateString

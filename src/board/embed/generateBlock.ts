@@ -8,6 +8,7 @@ import { doesPageFileExist, getPageBlocks } from "../../lib/query/advancedQuery"
 import { SettingKeys } from "../../settings/SettingKeys"
 import { mainPageTitle, mainPageTitleLower } from "../constant"
 import { dayTemplates, pageTemplate } from "./dayTemplates"
+import { separate } from "../../journals/nav"
 
 
 
@@ -97,12 +98,10 @@ const generateContentForMainPageContent = async (
     const month = format(today, "MM")
     const startOfWeek = getWeekStartFromWeekNumber(year, Number(weekString), weekStartsOn, isIso)
 
-
+    const formatSeparate = separate() as "/" | "-"
     const weeklyPageName = getWeeklyNumberString(year, weekString, quarter)
-    const monthlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-Www" ? `${year}-${month}`
-      : `${year}/${month}`}`
-    const quarterlyPageName = `${logseq.settings![SettingKeys.weekNumberOptions] === "YYYY-qqq-Www" ? `${year}-Q${quarter}`
-      : `${year}/Q${quarter}`}`
+    const monthlyPageName = `${year}${formatSeparate}${month}`
+    const quarterlyPageName = `${year}${formatSeparate}Q${quarter}`
     const yearlyPageName = `${year}`
 
     // 月曜日を基準にした3週間分の日付配列を生成
