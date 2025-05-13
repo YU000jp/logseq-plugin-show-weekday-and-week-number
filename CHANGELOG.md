@@ -1,3 +1,10 @@
+## [1.63.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.1...v1.63.2) (2025-05-13)
+
+
+### Bug Fixes
+
+* **bug:** upper nav: Incorrect links [#156](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/156) ([ecf79da](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/ecf79dad4645916fbf1ca1074fa3577fa4436b5a))
+
 ## [1.63.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.0...v1.63.1) (2025-04-30)
 
 
