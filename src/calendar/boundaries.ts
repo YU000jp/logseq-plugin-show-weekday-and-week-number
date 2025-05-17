@@ -90,8 +90,8 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
 
     await createDaysElements(
       getWeekOffsetDays(flagShowNextWeek) as number[], //どの週を表示するか
-      selectStartDate ? //targetDateを週の初めにする
-        selectStartDate :
+      // selectStartDate ? //targetDateを週の初めにする
+      //   selectStartDate :
         weekStartsOn === 1
           && logseq.settings?.weekNumberFormat === "ISO(EU) format"
           ? startOfISOWeek(targetDate)
