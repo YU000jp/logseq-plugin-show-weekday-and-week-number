@@ -205,7 +205,8 @@ const main = async () => {
 
   // ボード機能のセットアップ
   // メニュー用のボタンを設置する
-  initializeBoard()//ページ読み込み時に実行コールバック
+  if (logseq.settings!.addLeftMenu === true)
+    initializeBoard()//ページ読み込み時に実行コールバック
 
 
 
