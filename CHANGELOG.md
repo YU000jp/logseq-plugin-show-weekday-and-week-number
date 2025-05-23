@@ -1,3 +1,10 @@
+## [1.63.5](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.4...v1.63.5) (2025-05-23)
+
+
+### Bug Fixes
+
+* **bug:** Inconsistent "Week start" day when using custom value [#164](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/164) ([4225cf8](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/4225cf86f272dcb562b7086b049a2b6d3c0d0ca5))
+
 ## [1.63.4](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.3...v1.63.4) (2025-05-23)
 
 
