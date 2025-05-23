@@ -1,3 +1,10 @@
+## [1.63.4](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.3...v1.63.4) (2025-05-23)
+
+
+### Bug Fixes
+
+* **bug:** Weekly-Desk menu entry in left menu bar always shows up after restart [#165](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/165) ([0791157](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/0791157ac347c10ac0e24b40513184326bc102b4))
+
 ## [1.63.3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.2...v1.63.3) (2025-05-17)
 
 
