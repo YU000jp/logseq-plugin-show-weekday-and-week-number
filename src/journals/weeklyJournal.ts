@@ -1,5 +1,5 @@
 import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
+import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshCalendar } from '../calendar/left-calendar'
@@ -298,7 +298,7 @@ export const callMiniCalendar = (check: boolean, monthStartDay: Date) => {
         && processingFoundBoundaries !== true) {
         processingFoundBoundaries = true
         setTimeout(() => {
-            boundariesProcess("weeklyJournal", false, 0, monthStartDay)
+            boundariesProcess("weeklyJournal", false, 0, startOfWeek(monthStartDay))
             processingFoundBoundaries = false
         }, 200)
     }
