@@ -3,7 +3,7 @@
 Make your Logseq journals smarter with weekdays, week numbers, and powerful calendar features!
 
 > [!NOTE]
-> - Works with Logseq v0.9.x (File system version)
+> - Works with Logseq v0.10.x (File system version)
 > - Currently not compatible with Logseq db version
 
 <div align="right">
