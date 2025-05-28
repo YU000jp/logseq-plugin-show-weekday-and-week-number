@@ -1,6 +1,6 @@
-import "@logseq/libs"; //https://plugins-doc.logseq.com/
+import "@logseq/libs" //https://plugins-doc.logseq.com/
 import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { setup as l10nSetup, t } from "logseq-l10n"; //https://github.com/sethyuan/logseq-l10n
+import { setup as l10nSetup, t } from "logseq-l10n" //https://github.com/sethyuan/logseq-l10n
 import { shortKey } from "./board/constant"
 import { initializeBoard } from "./board/handle"
 import { boundariesProcess, removeBoundaries } from "./calendar/boundaries"
@@ -199,7 +199,8 @@ const main = async () => {
 
 
   // Left Calendarのセットアップ
-  loadLeftCalendar()
+  if (logseq.settings!.booleanLeftCalendar === true)
+    loadLeftCalendar()
 
 
 

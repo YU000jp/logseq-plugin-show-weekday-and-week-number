@@ -7,6 +7,7 @@ import { getHolidaysBundle, removeHolidaysBundle } from "../lib/holidays"
 import { removeElementById, removeProvideStyle } from "../lib/lib"
 import { doesPageExist } from "../lib/query/advancedQuery"
 import { SettingKeys } from "./SettingKeys"
+import { currentCalendarDate, keyLeftCalendarContainer, loadLeftCalendar, refreshCalendar } from "../calendar/left-calendar"
 
 let processingSettingsChanged: boolean = false
 let processingRenamePage: boolean = false
@@ -40,6 +41,19 @@ export const isEssentialSettingsAltered = (oldSet: LSPluginBaseInfo["settings"],
 // ユーザー設定が変更されたときに実行
 export const handleSettingsUpdate = () => {
   logseq.onSettingsChanged((newSet: LSPluginBaseInfo["settings"], oldSet: LSPluginBaseInfo["settings"]) => {
+
+    if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
+      if (newSet.booleanLeftCalendar === true)
+        loadLeftCalendar()//表示する
+      else
+        removeElementById(keyLeftCalendarContainer)//消す
+    }
+    if (oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
+      || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
+      || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
+      || isEssentialSettingsAltered(newSet, oldSet) === true //共通処理
+    )
+      refreshCalendar(currentCalendarDate, false, false)
 
     if ([
       SettingKeys.booleanBoundariesAll,

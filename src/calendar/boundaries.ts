@@ -287,7 +287,7 @@ const indicator = async (targetPageName: string, dayOfMonthElement: HTMLSpanElem
 
 
 // 週末の色を適用する
-const applyWeekendColor = (dayCell: HTMLElement, day: DayShortCode) => {
+export const applyWeekendColor = (dayCell: HTMLElement, day: DayShortCode) => {
   const color = colorMap[logseq.settings!["userWeekend" + day] as string]
   if (color) dayCell.style.color = color
 }

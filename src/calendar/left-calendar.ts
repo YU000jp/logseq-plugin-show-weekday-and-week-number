@@ -1,14 +1,12 @@
-import { LSPluginBaseInfo } from "@logseq/libs/dist/LSPlugin.user"
 import { addDays, Day, eachDayOfInterval, getISOWeek, getWeek, isSameDay, isSameISOWeek, isSameMonth, isSameWeek, isSameYear, isToday, startOfISOWeek, startOfMonth, startOfWeek } from "date-fns"
 import { format } from "date-fns/format"
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage, pluginName } from ".."
-import { holidaysWorld, lunarString } from "../lib/holidays"
-import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, removeElementById, userColor } from "../lib/lib"
-import { doesPageExist } from "../lib/query/advancedQuery"
-import { isEssentialSettingsAltered } from "../settings/onSettingsChanged"
-import { openPageToSingleDay } from "./boundaries"
 import { separate } from "../journals/nav"
+import { holidaysWorld, lunarString } from "../lib/holidays"
+import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, removeElementById, shortDayNames, userColor } from "../lib/lib"
+import { doesPageExist } from "../lib/query/advancedQuery"
+import { applyWeekendColor, openPageToSingleDay } from "./boundaries"
 
 export const keyLeftCalendarContainer = "left-calendar-container"
 
@@ -16,32 +14,6 @@ export let currentCalendarDate: Date = new Date() //今日の日付を取得
 let flagWeekly = false //週間表示フラグ
 
 export const loadLeftCalendar = () => {
-
-    if (logseq.settings!.booleanLeftCalendar === true)
-        main()
-
-
-    setTimeout(() => {
-        //プラグイン設定変更時
-        logseq.onSettingsChanged(async (newSet: LSPluginBaseInfo['settings'], oldSet: LSPluginBaseInfo['settings']) => {
-            if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
-                if (newSet.booleanLeftCalendar === true)
-                    main()//表示する
-                else
-                    removeElementById(keyLeftCalendarContainer)//消す
-            }
-            if (oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
-                || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
-                || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
-                || isEssentialSettingsAltered(newSet, oldSet) === true //共通処理
-            )
-                refreshCalendar(currentCalendarDate, false, false)
-
-        })
-    }, 500)
-}
-
-const main = () => {
     if (parent.document.getElementById(keyLeftCalendarContainer))
         removeElementById(keyLeftCalendarContainer)//すでに存在する場合は削除する
 
@@ -95,7 +67,7 @@ const createButton = (text: string, title: string, onClick: () => void): HTMLBut
 }
 
 const createTableCell = (text: string, className: string = "", title: string = "", colSpan: number = 1, type: 'td' | 'th' = 'td'): HTMLTableCellElement => {
-    const cell = document.createElement(type) as HTMLTableCellElement;
+    const cell = document.createElement(type) as HTMLTableCellElement
     cell.textContent = text
     cell.className = className
     cell.title = title
@@ -104,7 +76,7 @@ const createTableCell = (text: string, className: string = "", title: string = "
 }
 
 const createTableHeaderCell = (text: string, className: string = "", title: string = "", colSpan: number = 1): HTMLTableCellElement => {
-    return createTableCell(text, className, title, colSpan, 'th');
+    return createTableCell(text, className, title, colSpan, 'th')
 }
 
 const createDayCell = async (
