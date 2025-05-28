@@ -2,7 +2,7 @@ import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from 
 import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
-import { refreshCalendar } from '../calendar/left-calendar'
+import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib/lib'
 import { findPageUuid } from '../lib/query/advancedQuery'
 import { separate, weeklyJournalCreateNav } from './nav'
@@ -38,7 +38,7 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
     callMiniCalendar(logseq.settings!.booleanBoundariesOnWeeklyJournal as boolean, weekStart)
 
     //Left Calendarの更新
-    refreshCalendar(weekStart, false, true)
+    refreshMonthlyCalendar(weekStart, false, true)
 
     if (logseq.settings!.booleanWeeklyJournal === false) return
 

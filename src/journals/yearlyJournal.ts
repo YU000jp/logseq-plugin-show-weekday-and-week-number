@@ -1,6 +1,6 @@
 import { startOfYear } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
-import { refreshCalendar } from '../calendar/left-calendar'
+import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { yearlyJournalCreateNav } from './nav'
 import { processJournal } from './utils'
 import { callMiniCalendar } from './weeklyJournal'
@@ -24,7 +24,7 @@ export const currentPageIsYearlyJournal = async (titleElement: HTMLElement, matc
       callMiniCalendar(logseq.settings!.booleanBoundariesOnMonthlyJournal as boolean, monthStartDay)
 
       //Left Calendarの更新
-      refreshCalendar(monthStartDay, false, false)
+      refreshMonthlyCalendar(monthStartDay, false, false)
 
       if (logseq.settings!.booleanYearlyJournal === false) return
 

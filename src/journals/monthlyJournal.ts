@@ -1,7 +1,7 @@
 import { BlockEntity } from '@logseq/libs/dist/LSPlugin.user'
 import { startOfMonth } from 'date-fns'; //https://date-fns.org/
 import { t } from 'logseq-l10n'
-import { refreshCalendar } from '../calendar/left-calendar'
+import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { monthlyJournalCreateNav } from './nav'
 import { journalInsertTemplate } from './utils'
 import { callMiniCalendar } from './weeklyJournal'
@@ -29,7 +29,7 @@ export const currentPageIsMonthlyJournal = async (titleElement: HTMLElement, mat
   callMiniCalendar(logseq.settings!.booleanBoundariesOnMonthlyJournal as boolean, monthStartDay)
 
   //Left Calendarの更新
-  refreshCalendar(monthStartDay, false, false)
+  refreshMonthlyCalendar(monthStartDay, false, false)
 
   if (logseq.settings!.booleanMonthlyJournal === false) return
 

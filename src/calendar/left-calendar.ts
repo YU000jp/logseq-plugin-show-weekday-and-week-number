@@ -358,7 +358,7 @@ const checkDay = async (dayDate: Date, month: number, dayCell: HTMLElement, pref
 }
 
 
-export const refreshCalendar = async (targetDate: Date, singlePage: boolean, weekly: boolean) => {
+export const refreshMonthlyCalendar = async (targetDate: Date, singlePage: boolean, weekly: boolean) => {
     const innerElement: HTMLDivElement | null = parent.document.getElementById("left-calendar-inner") as HTMLDivElement | null
     if (innerElement) {
         removeCalendarAndNav()
@@ -375,7 +375,7 @@ export const refreshCalendarCheckSameMonth = () => {
     const today = new Date()
     if (flagWeekly === true
         || isSameMonth(currentCalendarDate, today) === false)
-        refreshCalendar(today, false, false)
+        refreshMonthlyCalendar(today, false, false)
 }
 
 

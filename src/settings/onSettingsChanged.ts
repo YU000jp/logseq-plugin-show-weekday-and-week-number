@@ -7,7 +7,7 @@ import { getHolidaysBundle, removeHolidaysBundle } from "../lib/holidays"
 import { removeElementById, removeProvideStyle } from "../lib/lib"
 import { doesPageExist } from "../lib/query/advancedQuery"
 import { SettingKeys } from "./SettingKeys"
-import { currentCalendarDate, keyLeftCalendarContainer, loadLeftCalendar, refreshCalendar } from "../calendar/left-calendar"
+import { currentCalendarDate, keyLeftCalendarContainer, loadLeftCalendar, refreshMonthlyCalendar } from "../calendar/left-calendar"
 
 let processingSettingsChanged: boolean = false
 let processingRenamePage: boolean = false
@@ -40,6 +40,8 @@ const isEssentialSettingsAltered = (oldSet: LSPluginBaseInfo["settings"], newSet
 
 // ユーザー設定が変更されたときに実行
 export const handleSettingsUpdate = () => {
+
+
   logseq.onSettingsChanged((newSet: LSPluginBaseInfo["settings"], oldSet: LSPluginBaseInfo["settings"]) => {
 
     if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
@@ -48,60 +50,24 @@ export const handleSettingsUpdate = () => {
       else
         removeElementById(keyLeftCalendarContainer)//消す
     } else {
-
-      const isEssential: boolean = isEssentialSettingsAltered(oldSet, newSet)
-
-      if (oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
-        || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
-        || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
-        || isEssential === true //共通処理
-      )
-        refreshCalendar(currentCalendarDate, false, false)
-
-      if ([
-        SettingKeys.booleanBoundariesAll,
-        SettingKeys.booleanBoundaries,
-        SettingKeys.booleanJournalsBoundaries,
-        SettingKeys.booleanBoundariesOnWeeklyJournal,
+      const journalKeys = [
         SettingKeys.booleanWeeklyJournal,
-        SettingKeys.boundariesBottom,
-        SettingKeys.booleanBoundariesShowMonth,
-        SettingKeys.booleanBoundariesShowWeekNumber,
-        SettingKeys.booleanBoundariesHolidays,
-        SettingKeys.booleanDayOfWeek,
-        SettingKeys.longOrShort,
-        SettingKeys.booleanWeekNumber,
-        SettingKeys.weekNumberOfTheYearOrMonth,
-        SettingKeys.booleanRelativeTime,
-        SettingKeys.booleanSettingsButton,
-        SettingKeys.booleanMonthlyJournalLink,
-        SettingKeys.underHolidaysAlert,
-        SettingKeys.booleanBesideJournalTitle,
-        SettingKeys.weeklyEmbed,
-        SettingKeys.weeklyJournalHeadlineProperty,
-        SettingKeys.holidaysCountry,
-        SettingKeys.holidaysState,
-        SettingKeys.holidaysRegion,
-        SettingKeys.weekNumberChangeQ,
-        SettingKeys.weekNumberChangeQS,
-        SettingKeys.weekNumberChangeRevert,
-        SettingKeys.weekNumberChangeSlash,
-        SettingKeys.weekNumberChangeFRevertToISO,
-        SettingKeys.weekNumberChangeToQfull,
         SettingKeys.booleanMonthlyJournal,
         SettingKeys.booleanQuarterlyJournal,
-        SettingKeys.booleanYearlyJournal,
-        SettingKeys.booleanWeeklyDeskMonthly,
-        SettingKeys.booleanWeeklyDeskQuarterly,
-        SettingKeys.booleanWeeklyDeskYearly
-      ].some(key => oldSet[key] !== newSet[key])) {
+        SettingKeys.booleanYearlyJournal
+      ]
+      if (journalKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
+        journalKeys.forEach(key => {
+          if (oldSet[key] === true && newSet[key] === false)
+            removeElementById(`${key.replace('boolean', '').toLowerCase()}Nav`)
+        })
+      } else {
         const boundaryKeys = [
           SettingKeys.booleanBoundariesAll,
           SettingKeys.booleanBoundaries,
           SettingKeys.booleanJournalsBoundaries,
           SettingKeys.booleanBoundariesOnWeeklyJournal
         ]
-
         if (boundaryKeys.some(key => oldSet[key] !== newSet[key])) {
           if (boundaryKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
             removeBoundaries()
@@ -109,101 +75,98 @@ export const handleSettingsUpdate = () => {
             if (boundaryKeys.some(key => oldSet[key] === false && newSet[key] === true)) {
               ApplyBoundarySettingsOnChange(newSet)
             }
-        }
+        } else
+          if (oldSet.weeklyEmbed !== newSet.weeklyEmbed) {
+            if (newSet.weeklyEmbed === true)
+              weeklyEmbed()
+            else
+              removeProvideStyle(keyThisWeekPopup)
+          } else {
 
-        if ([
-          SettingKeys.boundariesBottom,
-          SettingKeys.booleanBoundariesShowMonth,
-          SettingKeys.booleanBoundariesShowWeekNumber,
-          SettingKeys.booleanBoundariesHolidays
-        ].some(key => oldSet[key] !== newSet[key]) || isEssential === true) {
-          removeBoundaries()
-          ApplyBoundarySettingsOnChange(newSet)
-        }
+            const isEssential: boolean = isEssentialSettingsAltered(oldSet, newSet)
 
-        if ([
-          SettingKeys.booleanDayOfWeek,
-          SettingKeys.longOrShort,
-          SettingKeys.booleanWeekNumber,
-          SettingKeys.weekNumberOfTheYearOrMonth,
-          SettingKeys.booleanRelativeTime,
-          SettingKeys.booleanWeeklyJournal,
-          SettingKeys.booleanWeekNumberHideYear,
-          SettingKeys.booleanSettingsButton,
-          SettingKeys.booleanMonthlyJournalLink,
-          SettingKeys.underHolidaysAlert,
-          SettingKeys.booleanBesideJournalTitle
-        ].some(key => oldSet[key] !== newSet[key]) || isEssential === true) {
-          removeTitleQuery()
-          setTimeout(() => fetchJournalTitles(newSet.booleanBesideJournalTitle as boolean), 500)
-        }
+            if (isEssential === true //共通処理
+              || oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
+              || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
+              || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
+            )
+              refreshMonthlyCalendar(currentCalendarDate, false, false)
 
-        if (oldSet.weeklyEmbed !== newSet.weeklyEmbed) {
-          if (newSet.weeklyEmbed === true)
-            weeklyEmbed()
-          else
-            removeProvideStyle(keyThisWeekPopup)
-        }
-
-        [{
-          key: SettingKeys.weeklyJournalHeadlineProperty, action: () => {
-            if (oldSet.weeklyJournalHeadlineProperty !== "" && newSet.weeklyJournalHeadlineProperty !== "") {
-              logseq.Editor.renamePage(oldSet.weeklyJournalHeadlineProperty as string, newSet.weeklyJournalHeadlineProperty as string)
+            // Boundaries Calendar の再表示
+            if (isEssential === true || [
+              SettingKeys.boundariesBottom,
+              SettingKeys.booleanBoundariesShowMonth,
+              SettingKeys.booleanBoundariesShowWeekNumber,
+              SettingKeys.booleanBoundariesHolidays
+            ].some(key => oldSet[key] !== newSet[key])) {
+              removeBoundaries()
+              ApplyBoundarySettingsOnChange(newSet)
             }
-          }
-        },
-        {
-          key: SettingKeys.boundariesBottom, action: () => {
-            if (newSet.boundariesBottom === true)
-              parent.document.body.classList!.add("boundaries-bottom")
-            else
-              parent.document.body.classList!.remove("boundaries-bottom")
-          }
-        },
-        {
-          key: SettingKeys.booleanBoundariesHolidays, action: () => {
-            if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true)
-              getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true })
-            else
-              if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false)
-                removeHolidaysBundle()
-          }
-        },
-        {
-          key: SettingKeys.underHolidaysAlert, action: () => {
-            if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true)
-              getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true })
-            else
-              if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false)
-                removeHolidaysBundle()
-          }
-        },
-        { key: SettingKeys.holidaysCountry, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
-        { key: SettingKeys.holidaysState, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
-        { key: SettingKeys.holidaysRegion, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
-        { key: SettingKeys.weekNumberChangeQ, action: () => convertWeekToQuarterFormat("-", false, "/") },
-        { key: SettingKeys.weekNumberChangeQS, action: () => convertWeekToQuarterFormat("/", false, "/") },
-        { key: SettingKeys.weekNumberChangeRevert, action: () => convertWeekToQuarterFormat("/", true, "/") },
-        { key: SettingKeys.weekNumberChangeSlash, action: () => convertWeekNumberToSlash() },
-        { key: SettingKeys.weekNumberChangeFRevertToISO, action: () => convertWeekToQuarterFormat("-", true, "-") },
-        { key: SettingKeys.weekNumberChangeToQfull, action: () => convertWeekToQuarterFormat("-", false, "-") },
 
-        ].forEach(({ key, action }) => {
-          if (oldSet[key] !== newSet[key]) action()
-        })
+            // ジャーナルタイトル横 の再表示
+            if (isEssential === true || [
+              SettingKeys.booleanDayOfWeek,
+              SettingKeys.longOrShort,
+              SettingKeys.booleanWeekNumber,
+              SettingKeys.weekNumberOfTheYearOrMonth,
+              SettingKeys.booleanRelativeTime,
+              SettingKeys.booleanWeeklyJournal,
+              SettingKeys.booleanWeekNumberHideYear,
+              SettingKeys.booleanSettingsButton,
+              SettingKeys.booleanMonthlyJournalLink,
+              SettingKeys.underHolidaysAlert,
+              SettingKeys.booleanBesideJournalTitle
+            ].some(key => oldSet[key] !== newSet[key])) {
+              removeTitleQuery()
+              setTimeout(() => fetchJournalTitles(newSet.booleanBesideJournalTitle as boolean), 500)
+            }
 
-        const journalKeys = [
-          SettingKeys.booleanWeeklyJournal,
-          SettingKeys.booleanMonthlyJournal,
-          SettingKeys.booleanQuarterlyJournal,
-          SettingKeys.booleanYearlyJournal
-        ]
-        if (journalKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
-          journalKeys.forEach(key => {
-            if (oldSet[key] === true && newSet[key] === false)
-              removeElementById(`${key.replace('boolean', '').toLowerCase()}Nav`)
-          })
-        }
+            [{
+              key: SettingKeys.weeklyJournalHeadlineProperty, action: () => {
+                if (oldSet.weeklyJournalHeadlineProperty !== "" && newSet.weeklyJournalHeadlineProperty !== "") {
+                  logseq.Editor.renamePage(oldSet.weeklyJournalHeadlineProperty as string, newSet.weeklyJournalHeadlineProperty as string)
+                }
+              }
+            },
+            {
+              key: SettingKeys.boundariesBottom, action: () => {
+                if (newSet.boundariesBottom === true)
+                  parent.document.body.classList!.add("boundaries-bottom")
+                else
+                  parent.document.body.classList!.remove("boundaries-bottom")
+              }
+            },
+            {
+              key: SettingKeys.booleanBoundariesHolidays, action: () => {
+                if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true)
+                  getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true })
+                else
+                  if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false)
+                    removeHolidaysBundle()
+              }
+            },
+            {
+              key: SettingKeys.underHolidaysAlert, action: () => {
+                if (newSet.booleanBoundariesHolidays === true || newSet.underHolidaysAlert === true)
+                  getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true })
+                else
+                  if (newSet.booleanBoundariesHolidays === false && newSet.underHolidaysAlert === false)
+                    removeHolidaysBundle()
+              }
+            },
+            { key: SettingKeys.holidaysCountry, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
+            { key: SettingKeys.holidaysState, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
+            { key: SettingKeys.holidaysRegion, action: () => getHolidaysBundle(newSet.holidaysCountry as string, { settingsChanged: true }) },
+            { key: SettingKeys.weekNumberChangeQ, action: () => convertWeekToQuarterFormat("-", false, "/") },
+            { key: SettingKeys.weekNumberChangeQS, action: () => convertWeekToQuarterFormat("/", false, "/") },
+            { key: SettingKeys.weekNumberChangeRevert, action: () => convertWeekToQuarterFormat("/", true, "/") },
+            { key: SettingKeys.weekNumberChangeSlash, action: () => convertWeekNumberToSlash() },
+            { key: SettingKeys.weekNumberChangeFRevertToISO, action: () => convertWeekToQuarterFormat("-", true, "-") },
+            { key: SettingKeys.weekNumberChangeToQfull, action: () => convertWeekToQuarterFormat("-", false, "-") },
+            ].forEach(({ key, action }) => {
+              if (oldSet[key] !== newSet[key]) action()
+            })
+          }
       }
 
       //CAUTION: 日付形式が変更された場合は、re-indexをおこなうので、問題ないが、言語設定が変更された場合は、その設定は、すぐには反映されない。プラグインの再読み込みが必要になるが、その頻度がかなり少ないので問題ない。
