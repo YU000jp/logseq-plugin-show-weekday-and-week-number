@@ -348,6 +348,9 @@ const checkDay = async (dayDate: Date, month: number, dayCell: HTMLElement, pref
                 return holiday !== "" ? `${eventName}\n${holiday}` : eventName
             }
         }
+    } else {
+        if (logseq.settings?.booleanWeekendsColor === true)
+            applyWeekendColor(dayCell, shortDayNames[dayDate.getDay()])
     }
 
     // 祝日を表示する ユーザー設定日オフの場合
