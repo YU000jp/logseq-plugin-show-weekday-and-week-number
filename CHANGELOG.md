@@ -1,3 +1,15 @@
+# [1.64.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.5...v1.64.0) (2025-05-28)
+
+
+### Bug Fixes
+
+* **bug:** Cannot apply user weekend color on Monthly Calendar ([5dedf04](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/5dedf04c4c00ad02e50108b4d184ef7d4101e4a4))
+
+
+### Features
+
+* Immediate reflection of plugin settings ([84048a6](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/84048a6692646c6d1e40617c86336f179e95b2fa))
+
 ## [1.63.5](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.4...v1.63.5) (2025-05-23)
 
 
