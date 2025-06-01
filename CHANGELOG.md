@@ -1,3 +1,10 @@
+## [1.64.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.64.0...v1.64.1) (2025-06-01)
+
+
+### Bug Fixes
+
+* **bug:** User date format not recognised correctly ([267f1c0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/267f1c068d5322646a5f521184a3a2a5cc5a2182))
+
 # [1.64.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.63.5...v1.64.0) (2025-05-28)
 
 
