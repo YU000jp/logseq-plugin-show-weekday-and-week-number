@@ -108,6 +108,10 @@ const main = async () => {
   logseq.provideStyle({ key: "main", style: fileMainCSS })
 
 
+  // 100ms待機
+  await new Promise(resolve => setTimeout(resolve, 100))
+
+
   // ユーザー設定を取得
   await getUserConfig()
 
@@ -233,9 +237,9 @@ const main = async () => {
 
 
   // グラフが変更されたときに実行
-  logseq.App.onCurrentGraphChanged(() => {
+  logseq.App.onCurrentGraphChanged(async() => {
     // ユーザー設定を取得して更新
-    getUserConfig()
+    await getUserConfig()
   })
 
 
