@@ -1,3 +1,10 @@
+# [1.65.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.64.1...v1.65.0) (2025-06-08)
+
+
+### Features
+
+* Remove Weekly-Desk functionality (Cancel the project) [#159](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/159) ([3ed7d93](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/3ed7d9365c0cb624f32360a6cf2df4b7e625e725))
+
 ## [1.64.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.64.0...v1.64.1) (2025-06-01)
 
 
