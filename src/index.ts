@@ -1,8 +1,6 @@
 import "@logseq/libs" //https://plugins-doc.logseq.com/
 import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { setup as l10nSetup, t } from "logseq-l10n" //https://github.com/sethyuan/logseq-l10n
-import { shortKey } from "./board/constant"
-import { initializeBoard } from "./board/handle"
 import { boundariesProcess, removeBoundaries } from "./calendar/boundaries"
 import { keyLeftCalendarContainer, loadLeftCalendar, refreshCalendarCheckSameMonth } from "./calendar/left-calendar"
 import { dailyJournalDetails, observer, observerMain, removeTitleQuery } from "./dailyJournalDetails"
@@ -102,6 +100,13 @@ const main = async () => {
       setTimeout(() => logseq.showSettingsUI(), 300)
     }
   }, 3000)
+
+  if (logseq.settings!["cashBatch-daily-desk"] !== null) {
+    logseq.updateSettings({ "cashBatch-daily-desk": null })
+  }
+  if (logseq.settings!["cashBatch-weekly-desk"] !== null) {
+    logseq.updateSettings({ "cashBatch-weekly-desk": null })
+  }
 
 
   // CSS適用
@@ -206,15 +211,6 @@ const main = async () => {
   if (logseq.settings!.booleanLeftCalendar === true)
     loadLeftCalendar()
 
-
-
-  // ボード機能のセットアップ
-  // メニュー用のボタンを設置する
-  if (logseq.settings!.addLeftMenu === true)
-    initializeBoard()//ページ読み込み時に実行コールバック
-
-
-
   // プラグインオフ時に実行
   logseq.beforeunload(async () => {
 
@@ -229,15 +225,11 @@ const main = async () => {
 
     // Left Calendarのcontainerを取り除く
     removeElementById(keyLeftCalendarContainer)
-
-    // ボード機能のメニューを取り除く
-    removeAllElements(`.${shortKey}--nav-header`)
-
   })
 
 
   // グラフが変更されたときに実行
-  logseq.App.onCurrentGraphChanged(async() => {
+  logseq.App.onCurrentGraphChanged(async () => {
     // ユーザー設定を取得して更新
     await getUserConfig()
   })
