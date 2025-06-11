@@ -1,6 +1,6 @@
-import "@logseq/libs"; //https://plugins-doc.logseq.com/
+import "@logseq/libs" //https://plugins-doc.logseq.com/
 import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { t } from "logseq-l10n"; //https://github.com/sethyuan/logseq-l10n
+import { t } from "logseq-l10n" //https://github.com/sethyuan/logseq-l10n
 import { boundariesProcess, removeBoundaries } from "./calendar/boundaries"
 import { keyLeftCalendarContainer, loadLeftCalendar, refreshCalendarCheckSameMonth } from "./calendar/left-calendar"
 import { dailyJournalDetails, observer, observerMain, removeTitleQuery } from "./dailyJournalDetails"
@@ -18,6 +18,7 @@ import { handleSettingsUpdate } from "./settings/onSettingsChanged"
 import { settingsTemplate } from "./settings/settings"
 import { loadShortcutItems, } from "./shortcutItems"
 import { loadLogseqL10n } from "./translations/l10nSetup"
+import { logseqModelCheck } from "./logseqModelCheck"
 
 // プラグイン名(小文字タイプ)
 export const pluginNameCut = "show-weekday-and-week-number"
@@ -25,6 +26,20 @@ export const pluginNameCut = "show-weekday-and-week-number"
 export const pluginName = `${pluginNameCut} ${t("plugin")}`
 // コンソールの署名用
 export const consoleSignature = ` <----- [${pluginName}]`
+
+
+// 変数 (同じモジュール内で使用するため、exportしない)
+let logseqVersion: string = "" //バージョンチェック用
+let logseqMdModel: boolean = false //モデルチェック用
+let logseqDbGraph: boolean = false //DBグラフチェック用
+// 外部から参照するためにexportする
+export const getLogseqVersion = () => logseqVersion //バージョンチェック用
+export const replaceLogseqVersion = (version: string) => logseqVersion = version
+export const booleanLogseqMdModel = () => logseqMdModel //モデルチェック用
+export const replaceLogseqMdModel = (mdModel: boolean) => logseqMdModel = mdModel
+
+export const booleanDbGraph = () => logseqDbGraph //DBグラフチェック用
+export const replaceLogseqDbGraph = (dbGraph: boolean) => logseqDbGraph = dbGraph
 
 
 let configPreferredLanguage: string
@@ -62,10 +77,17 @@ let processingCheck = false //処理中フラグ
 /* main */
 const main = async () => {
 
+  // Logseqモデルのチェックを実行
+  const [logseqDbGraph, logseqMdModel] = await logseqModelCheck()
+
+
   // ユーザー設定言語を取得し、L10Nをセットアップ
   const { preferredLanguage, preferredDateFormat } = await loadLogseqL10n()
   configPreferredLanguage = preferredLanguage
   configPreferredDateFormat = preferredDateFormat
+
+  // TODO: // Logseqのユーザー日付フォーマットがおかしい
+  console.log(`${consoleSignature} Logseq preferredDateFormat: ${preferredDateFormat}`)
 
 
   // 更新メッセージなどを表示する

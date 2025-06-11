@@ -20,7 +20,7 @@ import zhCN from "./zh-CN.json"
 import zhHant from "./zh-Hant.json"
 
 
-const getUserLanguage = async (): Promise<string[]> => {
+const getUserConfigs = async (): Promise<string[]> => {
              // 1秒待つ
              await new Promise((resolve) => setTimeout(resolve, 1000))
              const { preferredLanguage, preferredDateFormat } = await logseq.App.getUserConfigs() as { preferredDateFormat: string; preferredLanguage: string }
@@ -28,7 +28,7 @@ const getUserLanguage = async (): Promise<string[]> => {
 }
 
 export const loadLogseqL10n = async () => {
-             const [preferredLanguage, preferredDateFormat] = await getUserLanguage() //ユーザー設定言語を取得
+             const [preferredLanguage, preferredDateFormat] = await getUserConfigs() //ユーザー設定言語を取得
 
              const translations = {
                           ja, af, de, es, fr, id, it, ko, "nb-NO": nbNO, nl, pl, "pt-BR": ptBR, "pt-PT": ptPT, ru, sk, tr, uk, "zh-CN": zhCN, "zh-Hant": zhHant
