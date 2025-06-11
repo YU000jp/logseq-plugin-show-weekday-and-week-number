@@ -1,6 +1,6 @@
-import "@logseq/libs" //https://plugins-doc.logseq.com/
+import "@logseq/libs"; //https://plugins-doc.logseq.com/
 import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
-import { setup as l10nSetup, t } from "logseq-l10n" //https://github.com/sethyuan/logseq-l10n
+import { t } from "logseq-l10n"; //https://github.com/sethyuan/logseq-l10n
 import { boundariesProcess, removeBoundaries } from "./calendar/boundaries"
 import { keyLeftCalendarContainer, loadLeftCalendar, refreshCalendarCheckSameMonth } from "./calendar/left-calendar"
 import { dailyJournalDetails, observer, observerMain, removeTitleQuery } from "./dailyJournalDetails"
@@ -9,7 +9,7 @@ import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal, weeklyEmbed } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
 import { getHolidaysBundle } from "./lib/holidays"
-import { getDateFromJournalDay, removeAllElements, removeElementById } from "./lib/lib"
+import { getDateFromJournalDay, removeElementById } from "./lib/lib"
 import { advancedQuery, getCurrentPageUuid, queryCodeGetJournalDayFromOriginalName } from "./lib/query/advancedQuery"
 import fileMainCSS from "./main.css?inline"
 import { mapLanguageCodeToCountry } from "./settings/languageCountry"
@@ -17,25 +17,7 @@ import { notice } from "./settings/notice"
 import { handleSettingsUpdate } from "./settings/onSettingsChanged"
 import { settingsTemplate } from "./settings/settings"
 import { loadShortcutItems, } from "./shortcutItems"
-import af from "./translations/af.json"
-import de from "./translations/de.json"
-import es from "./translations/es.json"
-import fr from "./translations/fr.json"
-import id from "./translations/id.json"
-import it from "./translations/it.json"
-import ja from "./translations/ja.json"
-import ko from "./translations/ko.json"
-import nbNO from "./translations/nb-NO.json"
-import nl from "./translations/nl.json"
-import pl from "./translations/pl.json"
-import ptBR from "./translations/pt-BR.json"
-import ptPT from "./translations/pt-PT.json"
-import ru from "./translations/ru.json"
-import sk from "./translations/sk.json"
-import tr from "./translations/tr.json"
-import uk from "./translations/uk.json"
-import zhCN from "./translations/zh-CN.json"
-import zhHant from "./translations/zh-Hant.json"
+import { loadLogseqL10n } from "./translations/l10nSetup"
 
 // プラグイン名(小文字タイプ)
 export const pluginNameCut = "show-weekday-and-week-number"
@@ -80,13 +62,10 @@ let processingCheck = false //処理中フラグ
 /* main */
 const main = async () => {
 
-
-  // l10nのセットアップ
-  await l10nSetup({
-    builtinTranslations: {//Full translations
-      ja, af, de, es, fr, id, it, ko, "nb-NO": nbNO, nl, pl, "pt-BR": ptBR, "pt-PT": ptPT, ru, sk, tr, uk, "zh-CN": zhCN, "zh-Hant": zhHant
-    }
-  })
+  // ユーザー設定言語を取得し、L10Nをセットアップ
+  const { preferredLanguage, preferredDateFormat } = await loadLogseqL10n()
+  configPreferredLanguage = preferredLanguage
+  configPreferredDateFormat = preferredDateFormat
 
 
   // 更新メッセージなどを表示する
@@ -111,14 +90,6 @@ const main = async () => {
 
   // CSS適用
   logseq.provideStyle({ key: "main", style: fileMainCSS })
-
-
-  // 100ms待機
-  await new Promise(resolve => setTimeout(resolve, 100))
-
-
-  // ユーザー設定を取得
-  await getUserConfig()
 
 
   // プラグイン設定のセットアップ
