@@ -1,5 +1,7 @@
 import { LSPluginBaseInfo } from "@logseq/libs/dist/LSPlugin.user"
-import { fetchJournalTitles, getUserConfig, invokeBoundaryHandler } from ".."
+import { getUserConfig } from ".."
+import { fetchJournalTitles } from "../fetchJournalTitles"
+import { invokeBoundaryHandler } from "../calendar/invokeBoundaryHandler"
 import { removeBoundaries } from "../calendar/boundaries"
 import { removeTitleQuery } from "../dailyJournalDetails"
 import { keyThisWeekPopup, weeklyEmbed } from "../journals/weeklyJournal"

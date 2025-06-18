@@ -7,7 +7,7 @@ import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib/lib'
 import { findPageUuid } from '../lib/query/advancedQuery'
 import { separate, weeklyJournalCreateNav } from './nav'
 import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
-let processingFoundBoundaries: boolean = false
+
 let processingWeeklyJournal: boolean = false
 export const keyThisWeekPopup = "weeklyEmbed"
 
@@ -292,6 +292,7 @@ const eventListener = (scrollTargetElement: HTMLElement, ev: WheelEvent) => {
 }
 
 
+let processingFoundBoundaries: boolean = false
 export const callMiniCalendar = (check: boolean, monthStartDay: Date) => {
     if (check === true
         && !parent.document.getElementById("weekBoundaries")
