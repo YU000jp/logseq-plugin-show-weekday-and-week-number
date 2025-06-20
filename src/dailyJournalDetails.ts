@@ -218,9 +218,9 @@ const enableUnderHolidayForWorldCountry = (journalDate: Date, baseLineElement: H
 }
 
 export const removeTitleQuery = () => {
-  const titleBehindElements = parent.document.body.querySelectorAll("div#main-content-container div:is(.journal,.is-journals) h1.title+span.showWeekday") as NodeListOf<HTMLElement>
+  const titleBehindElements = parent.document.body.querySelectorAll("#main-content-container div:is(.journal,.is-journals) h1.title+span.showWeekday") as NodeListOf<HTMLElement>
   titleBehindElements.forEach((titleElement) => titleElement.remove())
-  const titleElements = parent.document.body.querySelectorAll("div#main-content-container div:is(.journal,.is-journals) h1.title[data-checked]") as NodeListOf<HTMLElement>
+  const titleElements = parent.document.body.querySelectorAll("#main-content-container div:is(.journal,.is-journals) h1.title[data-checked]") as NodeListOf<HTMLElement>
   titleElements.forEach((titleElement) => titleElement.removeAttribute("data-checked"))
 }
 

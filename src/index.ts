@@ -110,10 +110,10 @@ const main = async () => {
 
   // プラグイン設定のセットアップ
   logseq.useSettingsSchema(
-    settingsTemplate(
+    settingsTemplate(logseq.settings,logseqDbGraph, logseqMdModel,
       logseq.settings!.holidaysCountry === undefined ? // 国名が設定されていない場合は取得
         mapLanguageCodeToCountry(configPreferredLanguage)
-        : logseq.settings!.holidaysCountry
+        : logseq.settings!.holidaysCountry as string
     ))
 
 
