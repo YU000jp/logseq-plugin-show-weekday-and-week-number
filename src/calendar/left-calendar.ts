@@ -1,7 +1,7 @@
 import { addDays, Day, eachDayOfInterval, getISOWeek, getWeek, isSameDay, isSameISOWeek, isSameMonth, isSameWeek, isSameYear, isToday, startOfISOWeek, startOfMonth, startOfWeek } from "date-fns"
 import { format } from "date-fns/format"
 import { t } from "logseq-l10n"
-import { getConfigPreferredDateFormat, getConfigPreferredLanguage, pluginName } from ".."
+import { getConfigPreferredDateFormat, getConfigPreferredLanguage, getLeftSidebarFooterSelector, pluginName } from ".."
 import { separate } from "../journals/nav"
 import { holidaysWorld, lunarString } from "../lib/holidays"
 import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, removeElementById, shortDayNames, userColor } from "../lib/lib"
@@ -18,8 +18,9 @@ export const loadLeftCalendar = () => {
         removeElementById(keyLeftCalendarContainer)//すでに存在する場合は削除する
 
     setTimeout(async () => {
+        
         //左サイドバーのフッターに追加する
-        const footerElement: HTMLElement | null = parent.document.querySelector("div#main-container div#left-sidebar>div.left-sidebar-inner footer.create") as HTMLElement | null
+        const footerElement: HTMLElement | null = parent.document.querySelector(getLeftSidebarFooterSelector()) as HTMLElement | null
         if (footerElement === null) return //nullの場合はキャンセル
 
         const containerElement: HTMLDivElement = document.createElement("div")

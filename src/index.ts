@@ -110,7 +110,7 @@ const main = async () => {
 
   // プラグイン設定のセットアップ
   logseq.useSettingsSchema(
-    settingsTemplate(logseq.settings,logseqDbGraph, logseqMdModel,
+    settingsTemplate(logseq.settings, logseqDbGraph, logseqMdModel,
       logseq.settings!.holidaysCountry === undefined ? // 国名が設定されていない場合は取得
         mapLanguageCodeToCountry(configPreferredLanguage)
         : logseq.settings!.holidaysCountry as string
@@ -234,6 +234,33 @@ const main = async () => {
 
 } /* end_main */
 
+
+/**
+ * Logseqモデル・DBグラフ種別に応じたDOMクエリーセレクター
+ */
+export const getJournalTitleSelector = (): string =>
+  // 必要に応じて条件分岐でセレクターを切り替える
+  logseqDbGraph ?
+    // DBグラフ用
+    "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+    : logseqMdModel === false ?
+      // DBモデルかつfile-basedグラフ用
+      "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+      :
+      // MDモデル用
+      "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+
+
+export const getLeftSidebarFooterSelector = (): string =>
+  logseqDbGraph ?
+    // DBグラフ用
+    "#left-sidebar>div.left-sidebar-inner footer.create"
+    : logseqMdModel === false ?
+      // DBモデルかつfile-basedグラフ用
+      "#left-sidebar>div.left-sidebar-inner footer.create"
+      :
+      // MDモデル用
+      "#left-sidebar>div.left-sidebar-inner footer.create"
 
 
 logseq.ready(main).catch(console.error)

@@ -1,3 +1,4 @@
+import { getJournalTitleSelector } from "./index"
 import { validateJournalTitle } from "./validateJournalTitle"
 
 // クエリーセレクターでタイトルを取得する
@@ -10,8 +11,10 @@ export const fetchJournalTitles = async (enable: boolean): Promise<void> => {
   try {
     setTimeout(() => processingTitleQuery = false, 300) //boundaries 実行ロックの解除
 
-    //Journalsの場合は複数
-    parent.document.body.querySelectorAll("#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])")
+    // モデル・DBグラフ種別に応じたセレクターを取得
+    const selector = getJournalTitleSelector()
+
+    parent.document.body.querySelectorAll(selector)
       .forEach(async (titleElement) => await validateJournalTitle(titleElement as HTMLElement))
   } finally {
     processingTitleQuery = false // 確実にフラグを解除
