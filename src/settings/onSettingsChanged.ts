@@ -1,5 +1,5 @@
 import { LSPluginBaseInfo } from "@logseq/libs/dist/LSPlugin.user"
-import { booleanDbGraph, getUserConfig } from ".."
+import { booleanDbGraph, booleanLogseqMdModel, getUserConfig } from ".."
 import { fetchJournalTitles } from "../fetchJournalTitles"
 import { invokeBoundaryHandler } from "../calendar/invokeBoundaryHandler"
 import { removeBoundaries } from "../calendar/boundaries"
@@ -10,6 +10,7 @@ import { removeElementById, removeProvideStyle } from "../lib/lib"
 import { doesPageExist } from "../lib/query/advancedQuery"
 import { SettingKeys } from "./SettingKeys"
 import { currentCalendarDate, keyLeftCalendarContainer, loadLeftCalendar, refreshMonthlyCalendar } from "../calendar/left-calendar"
+import { settingsTemplate } from "./settings"
 
 let processingSettingsChanged: boolean = false
 let processingRenamePage: boolean = false
@@ -45,6 +46,27 @@ export const handleSettingsUpdate = () => {
 
 
   logseq.onSettingsChanged((newSet: LSPluginBaseInfo["settings"], oldSet: LSPluginBaseInfo["settings"]) => {
+
+    // プラグイン設定画面の更新が必要なケース
+    if (newSet.booleanLeftCalendar != oldSet.booleanLeftCalendar
+      || newSet.booleanMonthlyJournal != oldSet.booleanMonthlyJournal
+      || newSet.booleanWeeklyJournal != oldSet.booleanWeeklyJournal
+      || newSet.booleanQuarterlyJournal != oldSet.booleanQuarterlyJournal
+      || newSet.booleanYearlyJournal != oldSet.booleanYearlyJournal
+      || newSet.booleanBoundariesAll != oldSet.booleanBoundariesAll
+    ) {
+      logseq.hideSettingsUI()
+      setTimeout(() => {
+        logseq.useSettingsSchema(
+          settingsTemplate(newSet, booleanDbGraph(), booleanLogseqMdModel(),
+            newSet.holidaysCountry as string
+          ))
+        setTimeout(() => {
+          logseq.showSettingsUI()
+        }, 100)
+      }, 10)
+    }
+
 
     if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
       if (newSet.booleanLeftCalendar === true)

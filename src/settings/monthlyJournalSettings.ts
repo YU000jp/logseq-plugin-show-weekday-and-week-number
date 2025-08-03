@@ -19,11 +19,15 @@ export const monthlyJournalSettings = (logseqSettings: LSPluginBaseInfo['setting
     default: true,
     description: t("Enable the link and function. If there is no content available on a page with a month number like 2024/05, a template will be inserted."),
   },
-  {
-    key: SettingKeys.monthlyJournalTemplateName,
-    title: t("Template name"),
-    type: "string",
-    default: "",
-    description: t("Input the template name (default is blank)"),
-  },
+  ...(logseqSettings?.booleanMonthlyJournal === true
+    ? [
+      {
+        key: SettingKeys.monthlyJournalTemplateName,
+        title: t("Template name"),
+        type: "string" as const,
+        default: "",
+        description: t("Input the template name (default is blank)"),
+      },
+    ]
+    : []),
 ]
