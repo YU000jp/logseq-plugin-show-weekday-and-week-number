@@ -241,26 +241,25 @@ const main = async () => {
 export const getJournalTitleSelector = (): string =>
   // 必要に応じて条件分岐でセレクターを切り替える
   logseqDbGraph ?
-    // DBグラフ用
-    "#main-content-container div:is(.journal,#journals,.page) h1.title:not([data-checked])"
-    : logseqMdModel === false ?
-      // DBモデルかつfile-basedグラフ用
-      "#main-content-container div:is(.journal,#journals,.page) h1.title:not([data-checked])"
-      :
-      // MDモデル用
-      "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+    ""
+    // logseqDbGraph && logseqMdModel ?
+    //   // DBグラフ用
+    //   "#main-content-container div:is(#journals,.is-journals,.page) div.ls-page-title span.block-title-wrap:not([data-checked])"
+    //   : logseqDbGraph && logseqMdModel === false ?
+    //     // DBモデルかつfile-basedグラフ用
+    //     "#main-content-container div:is(.journal,#journals,.page) h1.title:not([data-checked])"
+    :
+    // MDモデル用
+    "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
 
 
 export const getLeftSidebarFooterSelector = (): string =>
   logseqDbGraph ?
-    // DBグラフ用
+    // DBグラフ用 および DBモデルかつfile-basedグラフ用
     "#left-sidebar>div.left-sidebar-inner div.sidebar-contents-container"
-    : logseqMdModel === false ?
-      // DBモデルかつfile-basedグラフ用
-      "#left-sidebar>div.left-sidebar-inner div.sidebar-contents-container"
-      :
-      // MDモデル用
-      "#left-sidebar>div.left-sidebar-inner footer.create"
+    :
+    // MDモデル用
+    "#left-sidebar>div.left-sidebar-inner footer.create"
 
 
 logseq.ready(main).catch(console.error)

@@ -36,13 +36,23 @@ export const styleList = [
 ]
 
 // 各セクションを結合して返す
-export const settingsTemplate = (logseqSettings: LSPluginBaseInfo['settings'] | undefined, logseqDbGraph: boolean, logseqMdModel: boolean, userLanguage: string): SettingSchemaDesc[] => [
-  ...commonSettings(logseqSettings, logseqDbGraph, logseqMdModel, userLanguage),
-  ...dailyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-  ...journalBoundariesSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-  ...leftCalendarSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-  ...weeklyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-  ...monthlyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-  ...quarterlyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-  ...yearlyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
-]
+export const settingsTemplate = (logseqSettings: LSPluginBaseInfo['settings'] | undefined, logseqDbGraph: boolean, logseqMdModel: boolean, userLanguage: string): SettingSchemaDesc[] => {
+  if (logseqMdModel === true) {
+    return [//
+      ...commonSettings(logseqSettings, logseqDbGraph, logseqMdModel, userLanguage),
+      ...dailyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...journalBoundariesSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...leftCalendarSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...weeklyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...monthlyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...quarterlyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...yearlyJournalSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+    ]
+  } else {
+    return [
+      ...commonSettings(logseqSettings, logseqDbGraph, logseqMdModel, userLanguage),
+      ...journalBoundariesSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+      ...leftCalendarSettings(logseqSettings, logseqDbGraph, logseqMdModel),
+    ]
+  }
+}

@@ -13,9 +13,9 @@ export const fetchJournalTitles = async (enable: boolean): Promise<void> => {
 
     // モデル・DBグラフ種別に応じたセレクターを取得
     const selector = getJournalTitleSelector()
-
-    parent.document.body.querySelectorAll(selector)
-      .forEach(async (titleElement) => await validateJournalTitle(titleElement as HTMLElement))
+    if (selector != "")
+      parent.document.body.querySelectorAll(selector)
+        .forEach(async (titleElement) => await validateJournalTitle(titleElement as HTMLElement))
   } finally {
     processingTitleQuery = false // 確実にフラグを解除
   }
