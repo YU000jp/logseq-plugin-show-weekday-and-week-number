@@ -13,12 +13,12 @@ export const keyLeftCalendarContainer = "left-calendar-container"
 export let currentCalendarDate: Date = new Date() //今日の日付を取得
 let flagWeekly = false //週間表示フラグ
 
-export const loadLeftCalendar = () => {
+export const loadLeftCalendar = (logseqDbGraph: boolean) => {
     if (parent.document.getElementById(keyLeftCalendarContainer))
         removeElementById(keyLeftCalendarContainer)//すでに存在する場合は削除する
 
     setTimeout(async () => {
-        
+
         //左サイドバーのフッターに追加する
         const footerElement: HTMLElement | null = parent.document.querySelector(getLeftSidebarFooterSelector()) as HTMLElement | null
         if (footerElement === null) return //nullの場合はキャンセル
@@ -41,7 +41,10 @@ export const loadLeftCalendar = () => {
         detailsElement.appendChild(summaryElement)
         detailsElement.appendChild(innerElement)
         containerElement.appendChild(detailsElement)
-        footerElement.insertAdjacentElement("beforebegin", containerElement)
+        if (logseqDbGraph)
+            footerElement.insertAdjacentElement("afterend", containerElement) //DBグラフの場合は後ろ
+        else
+            footerElement.insertAdjacentElement("beforebegin", containerElement)
 
         //スペースに表示する
         setTimeout(async () => {

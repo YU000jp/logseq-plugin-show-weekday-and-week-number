@@ -196,7 +196,7 @@ const main = async () => {
 
   // Left Calendarのセットアップ
   if (logseq.settings!.booleanLeftCalendar === true)
-    loadLeftCalendar()
+    loadLeftCalendar(logseqDbGraph)
 
 
 
@@ -242,10 +242,10 @@ export const getJournalTitleSelector = (): string =>
   // 必要に応じて条件分岐でセレクターを切り替える
   logseqDbGraph ?
     // DBグラフ用
-    "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+    "#main-content-container div:is(.journal,#journals,.page) h1.title:not([data-checked])"
     : logseqMdModel === false ?
       // DBモデルかつfile-basedグラフ用
-      "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+      "#main-content-container div:is(.journal,#journals,.page) h1.title:not([data-checked])"
       :
       // MDモデル用
       "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
@@ -254,10 +254,10 @@ export const getJournalTitleSelector = (): string =>
 export const getLeftSidebarFooterSelector = (): string =>
   logseqDbGraph ?
     // DBグラフ用
-    "#left-sidebar>div.left-sidebar-inner footer.create"
+    "#left-sidebar>div.left-sidebar-inner div.sidebar-contents-container"
     : logseqMdModel === false ?
       // DBモデルかつfile-basedグラフ用
-      "#left-sidebar>div.left-sidebar-inner footer.create"
+      "#left-sidebar>div.left-sidebar-inner div.sidebar-contents-container"
       :
       // MDモデル用
       "#left-sidebar>div.left-sidebar-inner footer.create"

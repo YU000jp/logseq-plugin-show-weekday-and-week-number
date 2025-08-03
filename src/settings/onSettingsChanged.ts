@@ -1,5 +1,5 @@
 import { LSPluginBaseInfo } from "@logseq/libs/dist/LSPlugin.user"
-import { getUserConfig } from ".."
+import { booleanDbGraph, getUserConfig } from ".."
 import { fetchJournalTitles } from "../fetchJournalTitles"
 import { invokeBoundaryHandler } from "../calendar/invokeBoundaryHandler"
 import { removeBoundaries } from "../calendar/boundaries"
@@ -48,7 +48,7 @@ export const handleSettingsUpdate = () => {
 
     if (oldSet.booleanLeftCalendar !== newSet.booleanLeftCalendar) {
       if (newSet.booleanLeftCalendar === true)
-        loadLeftCalendar()//表示する
+        loadLeftCalendar(booleanDbGraph())//表示する
       else
         removeElementById(keyLeftCalendarContainer)//消す
     } else {
