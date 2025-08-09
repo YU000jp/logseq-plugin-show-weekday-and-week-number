@@ -68,9 +68,9 @@ export const getCurrentPageExist = async (): Promise<boolean> => {
   return !!result?.[0]
 }
 
-export const getCurrentPageOriginalName = async (): Promise<PageEntity["original-name"] | null> => {
+export const getCurrentPageOriginalName = async (): Promise<PageEntity["original-name"] | string | null> => {
   const query = `
-    [:find (pull ?p [:block/original-name])
+    [:find (pull ?p [:block/original-name :block/title])
      :in $ ?current
      :where
    (or
