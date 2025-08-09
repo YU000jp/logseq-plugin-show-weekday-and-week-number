@@ -55,11 +55,11 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
    > ![README用](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/114708ab-0389-4c46-b962-00cb25e2070a)
 
- 1. **Monthly Calendar** in left sidebar 🆕
+ 1. **Monthly Calendar** in left sidebar
 
     > ![image](https://github.com/user-attachments/assets/6d0e4c0e-1960-4db4-b559-154300db164d)
 
-### Breadcrumb of Journal Links 🆕
+### Breadcrumb of Journal Links
 
 - Use the navigation links at the top of the page to access other journals.
 1. Weekly Journal:
@@ -79,7 +79,7 @@ Sample:
 
 - Click the link on the left side of the mini calendar to generate a page like `[[2023/10]]` and apply the template.
 
-### Quarterly Journal / Yearly Journal 🆕
+### Quarterly Journal / Yearly Journal
 
 > Note: Quartely Journal is only valid if the page title format for Weekly Journal is set to `yyyy/qqq/Www` or `yyyy-qqq-Www`.
 - Access from the hierarchical link of the Monthly or Weekly journal. The page will be generated and the template will be applied.
@@ -103,18 +103,11 @@ Sample:
 2. **Choose your week number format**:
    - `US format`: Weeks start on Sunday
    - `ISO format`: Weeks start on Monday
-   > 💡 ISO format is standard in most countries outside the US
+   > [Document here](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Week-number-format)
 
 3. Enable/disable features as needed
    - All settings can be changed later
    - Display format is fully customizable
-
-### Usage
-
-- The style be applied to journals or the single journal page, the right sidebar.
-- First, please configure the plugin settings.
-  1. Select either US format or ISO format.
-     > [Document here](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Week-number-format)
 
 ---
 
