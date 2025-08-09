@@ -4,6 +4,8 @@ import { t } from "logseq-l10n"
 import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
 import { SettingKeys } from "../settings/SettingKeys"
 import { getPageBlocks, doesPageExist, findPageUuid } from "./query/advancedQuery"
+import { booleanLogseqMdModel } from ".."
+import Swal from "sweetalert2"
 
 
 export const shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as DayShortCode[]
@@ -137,8 +139,37 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
     if (pageUuid)
       logseq.Editor.openInRightSidebar(pageUuid) //ページが存在しない場合は開かない
   }
-  else
-    logseq.App.pushState('page', { name: pageName })
+  else {
+    const mdModel = booleanLogseqMdModel() as boolean
+    if (mdModel === true) {
+      logseq.App.pushState('page', { name: pageName })
+    } else {
+      const page = await doesPageExist(pageName) as boolean
+      if (page) {
+        logseq.App.pushState('page', { name: pageName })
+      } else {
+        logseq.Editor.showMsg(`Page "${pageName}" does not exist.`, 'warning', { timeout: 5000 })
+
+        logseq.showMainUI()
+        await Swal.fire({
+          title: t("Do you want to continue?"),
+          text: `${t("Create a new page.")}\n\n[[${pageName}]]`,
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            //ページが存在しない場合は、ページを作成する
+            await logseq.Editor.createPage(pageName, {}, { createFirstBlock: true, redirect: true })
+            logseq.UI.showMsg(t("Page created successfully."), 'success', { timeout: 2000 })
+          } else
+            await logseq.UI.showMsg(t("Cancelled"), "warning")
+          logseq.hideMainUI()
+        })
+      }
+    }
+  }
 }
 
 export const removeProvideStyle = (className: string) => {

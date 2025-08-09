@@ -15,7 +15,9 @@ export const getPageBlocks = async (pageName: string): Promise<{ uuid: PageEntit
     [:find (pull ?b [:block/uuid])
      :in $ ?name
      :where
+   (or
      [?p :block/original-name ?name]
+     [?p :block/title ?name])
      [?b :block/page ?p]
      [?b :block/uuid ?uuid]]
   `
@@ -26,7 +28,9 @@ const createBaseQuery = (field: string): string => `
   [:find (pull ?b [:block/${field}])
    :in $ ?name
    :where
-   [?b :block/original-name ?name]
+   (or
+     [?b :block/original-name ?name]
+     [?b :block/title ?name])
    [?b :block/${field} ?${field}]] 
 `
 
@@ -54,7 +58,9 @@ export const getCurrentPageExist = async (): Promise<boolean> => {
     [:find (pull ?p [:block/uuid])
      :in $ ?current
      :where
+   (or
      [?p :block/name ?name]
+     [?p :block/title ?name])
      [(= ?name ?current)]
      [?p :block/uuid ?uuid]]
   `
@@ -67,7 +73,9 @@ export const getCurrentPageOriginalName = async (): Promise<PageEntity["original
     [:find (pull ?p [:block/original-name])
      :in $ ?current
      :where
+   (or
      [?p :block/name ?name]
+     [?p :block/title ?name])
      [(= ?name ?current)]
      [?p :block/original-name ?original-name]]
   `
@@ -81,7 +89,9 @@ export const getCurrentPageJournalDay = async (): Promise<PageEntity["journalDay
     [:find (pull ?p [:block/journal-day])
      :in $ ?current
      :where
+  (or
      [?p :block/name ?name]
+     [?p :block/title ?name])
      [(= ?name ?current)]
      [?p :block/journal-day ?journal]]
   `
@@ -89,12 +99,14 @@ export const getCurrentPageJournalDay = async (): Promise<PageEntity["journalDay
   return result?.[0]?.["journal-day"] ?? null
 }
 
-export const getCurrentPageUuid = async (): Promise< PageEntity["uuid"] | null> => {
+export const getCurrentPageUuid = async (): Promise<PageEntity["uuid"] | null> => {
   const query = `
     [:find (pull ?p [:block/uuid])
      :in $ ?current
      :where
+   (or
      [?p :block/name ?name]
+     [?p :block/title ?name])
      [(= ?name ?current)]
      [?p :block/uuid ?uuid]]
   `

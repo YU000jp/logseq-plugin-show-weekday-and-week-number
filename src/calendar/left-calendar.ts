@@ -6,7 +6,7 @@ import { separate } from "../journals/nav"
 import { holidaysWorld, lunarString } from "../lib/holidays"
 import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, removeElementById, shortDayNames, userColor } from "../lib/lib"
 import { doesPageExist } from "../lib/query/advancedQuery"
-import { applyWeekendColor, openPageToSingleDay } from "./boundaries"
+import { applyWeekendColor } from "./boundaries"
 
 export const keyLeftCalendarContainer = "left-calendar-container"
 
@@ -98,7 +98,7 @@ const createDayCell = async (
     const holiday = await checkDay(date, month, dayCell, preferredDateFormat, innerElement)
     const pageName = format(date, preferredDateFormat) as string
     if (pageName) {
-        dayCell.addEventListener("click", openPageToSingleDay(pageName))
+        dayCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(pageName, shiftKey))
         dayCell.classList.add("cursor")
         dayCell.title = holiday !== "" ? holiday + "\n" + pageName : pageName
     }

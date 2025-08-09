@@ -253,7 +253,7 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
           dayCell.title = `${eventName}\n${dayCell.title}`
       }
 
-      dayCell.addEventListener("click", openPageToSingleDay(dateFormatString))
+      dayCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(dateFormatString, shiftKey))
 
       //20240115
       //エントリーが存在するかどうかのインディケーターを表示する
@@ -306,27 +306,6 @@ const getWeekOffsetDays = (flagShowNextWeek: boolean): number[] =>
   flagShowNextWeek === true ?
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] //次の週を表示する場合
     : [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6] //次の週を表示しない場合
-
-
-// 日誌のページを開く function
-export function openPageToSingleDay(pageName: string): (this: HTMLSpanElement, ev: MouseEvent) => any {
-  return async (event) => {
-    if (event.shiftKey) {//Shiftキーを押しながらクリックした場合は、サイドバーでページを開く
-      const pageUuid = await findPageUuid(pageName) as PageEntity["uuid"] | null
-      if (pageUuid)
-        logseq.Editor.openInRightSidebar(pageUuid)//ページが存在しない場合は開かない
-    } else
-      //Shiftキーを押さずにクリックした場合は、ページを開く
-      if (logseq.settings!.booleanNoPageFoundCreatePage === true)
-        //ページが存在しない場合は作成しない
-        if (await doesPageExist(pageName) as boolean)
-          logseq.App.pushState('page', { name: pageName })//ページが存在する場合は開く
-        else
-          logseq.UI.showMsg(t("Page not found"), "warning", { timeout: 3000 })//ページが存在しない場合は警告を表示する
-      else
-        logseq.App.pushState('page', { name: pageName })//ページが存在しない場合も作成される
-  }
-}
 
 
 export const removeBoundaries = () => {

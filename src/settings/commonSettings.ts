@@ -173,13 +173,6 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
     description: "default-color: `#22c55e`",
   },
   {
-    key: SettingKeys.booleanNoPageFoundCreatePage,
-    title: t("If no page found, not create page (before today)"),
-    type: "boolean",
-    default: true,
-    description: "",
-  },
-  {
     key: SettingKeys.userColorList,
     title: t("User color") + "🆕",
     type: "string",

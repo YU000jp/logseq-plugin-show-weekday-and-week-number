@@ -20,7 +20,6 @@ export const SettingKeys = {
   userWeekendSun: "userWeekendSun",
   boundariesHighlightColorSinglePage: "boundariesHighlightColorSinglePage",
   boundariesHighlightColorToday: "boundariesHighlightColorToday",
-  booleanNoPageFoundCreatePage: "booleanNoPageFoundCreatePage",
   userColorList: "userColorList",
   choiceUserColor: "choiceUserColor",
   heading001: "heading001",
