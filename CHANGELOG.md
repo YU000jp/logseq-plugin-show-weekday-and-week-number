@@ -1,3 +1,10 @@
+## [1.65.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.1...v1.65.2) (2025-08-09)
+
+
+### Bug Fixes
+
+* **bug:** for DB model, [#152](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/152) ([4bfbfa6](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/4bfbfa64cf3a886aeaf04c0112ad57f96bceb6a6))
+
 ## [1.65.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.0...v1.65.1) (2025-08-09)
 
 
