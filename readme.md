@@ -19,7 +19,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
 ### 2️⃣ Smart Calendar Features
 - **Compact 2-line Calendar**
-   - Quick week navigation using ↑/↓ keys
+   - Quick week navigation using ↑/↓ buttons
    - One-click access to monthly/weekly journals
 - **Monthly Calendar** (left sidebar) 🆕
    - Highlights holidays
