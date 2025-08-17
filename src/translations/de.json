@@ -109,4 +109,10 @@
   "Use on Monthly Journal": "Verwendung im monatlichen Journal",
   "Use on Quarterly Journal": "Verwendung in vierteljährlichen Journalen",
   "Use on Yearly Journal": "Verwendung im Jahresjournal"
+    ,"Do you want to continue?": "Möchten Sie fortfahren?",
+    "Create a new page.": "Eine neue Seite erstellen.",
+    "Confirm": "Bestätigen",
+    "Cancel": "Abbrechen",
+    "Page created successfully.": "Seite erfolgreich erstellt.",
+    "Cancelled": "Abgebrochen"
 }

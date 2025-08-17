@@ -109,4 +109,10 @@
   "Use on Monthly Journal": "Uso en el diario mensual",
   "Use on Quarterly Journal": "Uso en el diario trimestral",
   "Use on Yearly Journal": "Uso en el Diario Anual"
+    ,"Do you want to continue?": "¿Desea continuar?",
+    "Create a new page.": "Crear una nueva página.",
+    "Confirm": "Confirmar",
+    "Cancel": "Cancelar",
+    "Page created successfully.": "Página creada con éxito.",
+    "Cancelled": "Cancelado"
 }
