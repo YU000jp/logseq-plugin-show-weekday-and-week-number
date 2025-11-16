@@ -25,13 +25,22 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
     // 読み込み中フラグをチェック
     if (loadingCalendar) return
 
-    loadingCalendar = true
+    // 既存のDOMがないかをチェックして重複を防ぐ
+    if (parent.document.getElementById(keyLeftCalendarContainer)) {
+        // すでに存在する場合は、何もしない
+        return
+    }
 
-    if (parent.document.getElementById(keyLeftCalendarContainer))
-        removeElementById(keyLeftCalendarContainer)//すでに存在する場合は削除する
+    loadingCalendar = true
 
     calendarLoadTimeout = setTimeout(async () => {
         calendarLoadTimeout = null
+
+        // 再度既存のDOMをチェック（タイムアウト中に作成された可能性があるため）
+        if (parent.document.getElementById(keyLeftCalendarContainer)) {
+            loadingCalendar = false
+            return
+        }
 
         //左サイドバーのフッターに追加する
         const footerElement: HTMLElement | null = parent.document.querySelector(getLeftSidebarFooterSelector()) as HTMLElement | null
@@ -76,9 +85,9 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
                 createCalendar(new Date(), await getConfigPreferredDateFormat(), innerElement)
 
             innerElement.dataset.flag = "true" //フラグを立てる
+            loadingCalendar = false // 読み込み完了フラグをリセット（カレンダー作成完了後）
         }, 1)
 
-        loadingCalendar = false // 読み込み完了フラグをリセット
     }, 500)
 }
 
