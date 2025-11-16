@@ -12,16 +12,41 @@ export const keyLeftCalendarContainer = "left-calendar-container"
 
 export let currentCalendarDate: Date = new Date() //今日の日付を取得
 let flagWeekly = false //週間表示フラグ
+let loadingCalendar = false //カレンダー読み込み中フラグ
+let calendarLoadTimeout: ReturnType<typeof setTimeout> | null = null //タイムアウトIDを保存
 
 export const loadLeftCalendar = (logseqDbGraph: boolean) => {
-    if (parent.document.getElementById(keyLeftCalendarContainer))
-        removeElementById(keyLeftCalendarContainer)//すでに存在する場合は削除する
+    // 読み込み中フラグをチェック
+    if (loadingCalendar) return
 
-    setTimeout(async () => {
+    // すでに読み込み中の場合は、既存のタイムアウトをキャンセル
+    if (calendarLoadTimeout !== null) {
+        clearTimeout(calendarLoadTimeout)
+        calendarLoadTimeout = null
+    }
+    // 既存のDOMがないかをチェックして重複を防ぐ
+    if (parent.document.getElementById(keyLeftCalendarContainer)) {
+        // すでに存在する場合は、何もしない
+        return
+    }
+
+    loadingCalendar = true
+
+    calendarLoadTimeout = setTimeout(async () => {
+        calendarLoadTimeout = null
+
+        // 再度既存のDOMをチェック（タイムアウト中に作成された可能性があるため）
+        if (parent.document.getElementById(keyLeftCalendarContainer)) {
+            loadingCalendar = false
+            return
+        }
 
         //左サイドバーのフッターに追加する
         const footerElement: HTMLElement | null = parent.document.querySelector(getLeftSidebarFooterSelector()) as HTMLElement | null
-        if (footerElement === null) return //nullの場合はキャンセル
+        if (footerElement === null) {
+            loadingCalendar = false // 読み込み完了フラグをリセット
+            return //nullの場合はキャンセル
+        }
 
         const containerElement: HTMLDivElement = document.createElement("div")
         containerElement.className = "nav-content-item mt-6 is-expand flex-shrink-0"
@@ -45,6 +70,8 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
             footerElement.insertAdjacentElement("afterend", containerElement) //DBグラフの場合は後ろ
         else
             footerElement.insertAdjacentElement("beforebegin", containerElement)
+
+        loadingCalendar = false // DOMが存在するため、フラグをリセット
 
         //スペースに表示する
         setTimeout(async () => {
