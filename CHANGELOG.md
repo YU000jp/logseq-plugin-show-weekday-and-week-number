@@ -1,3 +1,10 @@
+## [1.65.3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.2...v1.65.3) (2025-11-16)
+
+
+### Bug Fixes
+
+* **bug:** Merge pull request [#171](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/171) from YU000jp/copilot/fix-duplicated-calendar-sidebar ([d31bee8](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/d31bee87c4b4fec8af893234c324042cc50881b6))
+
 ## [1.65.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.1...v1.65.2) (2025-08-09)
 
 
