@@ -16,15 +16,14 @@ let loadingCalendar = false //カレンダー読み込み中フラグ
 let calendarLoadTimeout: ReturnType<typeof setTimeout> | null = null //タイムアウトIDを保存
 
 export const loadLeftCalendar = (logseqDbGraph: boolean) => {
+    // 読み込み中フラグをチェック
+    if (loadingCalendar) return
+
     // すでに読み込み中の場合は、既存のタイムアウトをキャンセル
     if (calendarLoadTimeout !== null) {
         clearTimeout(calendarLoadTimeout)
         calendarLoadTimeout = null
     }
-
-    // 読み込み中フラグをチェック
-    if (loadingCalendar) return
-
     // 既存のDOMがないかをチェックして重複を防ぐ
     if (parent.document.getElementById(keyLeftCalendarContainer)) {
         // すでに存在する場合は、何もしない
