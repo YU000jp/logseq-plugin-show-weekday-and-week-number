@@ -71,20 +71,18 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
         else
             footerElement.insertAdjacentElement("beforebegin", containerElement)
 
+        loadingCalendar = false // DOMが存在するため、フラグをリセット
+
         //スペースに表示する
         setTimeout(async () => {
             const innerElement: HTMLDivElement | null = parent.document.getElementById("left-calendar-inner") as HTMLDivElement | null
 
-            if (innerElement === null) {
-                loadingCalendar = false // 読み込み完了フラグをリセット
-                return //nullの場合はキャンセル
-            }
+            if (innerElement === null) return //nullの場合はキャンセル
 
             if (innerElement.dataset.flag !== "true")//すでに存在する場合はキャンセル
                 createCalendar(new Date(), await getConfigPreferredDateFormat(), innerElement)
 
             innerElement.dataset.flag = "true" //フラグを立てる
-            loadingCalendar = false // 読み込み完了フラグをリセット（カレンダー作成完了後）
         }, 1)
 
     }, 500)
