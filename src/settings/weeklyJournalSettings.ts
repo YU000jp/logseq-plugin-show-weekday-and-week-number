@@ -82,7 +82,6 @@ export const weeklyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings
     title: t("If no page found, not create page (before today)") + "🆕",
     type: "boolean",
     default: false,
-    // 日誌ページが存在しない場合は、埋め込みではなくリンクのみを作成する。これにより、新しい空白ジャーナルページの自動作成を防ぎます。
     description: t("If the daily journal page does not exist, create a link only instead of embed. This prevents automatic creation of new blank journal pages."),
   },
   {

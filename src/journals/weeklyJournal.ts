@@ -169,10 +169,13 @@ const weeklyJournalCreateContent = async (
                 let useEmbed = logseq.settings!.weeklyEmbed === true
                 
                 // If link-only mode is enabled, check if the day is before today and page doesn't exist
-                if (useEmbed && booleanLinkOnly && isBefore(startOfDay(day), today)) {
-                    const pageExists = await doesPageExist(journalName)
-                    if (!pageExists) {
-                        useEmbed = false // Use link instead of embed
+                if (useEmbed && booleanLinkOnly) {
+                    const dayStart = startOfDay(day)
+                    if (isBefore(dayStart, today)) {
+                        const pageExists = await doesPageExist(journalName)
+                        if (!pageExists) {
+                            useEmbed = false // Use link instead of embed
+                        }
                     }
                 }
                 
