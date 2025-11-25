@@ -59,6 +59,7 @@ export const SettingKeys = {
   weeklyJournalHeadlineProperty: "weeklyJournalHeadlineProperty",
   booleanWeeklyJournalThisWeek: "booleanWeeklyJournalThisWeek",
   weeklyEmbed: "weeklyEmbed",
+  booleanWeeklyJournalLinkOnly: "booleanWeeklyJournalLinkOnly",
   weekNumberOptions: "weekNumberOptions",
   heading011: "heading011",
   weekNumberChangeQ: "weekNumberChangeQ",

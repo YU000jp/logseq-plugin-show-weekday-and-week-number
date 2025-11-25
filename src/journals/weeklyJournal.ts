@@ -1,10 +1,10 @@
 import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
+import { addDays, addWeeks, eachDayOfInterval, format, isBefore, isSameISOWeek, isSameWeek, startOfDay, startOfWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib/lib'
-import { findPageUuid } from '../lib/query/advancedQuery'
+import { doesPageExist, findPageUuid } from '../lib/query/advancedQuery'
 import { separate, weeklyJournalCreateNav } from './nav'
 import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
 
@@ -157,17 +157,37 @@ const weeklyJournalCreateContent = async (
         const weekDays: Date[] = eachDayOfInterval({ start: weekStart, end: weekEnd })
         const { preferredDateFormat } = await logseq.App.getUserConfigs() as { preferredDateFormat: AppUserConfigs["preferredDateFormat"] }
         const weekDaysLinkArray: string[] = weekDays.map((day) => format(day, preferredDateFormat) as string) // 曜日ごとのリンクを作成する
+        
+        // Check if link-only mode is enabled (for past days without existing journal pages)
+        const booleanLinkOnly = logseq.settings!.booleanWeeklyJournalLinkOnly === true
+        const today = startOfDay(new Date())
+        
+        // Build children blocks for each day
+        const childrenBlocks: IBatchBlock[] = await Promise.all(
+            weekDays.map(async (day, index) => {
+                const journalName = weekDaysLinkArray[index]
+                let useEmbed = logseq.settings!.weeklyEmbed === true
+                
+                // If link-only mode is enabled, check if the day is before today and page doesn't exist
+                if (useEmbed && booleanLinkOnly && isBefore(startOfDay(day), today)) {
+                    const pageExists = await doesPageExist(journalName)
+                    if (!pageExists) {
+                        useEmbed = false // Use link instead of embed
+                    }
+                }
+                
+                return {
+                    content: useEmbed ? `{{embed [[${journalName}]]}}` : `[[${journalName}]]`,
+                    children: [
+                        { content: "" }
+                    ]
+                }
+            })
+        )
+        
         batchArray.push({
             content: `#### ${t("This Week")}${logseq.settings!.weeklyEmbed === true ? " #.ThisWeek " : ""}`,
-            children:
-                weekDaysLinkArray.map((eachJournal) => {
-                    return {
-                        content: logseq.settings!.weeklyEmbed === true ? `{{embed [[${eachJournal}]]}}` : `[[${eachJournal}]]`,
-                        children: [
-                            { content: "" }
-                        ]
-                    }
-                })
+            children: childrenBlocks
         } as IBatchBlock)
     }
 

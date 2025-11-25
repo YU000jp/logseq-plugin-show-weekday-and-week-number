@@ -108,11 +108,12 @@
   "Single journal page only": "단일 저널 페이지만 해당",
   "Use on Monthly Journal": "월간 저널에 사용",
   "Use on Quarterly Journal": "분기별 저널에 사용",
-  "Use on Yearly Journal": "연간 분개장에 사용"
-  ,"Do you want to continue?": "계속하시겠습니까?",
+  "Use on Yearly Journal": "연간 분개장에 사용",
+  "Do you want to continue?": "계속하시겠습니까?",
   "Create a new page.": "새 페이지를 생성합니다.",
   "Confirm": "확인",
   "Cancel": "취소",
   "Page created successfully.": "페이지가 성공적으로 생성되었습니다.",
-  "Cancelled": "취소됨"
+  "Cancelled": "취소됨",
+  "If the daily journal page does not exist, create a link only instead of embed. This prevents automatic creation of new blank journal pages.": "일기 페이지가 존재하지 않으면 임베드 대신 링크만 생성합니다. 이렇게 하면 새로운 빈 일기 페이지가 자동으로 생성되는 것을 방지합니다."
 }

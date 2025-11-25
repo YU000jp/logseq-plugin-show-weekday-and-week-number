@@ -36,6 +36,7 @@
   "Holidays > Select your state of the country (:additional option)": "祝日 > 国の都道府県を選択 (日本の場合は、設定不要です！)",
   "If default is selected, the browser's language settings are followed (localisation).": "デフォルトが選択されている場合、ブラウザの言語設定に従います(ローカリゼーション)。",
   "If no page found, not create page (before today)": "ページが見つからない場合は、ページを作成しません(今日より前)",
+  "If the daily journal page does not exist, create a link only instead of embed. This prevents automatic creation of new blank journal pages.": "日誌ページが存在しない場合は、埋め込みではなくリンクのみを作成します。これにより、新しい空白ジャーナルページの自動作成を防ぎます。",
   "If possible to set the State and Region, do so individually.": "都道府県と地域を設定できる場合は、個別に設定してください。",
   "If you input in the form of mm/dd::Event name, the color will be applied every year on that day.": "`mm/dd::イベント名`の形式で入力すると、毎年その日に色が適用されます。",
   "Input a page name (default is blank)": "ページ名を入力します(デフォルトは空白です)",

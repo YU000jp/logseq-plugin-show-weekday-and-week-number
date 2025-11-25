@@ -108,5 +108,6 @@
   "Single journal page only": "僅限單個期刊頁面",
   "Use on Monthly Journal": "在月刊上使用",
   "Use on Quarterly Journal": "在季刊上使用",
-  "Use on Yearly Journal": "在年刊上使用"
+  "Use on Yearly Journal": "在年刊上使用",
+  "If the daily journal page does not exist, create a link only instead of embed. This prevents automatic creation of new blank journal pages.": "如果日誌頁面不存在，則僅創建連結而非嵌入。這可以防止自動創建新的空白日誌頁面。"
 }
