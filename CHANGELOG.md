@@ -1,3 +1,15 @@
+# [1.67.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.66.0...v1.67.0) (2025-12-06)
+
+
+### Bug Fixes
+
+* Force calendar refresh on essential settings change ([2ef984e](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/2ef984e20659ff6cf743c826eec847c3e0726189))
+
+
+### Features
+
+* Improve month label display in TwoLineCalendar ([ec596fb](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/ec596fbf5d0ba9047218649c83edac4a87d0860f))
+
 # [1.66.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.2...v1.66.0) (2025-12-06)
 
 
