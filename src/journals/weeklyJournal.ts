@@ -1,10 +1,11 @@
 import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
+import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfWeek, startOfISOWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib'
 import { findPageUuid } from '../lib'
+import { getWeekStartOn } from '../lib'
 import { separate, weeklyJournalCreateNav } from './nav'
 import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
 
@@ -299,7 +300,15 @@ export const callMiniCalendar = (check: boolean, monthStartDay: Date) => {
         && processingFoundBoundaries !== true) {
         processingFoundBoundaries = true
         setTimeout(() => {
-            boundariesProcess("weeklyJournal", false, 0, startOfWeek(monthStartDay))
+            try {
+                const weekStartsOn = getWeekStartOn()
+                const useISO = weekStartsOn === 1 && (logseq.settings?.weekNumberFormat === "ISO(EU) format")
+                const start = useISO ? startOfISOWeek(monthStartDay) : startOfWeek(monthStartDay, { weekStartsOn })
+                boundariesProcess("weeklyJournal", false, 0, start)
+            } catch (e) {
+                // fallback
+                boundariesProcess("weeklyJournal", false, 0, startOfWeek(monthStartDay))
+            }
             processingFoundBoundaries = false
         }, 200)
     }
