@@ -1,3 +1,10 @@
+# [1.66.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.2...v1.66.0) (2025-12-06)
+
+
+### Features
+
+* Refactor calendar (React) [#170](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/170) ([fad5a6b](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/fad5a6bb62dc905c71d2983ba72acda725d837ee))
+
 ## [1.65.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.65.1...v1.65.2) (2025-08-09)
 
 
