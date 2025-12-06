@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { addDays, format, isToday, startOfISOWeek, startOfWeek } from 'date-fns'
 import { t } from 'logseq-l10n'
 import { getConfigPreferredDateFormat } from '..'
@@ -65,10 +65,35 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 
   const days = useMemo(() => offsets.map((o) => (o === 0 ? startDate : addDays(startDate, o))), [startDate, JSON.stringify(offsets)])
 
-  const onScrollClick = (delta: number) => {
+  const onScrollClick = useCallback((delta: number) => {
     if (!onRequestScroll) return
     onRequestScroll(delta)
-  }
+  }, [onRequestScroll])
+
+  const onCellClickFactory = useCallback((pageName?: string) => {
+    return () => { if (pageName) openPageFromPageName(pageName, false) }
+  }, [])
+
+  const handleMonthClick = useCallback((monthPageName: string) => (e: React.MouseEvent) => {
+    openPageFromPageName(monthPageName, (e as any).shiftKey)
+  }, [])
+
+  const handleTodayClick = useCallback(async () => {
+    const desiredDate: Date = new Date()
+    if (onRequestScroll) {
+      const weekStartsOn: 0 | 1 | 6 = getWeekStartOn()
+      const useISO = weekStartsOn === 1 && (logseq.settings as any)?.weekNumberFormat === 'ISO(EU) format'
+      const desiredStart = useISO ? startOfISOWeek(desiredDate) : startOfWeek(desiredDate, { weekStartsOn })
+      const s = new Date(startDate)
+      s.setHours(0, 0, 0, 0)
+      const sStart = useISO ? startOfISOWeek(s) : startOfWeek(s, { weekStartsOn })
+      const diffMs = desiredStart.getTime() - sStart.getTime()
+      const deltaWeeks = Math.round(diffMs / (7 * 24 * 60 * 60 * 1000))
+      onRequestScroll(deltaWeeks)
+    } else {
+      openPageFromPageName(format(new Date(), preferredDateFormat), false)
+    }
+  }, [onRequestScroll, preferredDateFormat, startDate])
 
   return (
     <div className="two-line-calendar-root" style={{ padding: '6px' }}>
@@ -128,7 +153,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
               }
 
               return (
-                <td key={key} onClick={() => pageName && openPageFromPageName(pageName, false)} className={`${pageName ? 'cursor' : ''} lc-day-cell`} title={titleParts.length > 0 ? titleParts.join('\n') : pageName} style={cellStyle}>
+                <td key={key} onClick={onCellClickFactory(pageName)} className={`${pageName ? 'cursor' : ''} lc-day-cell`} title={titleParts.length > 0 ? titleParts.join('\n') : pageName} style={cellStyle}>
                   <span className="lc-day-number" style={dayNumberInlineStyle}>{d.getDate()}</span>
                 </td>
               )
@@ -153,7 +178,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
                     <button
                       className="daySide"
                       title={monthPageName}
-                      onClick={(e: any) => openPageFromPageName(monthPageName, e.shiftKey)}
+                      onClick={handleMonthClick(monthPageName)}
                       style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: '0.95em' }}
                     >
                       {monthLabel}
@@ -171,32 +196,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
               )
             })}
             <td style={{ width: 32, verticalAlign: 'middle', textAlign: 'center' }}>
-              <button
-                title={t('Today')}
-                onClick={() => {
-                  (async () => {
-                        // Use today as desired base date and compute the start-of-week
-                        const desiredDate: Date = new Date()
-                        if (onRequestScroll) {
-                          // Compute the same startForComponent as boundariesProcess does
-                          const weekStartsOn: 0 | 1 | 6 = getWeekStartOn()
-                          const useISO = weekStartsOn === 1 && (logseq.settings as any)?.weekNumberFormat === 'ISO(EU) format'
-                          const desiredStart = useISO ? startOfISOWeek(desiredDate) : startOfWeek(desiredDate, { weekStartsOn })
-                          const s = new Date(startDate)
-                          s.setHours(0, 0, 0, 0)
-                          const sStart = useISO ? startOfISOWeek(s) : startOfWeek(s, { weekStartsOn })
-                          const diffMs = desiredStart.getTime() - sStart.getTime()
-                          const deltaWeeks = Math.round(diffMs / (7 * 24 * 60 * 60 * 1000))
-                          onRequestScroll(deltaWeeks)
-                        } else {
-                          openPageFromPageName(format(desiredDate, preferredDateFormat), false)
-                        }
-                  })()
-                }}
-                style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
-              >
-                {"<>"}
-              </button>
+              <button title={t('Today')} onClick={handleTodayClick} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>{"<>"}</button>
             </td>
           </tr>
 

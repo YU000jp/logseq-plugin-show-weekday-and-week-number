@@ -39,8 +39,6 @@ export const SettingKeys = {
   booleanJournalsBoundaries: "booleanJournalsBoundaries",
   booleanBoundariesOnWeeklyJournal: "booleanBoundariesOnWeeklyJournal",
   booleanBoundariesOnMonthlyJournal: "booleanBoundariesOnMonthlyJournal",
-  booleanBoundariesOnQuarterlyJournal: "booleanBoundariesOnQuarterlyJournal",
-  booleanBoundariesOnYearlyJournal: "booleanBoundariesOnYearlyJournal",
   boundariesBottom: "boundariesBottom",
   booleanBoundariesHolidays: "booleanBoundariesHolidays",
   heading003: "heading003",

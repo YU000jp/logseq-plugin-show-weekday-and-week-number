@@ -1,8 +1,6 @@
-import { PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday, isToday, isWednesday, startOfISOWeek, startOfWeek } from 'date-fns' //https://date-fns.org/
+import { addDays, startOfISOWeek, startOfWeek } from 'date-fns' //https://date-fns.org/
 import { t } from "logseq-l10n"
-import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
-import { holidaysWorld, lunarString, DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor, findPageUuid, doesPageFileExist, getCurrentPageJournalDay } from '../lib'
+import { getWeekStartOn, getCurrentPageJournalDay, getDateFromJournalDay, DayShortCode, colorMap } from '../lib'
 import React from 'react'
 import { createRoot, Root } from 'react-dom/client'
 import TwoLineCalendar from '../components/TwoLineCalendar'
@@ -71,7 +69,7 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
       targetDate = today
     else
       if (targetElementName === 'is-journals') {
-        const journalDay = await getCurrentPageJournalDay() as PageEntity["journalDay"] | null
+        const journalDay = await getCurrentPageJournalDay() as any
         if (!journalDay) {
           console.error('journalDay is undefined')
           processingFoundBoundaries = false
@@ -88,7 +86,10 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
         }
 
     // 次の週を表示するかどうかの判定
-    const flagShowNextWeek: boolean = checkIfNextWeekVisible(weekStartsOn, isThursday(targetDate), isFriday(targetDate), isSaturday(targetDate), targetDate)
+    const isDayThursday = targetDate.getDay() === 4
+    const isDayFriday = targetDate.getDay() === 5
+    const isDaySaturday = targetDate.getDay() === 6
+    const flagShowNextWeek: boolean = checkIfNextWeekVisible(weekStartsOn, isDayThursday, isDayFriday, isDaySaturday, targetDate)
 
     // Instead of building DOM here, mount a React TwoLineCalendar into boundariesInner.
     const offsets = getWeekOffsetDays(flagShowNextWeek) as number[]
@@ -116,195 +117,14 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
         boundariesProcess(targetElementName, true, 0, newStart)
       } }))
     } catch (e) {
-      // fallback to old DOM builder
-      await createDaysElements(
-        offsets,
-        startForComponent,
-        boundariesInner,
-        today,
-        targetDate,
-        targetElementName,
-        flagShowNextWeek
-      )
+      console.error('Failed to mount TwoLineCalendar React component', e)
     }
   }
   processingFoundBoundaries = false
 }
-
-
-const daySideWeekNumber = (date: Date, boundariesInner: HTMLDivElement) => {
-  const { year, weekString, quarter } = getWeeklyNumberFromDate(date, logseq.settings?.weekNumberFormat === "US format" ? 0 : 1) // 週番号を取得する
-  const weekNumberString = getWeeklyNumberString(year, weekString, quarter) // 週番号からユーザー指定文字列を取得する
-  const weekNumberElement = createElementWithClass('span', 'daySide', 'daySideWeekNumber')
-  weekNumberElement.innerText = "W" + weekString
-  weekNumberElement.title = t("Week number: ") + weekNumberString
-  if (logseq.settings!.booleanWeeklyJournal === true)
-    addEventListenerOnce(weekNumberElement, "click", (event) => openPageFromPageName(weekNumberString, (event as MouseEvent).shiftKey))
-  else
-    weekNumberElement.style.cursor = 'unset'
-  boundariesInner.appendChild(weekNumberElement)
-}
-
-
-const daySideMonth = (date: Date, boundariesInner: HTMLDivElement, monthDuplicate: Date | null): Date => {
-  const sideMonthElement = createElementWithClass('span', 'daySide')
-  //monthDuplicateが存在したら、dateの6日後を代入する
-  const dateShowMonth: Date = monthDuplicate ? addDays(date, 6) as Date : date
-
-  const monthString: string = localizeMonthString(dateShowMonth, false)
-  sideMonthElement.innerText = monthString
-
-  if (monthDuplicate //上下の月が一致する場合は、非表示にする
-    && dateShowMonth.getMonth() === monthDuplicate.getMonth()
-    && dateShowMonth.getFullYear() === monthDuplicate.getFullYear()) {
-    sideMonthElement.style.visibility = 'hidden'
-  } else {
-    const monthString: string = format(dateShowMonth, `yyyy${separate()}MM`)
-    // monthStringが正しくない場合は、非表示
-    if (monthString.length === 7) {
-      sideMonthElement.title = monthString
-      sideMonthElement.addEventListener("click", ({ shiftKey }) => openPageFromPageName(monthString, shiftKey))// 2023/10のようなページを開く
-    }
-  }
-  boundariesInner.appendChild(sideMonthElement)
-  return dateShowMonth
-}
-
-
-// 週の上下スクロールボタン
-const weekScrollButtons = (index: number, boundariesInner: HTMLDivElement, targetElementName: string, startDate: Date) => {
-  const sideScrollElement = createElementWithClass('span', 'daySide', 'daySideScroll')
-  sideScrollElement.innerText = index === 6 ? '↑' : '↓'
-  sideScrollElement.title = index === 6 ? t("Previous week") : t("Next week")
-  boundariesInner.appendChild(sideScrollElement)
-  addEventListenerOnce(sideScrollElement, 'click', () => {
-    //boundariesInnerを削除する
-    boundariesInner.remove()
-    //startDateを1週間ずらす
-    boundariesProcess(targetElementName, true, 0, addDays(startDate, index === 6 ? -7 : 7) as Date)
-  })
-}
-
-
-// 1日ずつ区画を作成する
-const createDaysElements = async (days: number[], startDate: Date, boundariesInner: HTMLDivElement, today: Date, targetDate: Date, targetElementName: string, flagShowNextWeek: boolean) => {
-  let monthDuplicate: Date | null = null
-  const preferredDateFormat = await getConfigPreferredDateFormat()
-  //ミニカレンダー作成 1日ずつ処理
-  for (const [index, numDays] of days.entries()) {
-    const dayDate: Date = numDays === 0 ? startDate : addDays(startDate, numDays) as Date // dateを取得する
-    const dateFormatString: string = format(dayDate, preferredDateFormat) //日付をフォーマットする
-    const dayCell = createElementWithClass('span', 'day')
-    try {
-      if (index === 7) {
-        const element: HTMLDivElement = parent.document.createElement('div')
-        element.style.width = "100%"
-        boundariesInner.append(element)
-      }
-      if (index === 0
-        || index === 7)
-        //daySideElement作成
-        //月名は常に表示
-        monthDuplicate = daySideMonth(dayDate, boundariesInner, monthDuplicate) //daySideElement作成
-
-      //dayElement作成
-      // const isBooleanBeforeToday: boolean = isBefore(dayDate, today)
-      const isBooleanToday: boolean = isToday(dayDate)
-      const isBooleanTargetSameDay: boolean = isSameDay(targetDate, dayDate)
-      dayCell.classList.add('day')
-      const dayOfWeekElement: HTMLSpanElement = parent.document.createElement('span')
-      dayOfWeekElement.classList.add('dayOfWeek')
-      dayOfWeekElement.innerText = localizeDayOfWeekString(dayDate, false) // 曜日を取得する
-
-      // 20240121
-      // 祝日のカラーリング機能
-      if (logseq.settings!.booleanBoundariesHolidays === true) {
-        const configPreferredLanguage = await getConfigPreferredLanguage()
-        // Chinese lunar-calendar and holidays
-        if (logseq.settings!.booleanLunarCalendar === true // プラグイン設定で太陰暦オンの場合
-          && (configPreferredLanguage === "zh-Hant" //中国語の場合
-            || configPreferredLanguage === "zh-CN")) {
-          dayOfWeekElement.style.fontSize = ".88em"
-          dayOfWeekElement.innerHTML += ` <smaLl>${lunarString(dayDate, dayCell, true)}</small>` //文字数が少ないため、小さく祝日名を表示する
-        } else {
-          // World holidays
-          const displayNameOfHoliday = holidaysWorld(dayDate, dayCell, true)
-          if (displayNameOfHoliday
-            && (configPreferredLanguage === "ja" //日本語の場合
-              || configPreferredLanguage === "ko" // 韓国語の場合
-            )) dayOfWeekElement.innerHTML += ` <smaLl>${displayNameOfHoliday}</small>` //文字数が少ないため、小さく祝日名を表示する
-        }
-      }
-
-      dayCell.appendChild(dayOfWeekElement)
-      const dayOfMonthElement: HTMLSpanElement = parent.document.createElement('span')
-      dayOfMonthElement.classList.add('dayOfMonth')
-      dayOfMonthElement.innerText = `${dayDate.getDate()}`
-      dayCell.appendChild(dayOfMonthElement)
-      //日付と相対時間をtitleに追加する
-      dayCell.title += logseq.settings?.booleanRelativeTime === true ?
-        dateFormatString + '\n' + getRelativeDateString(dayDate, today)//相対時間を表示する場合
-        : dateFormatString
-
-      //indexが0~6
-      if (targetElementName === 'weeklyJournal') {
-        if (index >= 7
-          && index <= 14)
-          dayCell.classList.add('thisWeek')
-      } else {
-        if ((flagShowNextWeek === true
-          && index < 7)
-          || (flagShowNextWeek === false
-            && index > 6))
-          dayCell.classList.add('thisWeek')
-      }
-      if (targetElementName !== 'journals'
-        && targetElementName !== "weeklyJournal"
-        && isBooleanTargetSameDay === true)
-        dayCell.style.border = `1px solid ${logseq.settings!.boundariesHighlightColorSinglePage}` //シングルページの日付をハイライト
-      else
-        if (isBooleanToday === true)
-          dayCell.style.border = `1px solid ${logseq.settings!.boundariesHighlightColorToday}` //今日をハイライト
-
-      if (logseq.settings?.booleanWeekendsColor === true)
-        applyWeekendColor(dayCell, shortDayNames[dayDate.getDay()])
-
-      // ユーザー設定日
-      if (logseq.settings!.userColorList as string !== "") {
-        const eventName = userColor(dayDate, dayCell)
-        if (eventName)
-          dayCell.title = `${eventName}\n${dayCell.title}`
-      }
-
-      dayCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(dateFormatString, shiftKey))
-
-      //20240115
-      //エントリーが存在するかどうかのインディケーターを表示する（常に表示）
-      await indicator(dateFormatString, dayOfMonthElement)
-
-    } finally {
-      boundariesInner.appendChild(dayCell)
-      if (index === 6
-        || index === 13) {
-        //daySideElement作成    
-        //週番号は常に表示
-        daySideWeekNumber(dayDate, boundariesInner)
-        weekScrollButtons(index, boundariesInner, targetElementName, startDate)
-      }
-    }
-  }
-}
-
-
-// 日誌のページが存在するかどうかのインディケーターを表示する
-const indicator = async (targetPageName: string, dayOfMonthElement: HTMLSpanElement) => {
-  if (await doesPageFileExist(targetPageName) === true) {
-    const indicatorElement = createElementWithClass('span', 'indicator')
-    indicatorElement.innerText = "●"
-    indicatorElement.title = t("Page exists")
-    dayOfMonthElement.appendChild(indicatorElement)
-  }
-}
+// Legacy DOM builder functions (week number, side month, per-day DOM construction, indicator)
+// were removed in favor of the React `TwoLineCalendar` component.
+// The React component is now the canonical implementation; keeping only small shared helpers below.
 
 
 // 週末の色を適用する
@@ -317,8 +137,9 @@ export const applyWeekendColor = (dayCell: HTMLElement, day: DayShortCode) => {
 //次の週を表示するかどうかの判定
 const checkIfNextWeekVisible = (weekStartsOn: number, isDayThursday: boolean, isDayFriday: boolean, isDaySaturday: boolean, targetDate: Date): boolean => {
   if (weekStartsOn === 0) return isDayThursday || isDayFriday || isDaySaturday
-  if (weekStartsOn === 1) return isDayFriday || isDaySaturday || isSunday(targetDate)
-  return isWednesday(targetDate) || isDayThursday || isDayFriday
+  if (weekStartsOn === 1) return isDayFriday || isDaySaturday || targetDate.getDay() === 0 // Sunday
+  // fallback: when weekStartsOn === 6 (Saturday), show next week for Wed/Thu/Fri
+  return targetDate.getDay() === 3 || isDayThursday || isDayFriday // Wednesday(3), Thursday(4), Friday(5)
 }
 
 

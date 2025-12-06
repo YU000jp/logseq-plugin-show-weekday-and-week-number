@@ -91,17 +91,20 @@ const createCalendar = async (targetDate: Date, preferredDateFormat: string, inn
         innerElement.appendChild(calendarElement)
     }
 
-    try {
-        // Create or reuse root stored on the parent/window
-        const existingRoot = (window as any).__leftCalendarRoot || (parent as any).__leftCalendarRoot || null
-        if (existingRoot && typeof existingRoot.render === 'function') {
-            // Re-render into existing root
-            existingRoot.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
-        } else {
-            const root: Root = createRoot(calendarElement)
-            ;(window as any).__leftCalendarRoot = root
-            root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
-        }
+        try {
+            // Create or reuse root stored on the parent/window. Store the container reference
+            // so that we only reuse a root when mounted into the same element.
+            const existingRoot = (parent as any).__leftCalendarRoot || (window as any).__leftCalendarRoot || null
+            const existingContainer = (parent as any).__leftCalendarRootContainer || (window as any).__leftCalendarRootContainer || null
+            if (existingRoot && existingContainer === calendarElement && typeof existingRoot.render === 'function') {
+                // Re-render into existing root attached to the same container
+                existingRoot.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
+            } else {
+                const root: Root = createRoot(calendarElement)
+                ;(parent as any).__leftCalendarRoot = root
+                ;(parent as any).__leftCalendarRootContainer = calendarElement
+                root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
+            }
         try { (parent as any).__leftCalendarInitialized = true } catch (e) { /* ignore */ }
     } catch (e) {
         console.error('Failed to render MonthlyCalendar React component', e)
@@ -113,10 +116,13 @@ const removeCalendarAndNav = () => {
 
     // Unmount React root if exists
     try {
-        const root = (window as any).__leftCalendarRoot as any
+        const root = (parent as any).__leftCalendarRoot || (window as any).__leftCalendarRoot
         if (root && typeof root.unmount === 'function') {
             root.unmount()
-            (window as any).__leftCalendarRoot = null
+            try { (parent as any).__leftCalendarRoot = null } catch (e) { /* ignore */ }
+            try { (parent as any).__leftCalendarRootContainer = null } catch (e) { /* ignore */ }
+            try { (window as any).__leftCalendarRoot = null } catch (e) { /* ignore */ }
+            try { (window as any).__leftCalendarRootContainer = null } catch (e) { /* ignore */ }
         }
     } catch (e) { /* ignore */ }
 
@@ -135,8 +141,9 @@ export const refreshMonthlyCalendar = async (targetDate: Date, singlePage: boole
     const preferredDateFormat = await getConfigPreferredDateFormat()
     // If React root exists, update it by re-rendering with new props instead of unmounting
     try {
-        const root = (window as any).__leftCalendarRoot as any
-        if (root && typeof root.render === 'function') {
+        const root = (parent as any).__leftCalendarRoot || (window as any).__leftCalendarRoot
+        const rootContainer = (parent as any).__leftCalendarRootContainer || (window as any).__leftCalendarRootContainer || null
+        if (root && rootContainer && rootContainer.id === 'left-calendar-root' && typeof root.render === 'function') {
             root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag: { singlePage, weekly }, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = weekly === true } }))
             // update module-level state
             currentCalendarDate = targetDate

@@ -54,20 +54,7 @@ export const journalBoundariesSettings = (logseqSettings: LSPluginBaseInfo['sett
         default: false,
         description: t("Use on Monthly Journal") + "🆕",
       },
-      {
-        key: SettingKeys.booleanBoundariesOnQuarterlyJournal,
-        title: "",
-        type: "boolean",
-        default: false,
-        description: t("Use on Quarterly Journal") + "🆕",
-      },
-      {
-        key: SettingKeys.booleanBoundariesOnYearlyJournal,
-        title: "",
-        type: "boolean",
-        default: false,
-        description: t("Use on Yearly Journal") + "🆕",
-      },
+      // Quarterly/Yearly options removed: always off
       {
         key: SettingKeys.boundariesBottom,
         title: t("Show it on bottom"),

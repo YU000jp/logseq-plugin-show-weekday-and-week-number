@@ -46,7 +46,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
   
     const [pageExistsMap, setPageExistsMap] = useState<Record<string, boolean>>({});
     const [holidayMap, setHolidayMap] = useState<Record<string, string>>({});
-    const [alerts, setAlerts] = useState<Array<{ date: Date, text: string, isToday: boolean }>>([]);
+    const [alerts, setAlerts] = useState<Array<{ date: Date, text: string, isToday: boolean, source?: 'user' | 'holiday' }>>([]);
     const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
     const [weekExistsMap, setWeekExistsMap] = useState<Record<string, boolean>>({});
     const [userColorMap, setUserColorMap] = useState<Record<string, { color?: string; fontWeight?: string; eventName?: string }>>({})
@@ -88,35 +88,41 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 
   // Build alerts list using computed holidayMap and userColorMap (no DOM mutations)
   useEffect(() => {
-    const newAlerts: Array<{ date: Date, text: string, isToday: boolean }> = []
+    const newAlerts: Array<{ date: Date, text: string, isToday: boolean, source?: 'user' | 'holiday' }> = []
     for (const d of eachDays) {
       const isTodayFlag = isToday(d)
-      const msgs: Set<string> = new Set()
+      // use a map to preserve source info; if same text exists for both user and holiday, prefer 'user'
+      const msgs: Record<string, 'user' | 'holiday'> = {}
       const u = userColorMap[d.toISOString()]
       if (u && u.eventName) {
-        for (const ev of u.eventName.split('\n')) msgs.add(ev.trim())
+        for (const ev of u.eventName.split('\n')) msgs[ev.trim()] = 'user'
       }
       const pageName = format(d, preferredDateFormat)
       const holiday = pageName ? holidayMap[pageName] || '' : ''
       if (holiday) {
         if ((logseq.settings!.lcHolidaysAlert === 'Today only' && isTodayFlag) || logseq.settings!.lcHolidaysAlert === 'Monthly')
-          for (const h of holiday.split('\n')) msgs.add(h.trim())
+          for (const h of holiday.split('\n')) {
+            const k = h.trim()
+            if (!k) continue
+            // do not overwrite a user-sourced message
+            if (!msgs[k]) msgs[k] = 'holiday'
+          }
       }
-      for (const m of Array.from(msgs)) newAlerts.push({ date: d, text: m, isToday: isTodayFlag })
+      for (const [m, src] of Object.entries(msgs)) newAlerts.push({ date: d, text: m, isToday: isTodayFlag, source: src })
     }
     setAlerts(newAlerts)
   }, [holidayMap, pageExistsMap, userColorMap, targetDate])
 
   // Group alerts by date for UI (yyyy-MM-dd)
   const groupedAlerts = useMemo(() => {
-    const map: Record<string, Array<{ date: Date, text: string, isToday: boolean }>> = {}
+    const map: Record<string, Array<{ date: Date, text: string, isToday: boolean, source?: 'user' | 'holiday' }>> = {}
     for (const a of alerts) {
       const k = format(a.date, 'yyyy-LL-dd')
       map[k] = map[k] || []
       map[k].push(a)
     }
     // sort keys ascending
-    const ordered: Record<string, typeof map[string]> = {}
+    const ordered: Record<string, Array<{ date: Date, text: string, isToday: boolean, source?: 'user' | 'holiday' }>> = {}
     Object.keys(map).sort().forEach(k => { ordered[k] = map[k] })
     return ordered
   }, [alerts])
@@ -124,6 +130,10 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
   const toggleGroup = (k: string) => setCollapsedGroups(s => ({ ...s, [k]: !s[k] }))
 
   // No direct DOM mutation: weekend color will be applied via getWeekendColor in render
+
+  // compute holidays background color from settings
+  const holidaysCssColor = resolveColorChoice(logseq.settings!.choiceHolidaysColor as string | undefined)
+  const holidaysBg = toTranslucent(holidaysCssColor, 0.12)
 
   const onPrev = () => setTargetDate(d => { const n = new Date(d); n.setMonth(n.getMonth() - 1); return n })
   const onNext = () => setTargetDate(d => { const n = new Date(d); n.setMonth(n.getMonth() + 1); return n })
@@ -191,6 +201,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
                 const pageName = format(date, preferredDateFormat)
                 const holiday = pageName ? holidayMap[pageName] || '' : ''
                 const exists = pageName ? pageExistsMap[pageName] : false
+                const u = userColorMap[key]
                 const isOtherMonth = date.getMonth() !== month - 1
                 const checkIsToday = isToday(date)
                 const style: React.CSSProperties = { border: '1px solid rgba(0,0,0,0.06)', padding: '6px', whiteSpace: 'nowrap' }
@@ -198,9 +209,15 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
                 if (checkIsToday) { style.border = `2px solid ${logseq.settings!.boundariesHighlightColorToday}`; style.borderRadius = '50%' }
                 if (flag?.singlePage === true && isSameDay(date, initialTargetDate)) style.border = `3px solid ${logseq.settings!.boundariesHighlightColorSinglePage}`
                 if (flag?.weekly === true && (ISO ? isSameISOWeek(date, initialTargetDate) : isSameWeek(date, initialTargetDate, { weekStartsOn }))) style.borderBottom = `3px solid ${logseq.settings!.boundariesHighlightColorSinglePage}`
-                // highlight holiday according to plugin setting (use underline + text color)
+                // apply user event background (user color) preferentially, otherwise highlight holiday according to plugin setting
                 let holidayClass = ''
-                if (holiday && logseq.settings!.booleanLcHolidays === true) {
+                if (u && u.color) {
+                  const cssColor = resolveColorChoice(u.color as string | undefined)
+                  const bg = toTranslucent(cssColor, 0.12)
+                  style.backgroundColor = bg
+                  style.fontWeight = u.fontWeight as any || style.fontWeight
+                  holidayClass = ' lc-user-event'
+                } else if (holiday && logseq.settings!.booleanLcHolidays === true) {
                   const cssColor = resolveColorChoice(logseq.settings!.choiceHolidaysColor as string | undefined)
                   const bg = toTranslucent(cssColor, 0.12)
                   style.backgroundColor = bg
@@ -215,7 +232,6 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
                 }
 
                 // apply userColor (computed) and weekend color (computed) without DOM mutation
-                const u = userColorMap[key]
                 if (u && u.color) {
                   dayNumberInlineStyle.color = u.color
                   dayNumberInlineStyle.fontWeight = u.fontWeight as any || dayNumberInlineStyle.fontWeight
@@ -262,11 +278,26 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
               </div>
               {!collapsed && (
                 <div style={{ marginTop: '0.25rem', paddingLeft: '0.5rem' }}>
-                  {items.map((a, i) => (
-                    <div key={i} className="text-sm leftCalendarHolidayAlert" style={{ marginBottom: 4, color: 'var(--ls-ui-fg-muted)' }}>
-                      {a.text}
-                    </div>
-                  ))}
+                  {items.map((a, i) => {
+                    // determine background: prefer user color for user-sourced alerts
+                    let itemBg = holidaysBg
+                    if (a.source === 'user') {
+                      const u = userColorMap[a.date.toISOString()]
+                      if (u && u.color) {
+                        const cssColor = resolveColorChoice(u.color as string | undefined)
+                        itemBg = toTranslucent(cssColor, 0.12)
+                      } else {
+                        // fallback to global user color choice
+                        const cssColor = resolveColorChoice(logseq.settings!.choiceUserColor as string | undefined)
+                        itemBg = toTranslucent(cssColor, 0.12)
+                      }
+                    }
+                    return (
+                      <div key={i} className="text-sm leftCalendarHolidayAlert" style={{ marginBottom: 4, color: 'var(--ls-ui-fg-muted)', backgroundColor: itemBg, padding: '4px 6px', borderRadius: 6 }}>
+                        {a.text}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
