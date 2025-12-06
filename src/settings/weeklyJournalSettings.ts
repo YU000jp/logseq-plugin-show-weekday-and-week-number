@@ -37,7 +37,7 @@ export const weeklyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings
   {
     // Headline of each days
     key: SettingKeys.booleanWeeklyJournalHeadline,
-    title: t("Enable [headline of each days]") + "🆕",
+    title: t("Enable [headline of each days]"),
     type: "boolean",
     default: false,
     // その週のジャーナルにあるプロパティの値を取得して、日付ごとにヘッドラインを表示するクエリーを自動生成する。過去のWeekly Journalには適用されません。
@@ -46,7 +46,7 @@ export const weeklyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings
   {
     // Headline of each days用 プロパティ名指定
     key: SettingKeys.weeklyJournalHeadlineProperty,
-    title: t("headline of each days > Property name for headline of each days") + "🆕",
+    title: t("headline of each days > Property name for headline of each days"),
     type: "string",
     default: "headline",
     // 各ジャーナルのブロックに、このプロパティ名を持つブロックを用意します。ジャーナルテンプレートに取り込むと便利です。変更すると、リネームがおこなわれます。
@@ -78,7 +78,7 @@ export const weeklyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings
   },
   {
     key: SettingKeys.weekNumberOptions,
-    title: t("Week number format options") + "🆕",
+    title: t("Week number format options"),
     type: "enum",
     enumChoices: weekNumberFormat,
     default: "YYYY-Www",

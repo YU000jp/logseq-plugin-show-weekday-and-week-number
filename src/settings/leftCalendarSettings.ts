@@ -11,7 +11,7 @@ export const leftCalendarSettings = (
   const settings: SettingSchemaDesc[] = [
     {
       key: SettingKeys.heading003,
-      title: `3. ${t("Left Calendar")}${t("(Journal Boundaries)")}🆙`,
+      title: `3. ${t("Left Calendar")}${t("(Journal Boundaries)")}`,
       type: "heading",
       default: "",
       description: "",

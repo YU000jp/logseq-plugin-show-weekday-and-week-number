@@ -114,5 +114,15 @@
   "Confirm": "Bekreft",
   "Cancel": "Avbryt",
   "Page created successfully.": "Siden ble opprettet.",
-  "Cancelled": "Avbrutt"
+  "Cancelled": "Avbrutt",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Velg en farge for å fremheve helligdager. Du kan også bruke CSS-variabelnavn som '--highlight-bg-color' ved å redigere innstillingsteksten.",
+  "Decide the colour of Monday.": "Bestem fargen for mandag.",
+  "Decide the colour of Tuesday.": "Bestem fargen for tirsdag.",
+  "Decide the colour of Wednesday.": "Bestem fargen for onsdag.",
+  "Decide the colour of Thursday.": "Bestem fargen for torsdag.",
+  "Decide the colour of Friday.": "Bestem fargen for fredag.",
+  "Decide the colour of Saturday.": "Bestem fargen for lørdag.",
+  "Decide the colour of Sunday.": "Bestem fargen for søndag.",
+  "User event": "Brukerhendelse",
+  "No alerts": "Ingen varsler"
 }

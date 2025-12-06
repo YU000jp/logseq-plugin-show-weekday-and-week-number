@@ -108,5 +108,15 @@
   "Single journal page only": "僅限單個期刊頁面",
   "Use on Monthly Journal": "在月刊上使用",
   "Use on Quarterly Journal": "在季刊上使用",
-  "Use on Yearly Journal": "在年刊上使用"
+  "Use on Yearly Journal": "在年刊上使用",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "選擇用於突出顯示節假日的顏色。您也可以編輯設定文字使用像 '--highlight-bg-color' 這樣的 CSS 變數名稱。",
+  "Decide the colour of Monday.": "選擇星期一的顏色。",
+  "Decide the colour of Tuesday.": "選擇星期二的顏色。",
+  "Decide the colour of Wednesday.": "選擇星期三的顏色。",
+  "Decide the colour of Thursday.": "選擇星期四的顏色。",
+  "Decide the colour of Friday.": "選擇星期五的顏色。",
+  "Decide the colour of Saturday.": "選擇星期六的顏色。",
+  "Decide the colour of Sunday.": "選擇星期日的顏色。",
+  "User event": "使用者活動",
+  "No alerts": "沒有提醒"
 }

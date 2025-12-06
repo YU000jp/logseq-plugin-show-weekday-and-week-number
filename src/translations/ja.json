@@ -96,7 +96,7 @@
   "like `3 days ago`": "「3日前」のように",
   "plugin": "プラグイン",
   "year range": "年の範囲",
-  "Daily Journal Details": "デイリー・ジャーナルの詳細表示",
+  "Daily Journal Details": "デイリー・ジャーナルの補完",
   "Two-lines mini-Calendar": "2行のミニカレンダー",
   "(Journal Boundaries)": "(Journal Boundaries)",
   "Yearly Journal": "年次ジャーナル",
@@ -114,5 +114,15 @@
   "Single journal page only": "日付ページのみ",
   "Use on Monthly Journal": "月次ジャーナルで使用",
   "Use on Quarterly Journal": "四半期ジャーナルで使用",
-  "Use on Yearly Journal": "年次ジャーナルで使用"
+  "Use on Yearly Journal": "年次ジャーナルで使用",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "祝日をハイライトする色を選択してください。設定のテキストを編集して、'--highlight-bg-color' のような CSS 変数名を指定することもできます。",
+  "Decide the colour of Monday.": "月曜日の色を決めてください。",
+  "Decide the colour of Tuesday.": "火曜日の色を決めてください。",
+  "Decide the colour of Wednesday.": "水曜日の色を決めてください。",
+  "Decide the colour of Thursday.": "木曜日の色を決めてください。",
+  "Decide the colour of Friday.": "金曜日の色を決めてください。",
+  "Decide the colour of Saturday.": "土曜日の色を決めてください。",
+  "Decide the colour of Sunday.": "日曜日の色を決めてください。",
+  "User event": "ユーザーイベント",
+  "No alerts": "アラートはありません"
 }

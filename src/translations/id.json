@@ -114,5 +114,15 @@
   "Confirm": "Konfirmasi",
   "Cancel": "Batal",
   "Page created successfully.": "Halaman berhasil dibuat.",
-  "Cancelled": "Dibatalkan"
+  "Cancelled": "Dibatalkan",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Pilih warna untuk menyoroti hari libur. Anda juga dapat menggunakan nama variabel CSS seperti '--highlight-bg-color' dengan mengedit teks pengaturan.",
+  "Decide the colour of Monday.": "Tentukan warna untuk hari Senin.",
+  "Decide the colour of Tuesday.": "Tentukan warna untuk hari Selasa.",
+  "Decide the colour of Wednesday.": "Tentukan warna untuk hari Rabu.",
+  "Decide the colour of Thursday.": "Tentukan warna untuk hari Kamis.",
+  "Decide the colour of Friday.": "Tentukan warna untuk hari Jumat.",
+  "Decide the colour of Saturday.": "Tentukan warna untuk hari Sabtu.",
+  "Decide the colour of Sunday.": "Tentukan warna untuk hari Minggu.",
+  "User event": "Peristiwa pengguna",
+  "No alerts": "Tidak ada peringatan"
 }

@@ -114,5 +114,15 @@
   "Confirm": "Bevestigen",
   "Cancel": "Annuleren",
   "Page created successfully.": "Pagina succesvol gemaakt.",
-  "Cancelled": "Geannuleerd"
+  "Cancelled": "Geannuleerd",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Kies een kleur om feestdagen te markeren. U kunt ook CSS-variabelnamen zoals '--highlight-bg-color' gebruiken door de instellings tekst te bewerken.",
+  "Decide the colour of Monday.": "Bepaal de kleur van maandag.",
+  "Decide the colour of Tuesday.": "Bepaal de kleur van dinsdag.",
+  "Decide the colour of Wednesday.": "Bepaal de kleur van woensdag.",
+  "Decide the colour of Thursday.": "Bepaal de kleur van donderdag.",
+  "Decide the colour of Friday.": "Bepaal de kleur van vrijdag.",
+  "Decide the colour of Saturday.": "Bepaal de kleur van zaterdag.",
+  "Decide the colour of Sunday.": "Bepaal de kleur van zondag.",
+  "User event": "Gebeurtenis gebruiker",
+  "No alerts": "Geen meldingen"
 }

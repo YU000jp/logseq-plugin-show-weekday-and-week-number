@@ -114,5 +114,15 @@
   "Confirm": "Подтвердить",
   "Cancel": "Отмена",
   "Page created successfully.": "Страница успешно создана.",
-  "Cancelled": "Отменено"
+  "Cancelled": "Отменено",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Выберите цвет для выделения праздников. Вы также можете использовать имена CSS-переменных, такие как '--highlight-bg-color', отредактировав текст настройки.",
+  "Decide the colour of Monday.": "Выберите цвет для понедельника.",
+  "Decide the colour of Tuesday.": "Выберите цвет для вторника.",
+  "Decide the colour of Wednesday.": "Выберите цвет для среды.",
+  "Decide the colour of Thursday.": "Выберите цвет для четверга.",
+  "Decide the colour of Friday.": "Выберите цвет для пятницы.",
+  "Decide the colour of Saturday.": "Выберите цвет для субботы.",
+  "Decide the colour of Sunday.": "Выберите цвет для воскресенья.",
+  "User event": "Событие пользователя",
+  "No alerts": "Нет оповещений"
 }

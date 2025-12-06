@@ -39,7 +39,7 @@ Logseqのジャーナルをもっとスマートにするプラグインです�
 
 ### 📌 詳細な機能説明
 
-#### デイリージャーナルの詳細表示
+#### デイリージャーナルの補完
 - 日付タイトルの横に曜日や週番号を表示
 - 表示例:
    ![画像](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/f47b8948-5e7a-4e16-a5ae-6966672742b1)

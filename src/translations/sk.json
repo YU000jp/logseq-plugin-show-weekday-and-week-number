@@ -108,5 +108,15 @@
   "Single journal page only": "Len jedna strana denníka",
   "Use on Monthly Journal": "Použitie v mesačnom denníku",
   "Use on Quarterly Journal": "Použitie v štvrťročnom denníku",
-  "Use on Yearly Journal": "Použitie v ročnom denníku"
-}
+    "Use on Yearly Journal": "Použitie v ročnom denníku",
+    "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Vyberte farbu na zvýraznenie sviatkov. Môžete tiež použiť názvy CSS premenných, napríklad '--highlight-bg-color', úpravou textu nastavenia.",
+    "Decide the colour of Monday.": "Rozhodnite o farbe pondelka.",
+    "Decide the colour of Tuesday.": "Rozhodnite o farbe utorka.",
+    "Decide the colour of Wednesday.": "Rozhodnite o farbe stredy.",
+    "Decide the colour of Thursday.": "Rozhodnite o farbe štvrtka.",
+    "Decide the colour of Friday.": "Rozhodnite o farbe piatka.",
+    "Decide the colour of Saturday.": "Rozhodnite o farbe soboty.",
+    "Decide the colour of Sunday.": "Rozhodnite o farbe nedele.",
+    "User event": "Udalosť používateľa",
+    "No alerts": "Žiadne upozornenia"
+  }

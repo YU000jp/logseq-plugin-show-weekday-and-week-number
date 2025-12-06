@@ -114,5 +114,15 @@
   "Confirm": "확인",
   "Cancel": "취소",
   "Page created successfully.": "페이지가 성공적으로 생성되었습니다.",
-  "Cancelled": "취소됨"
+  "Cancelled": "취소됨",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "휴일을 강조할 색상을 선택하세요. 설정 텍스트를 편집하여 '--highlight-bg-color'와 같은 CSS 변수 이름을 사용할 수도 있습니다.",
+  "Decide the colour of Monday.": "월요일의 색상을 결정하세요.",
+  "Decide the colour of Tuesday.": "화요일의 색상을 결정하세요.",
+  "Decide the colour of Wednesday.": "수요일의 색상을 결정하세요.",
+  "Decide the colour of Thursday.": "목요일의 색상을 결정하세요.",
+  "Decide the colour of Friday.": "금요일의 색상을 결정하세요.",
+  "Decide the colour of Saturday.": "토요일의 색상을 결정하세요.",
+  "Decide the colour of Sunday.": "일요일의 색상을 결정하세요.",
+  "User event": "사용자 이벤트",
+  "No alerts": "알림 없음"
 }

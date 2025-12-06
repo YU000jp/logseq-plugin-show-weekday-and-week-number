@@ -114,5 +114,15 @@
   "Confirm": "Bevestig",
   "Cancel": "Kanselleer",
   "Page created successfully.": "Bladsy suksesvol geskep.",
-  "Cancelled": "Gekanselleer"
+  "Cancelled": "Gekanselleer",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Kies 'n kleur om vakansiedae uit te lig. Jy kan ook CSS-veranderlike name soos '--highlight-bg-color' gebruik deur die instellingstekst te wysig.",
+  "Decide the colour of Monday.": "Bepaal die kleur van Maandag.",
+  "Decide the colour of Tuesday.": "Bepaal die kleur van Dinsdag.",
+  "Decide the colour of Wednesday.": "Bepaal die kleur van Woensdag.",
+  "Decide the colour of Thursday.": "Bepaal die kleur van Donderdag.",
+  "Decide the colour of Friday.": "Bepaal die kleur van Vrydag.",
+  "Decide the colour of Saturday.": "Bepaal die kleur van Saterdag.",
+  "Decide the colour of Sunday.": "Bepaal die kleur van Sondag.",
+  "User event": "Gebruiker gebeurtenis",
+  "No alerts": "Geen waarskuwings"
 }

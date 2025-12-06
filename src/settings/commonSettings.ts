@@ -90,11 +90,11 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
     title: t("Colour the letters Saturday and Sunday"),
     type: "boolean",
     default: true,
-    description: t("Select your days of the weekends") + "🆕",
+    description: t("Select your days of the weekends"),
   },
   {
     key: SettingKeys.userWeekendMon,
-    title: t("Decide the colour of Monday.") + "🆕",
+    title: t("Decide the colour of Monday."),
     type: "enum",
     enumChoices: ["", "blue", "red", "green"],
     default: "",
@@ -102,7 +102,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userWeekendTue,
-    title: t("Decide the colour of Tuesday.") + "🆕",
+    title: t("Decide the colour of Tuesday."),
     type: "enum",
     enumChoices: ["", "blue", "red", "green"],
     default: "",
@@ -110,7 +110,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userWeekendWed,
-    title: t("Decide the colour of Wednesday.") + "🆕",
+    title: t("Decide the colour of Wednesday."),
     type: "enum",
     enumChoices: ["", "blue", "red", "green"],
     default: "",
@@ -118,7 +118,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userWeekendThu,
-    title: t("Decide the colour of Thursday.") + "🆕",
+    title: t("Decide the colour of Thursday."),
     type: "enum",
     enumChoices: ["", "blue", "red", "green"],
     default: "",
@@ -126,7 +126,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userWeekendFri,
-    title: t("Decide the colour of Friday.") + "🆕",
+    title: t("Decide the colour of Friday."),
     type: "enum",
     enumChoices: ["", "blue", "red", "green"],
     default: "",
@@ -134,7 +134,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userWeekendSat,
-    title: t("Decide the colour of Saturday.") + "🆕",
+    title: t("Decide the colour of Saturday."),
     type: "enum",
     enumChoices: ["blue", "", "red", "green"],
     default: "blue",
@@ -142,7 +142,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userWeekendSun,
-    title: t("Decide the colour of Sunday.") + "🆕",
+    title: t("Decide the colour of Sunday."),
     type: "enum",
     enumChoices: ["red", "", "blue", "green"],
     default: "red",
@@ -166,7 +166,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.userColorList,
-    title: t("User color") + "🆕",
+    title: t("User event"),
     type: "string",
     inputAs: "textarea",
     default: "",
@@ -185,6 +185,6 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
     type: "string",
     inputAs: "color",
     default: "#00BFFF",
-    description: t("User color") + "🆕",
+    description: t("User color"),
   },
 ]

@@ -7,7 +7,7 @@ export const yearlyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings
   // Yearly Journal
   {
     key: SettingKeys.heading007,
-    title: "7. " + t("Yearly Journal") + "🆕",
+    title: "7. " + t("Yearly Journal"),
     type: "heading",
     default: "",
     description: "",

@@ -95,7 +95,7 @@ export const dailyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings'
         {
           //20240721
           key: SettingKeys.booleanPrevNextLink,
-          title: t("Show previous and next link") + "🆕",
+          title: t("Show previous and next link"),
           type: "boolean" as const,
           default: true,
           description: t("Single journal page only"),

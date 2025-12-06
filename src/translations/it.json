@@ -114,5 +114,15 @@
   "Confirm": "Conferma",
   "Cancel": "Annulla",
   "Page created successfully.": "Pagina creata con successo.",
-  "Cancelled": "Annullato"
+  "Cancelled": "Annullato",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Scegli un colore per evidenziare le festività. Puoi anche usare nomi di variabili CSS come '--highlight-bg-color' modificando il testo delle impostazioni.",
+  "Decide the colour of Monday.": "Decidi il colore del lunedì.",
+  "Decide the colour of Tuesday.": "Decidi il colore del martedì.",
+  "Decide the colour of Wednesday.": "Decidi il colore del mercoledì.",
+  "Decide the colour of Thursday.": "Decidi il colore del giovedì.",
+  "Decide the colour of Friday.": "Decidi il colore del venerdì.",
+  "Decide the colour of Saturday.": "Decidi il colore del sabato.",
+  "Decide the colour of Sunday.": "Decidi il colore della domenica.",
+  "User event": "Evento utente",
+  "No alerts": "Nessun avviso"
 }

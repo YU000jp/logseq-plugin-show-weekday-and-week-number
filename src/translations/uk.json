@@ -108,5 +108,15 @@
   "Single journal page only": "Лише одна сторінка журналу",
   "Use on Monthly Journal": "Використання в щомісячному журналі",
   "Use on Quarterly Journal": "Використання в щоквартальному журналі",
-  "Use on Yearly Journal": "Використання в щорічному журналі"
+  "Use on Yearly Journal": "Використання в щорічному журналі",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Виберіть колір для підсвічування свят. Ви також можете використовувати імена змінних CSS, наприклад '--highlight-bg-color', відредагувавши текст налаштування.",
+  "Decide the colour of Monday.": "Виберіть колір для понеділка.",
+  "Decide the colour of Tuesday.": "Виберіть колір для вівторка.",
+  "Decide the colour of Wednesday.": "Виберіть колір для середи.",
+  "Decide the colour of Thursday.": "Виберіть колір для четверга.",
+  "Decide the colour of Friday.": "Виберіть колір для п’ятниці.",
+  "Decide the colour of Saturday.": "Виберіть колір для суботи.",
+  "Decide the colour of Sunday.": "Виберіть колір для неділі.",
+  "User event": "Подія користувача",
+  "No alerts": "Сповіщень немає"
 }

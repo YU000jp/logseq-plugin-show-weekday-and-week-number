@@ -108,5 +108,15 @@
   "Single journal page only": "Sadece tek dergi sayfası",
   "Use on Monthly Journal": "Aylık Dergide Kullanım",
   "Use on Quarterly Journal": "Üç Aylık Dergilerde Kullanım",
-  "Use on Yearly Journal": "Yıllık Dergide Kullanım"
+  "Use on Yearly Journal": "Yıllık Dergide Kullanım",
+  "Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text.": "Tatil günlerini vurgulamak için bir renk seçin. Ayar metnini düzenleyerek '--highlight-bg-color' gibi CSS değişken adlarını da kullanabilirsiniz.",
+  "Decide the colour of Monday.": "Pazartesi için renk seçin.",
+  "Decide the colour of Tuesday.": "Salı için renk seçin.",
+  "Decide the colour of Wednesday.": "Çarşamba için renk seçin.",
+  "Decide the colour of Thursday.": "Perşembe için renk seçin.",
+  "Decide the colour of Friday.": "Cuma için renk seçin.",
+  "Decide the colour of Saturday.": "Cumartesi için renk seçin.",
+  "Decide the colour of Sunday.": "Pazar için renk seçin.",
+  "User event": "Kullanıcı etkinliği",
+  "No alerts": "Uyarı yok"
 }

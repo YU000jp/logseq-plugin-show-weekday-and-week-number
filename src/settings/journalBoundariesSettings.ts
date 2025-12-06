@@ -52,7 +52,7 @@ export const journalBoundariesSettings = (logseqSettings: LSPluginBaseInfo['sett
         title: "",
         type: "boolean",
         default: false,
-        description: t("Use on Monthly Journal") + "🆕",
+        description: t("Use on Monthly Journal"),
       },
       // Quarterly/Yearly options removed: always off
       {
