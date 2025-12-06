@@ -75,20 +75,7 @@ export const journalBoundariesSettings = (logseqSettings: LSPluginBaseInfo['sett
         default: true,
         description: "",
       },
-      {
-        key: SettingKeys.booleanBoundariesShowMonth,
-        title: t("Show month"),
-        type: "boolean",
-        default: true,
-        description: "",
-      },
-      {
-        key: SettingKeys.booleanBoundariesShowWeekNumber,
-        title: t("Show week number"),
-        type: "boolean",
-        default: true,
-        description: "",
-      },
+      // Month and week-number are always shown in the Two-line calendar.
       //20240121
       {
         key: SettingKeys.booleanBoundariesHolidays,

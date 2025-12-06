@@ -22,7 +22,6 @@ const isEssentialSettingsAltered = (oldSet: LSPluginBaseInfo["settings"], newSet
   SettingKeys.booleanLunarCalendar,
   SettingKeys.booleanUnderLunarCalendar,
   SettingKeys.choiceHolidaysColor,
-  SettingKeys.booleanBoundariesIndicator,
   SettingKeys.boundariesWeekStart,
   SettingKeys.booleanWeekendsColor,
   SettingKeys.boundariesHighlightColorSinglePage,
@@ -78,12 +77,17 @@ export const handleSettingsUpdate = () => {
         SettingKeys.booleanQuarterlyJournal,
         SettingKeys.booleanYearlyJournal
       ]
-      if (journalKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
-        journalKeys.forEach(key => {
-          if (oldSet[key] === true && newSet[key] === false)
-            removeElementById(`${key.replace('boolean', '').toLowerCase()}Nav`)
-        })
-      } else {
+        if (journalKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
+          journalKeys.forEach(key => {
+            if (oldSet[key] === true && newSet[key] === false)
+              removeElementById(`${key.replace('boolean', '').toLowerCase()}Nav`)
+          })
+        } else if (journalKeys.some(key => oldSet[key] !== newSet[key])) {
+          // If any journal visibility setting changed (either enabled or disabled),
+          // re-apply boundary settings so the TwoLineCalendar reflects the change.
+          removeBoundaries()
+          ApplyBoundarySettingsOnChange(newSet)
+        } else {
         const boundaryKeys = [
           SettingKeys.booleanBoundariesAll,
           SettingKeys.booleanBoundaries,
@@ -117,8 +121,7 @@ export const handleSettingsUpdate = () => {
             // Boundaries Calendar の再表示
             if (isEssential === true || [
               SettingKeys.boundariesBottom,
-              SettingKeys.booleanBoundariesShowMonth,
-              SettingKeys.booleanBoundariesShowWeekNumber,
+              // Month and week-number settings removed; always shown
               SettingKeys.booleanBoundariesHolidays
             ].some(key => oldSet[key] !== newSet[key])) {
               removeBoundaries()

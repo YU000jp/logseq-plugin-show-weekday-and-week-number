@@ -3,6 +3,10 @@ import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday,
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
 import { holidaysWorld, lunarString, DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor, findPageUuid, doesPageFileExist, getCurrentPageJournalDay } from '../lib'
+import React from 'react'
+import { createRoot, Root } from 'react-dom/client'
+import TwoLineCalendar from '../components/TwoLineCalendar'
+import { ensureBoundariesMountPoint } from './boundariesMount'
 import { separate } from '../journals/nav'
 
 
@@ -86,21 +90,43 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
     // 次の週を表示するかどうかの判定
     const flagShowNextWeek: boolean = checkIfNextWeekVisible(weekStartsOn, isThursday(targetDate), isFriday(targetDate), isSaturday(targetDate), targetDate)
 
-    await createDaysElements(
-      getWeekOffsetDays(flagShowNextWeek) as number[], //どの週を表示するか
-      selectStartDate ? //targetDateを週の初めにする
-        selectStartDate :
-        weekStartsOn === 1
-          && logseq.settings?.weekNumberFormat === "ISO(EU) format"
-          ? startOfISOWeek(targetDate)
-          : startOfWeek(targetDate, { weekStartsOn }),
-      boundariesInner,
-      today,
-      targetDate,
-      targetElementName,
-      flagShowNextWeek
-    )
+    // Instead of building DOM here, mount a React TwoLineCalendar into boundariesInner.
+    const offsets = getWeekOffsetDays(flagShowNextWeek) as number[]
+    const startForComponent = selectStartDate ?
+      selectStartDate :
+      weekStartsOn === 1 && logseq.settings?.weekNumberFormat === "ISO(EU) format"
+        ? startOfISOWeek(targetDate)
+        : startOfWeek(targetDate, { weekStartsOn })
+
+    // append the container wrapper so existing layout is preserved
     weekBoundaries.appendChild(boundariesInner)
+
+    try {
+      const mount = ensureBoundariesMountPoint(boundariesInner)
+      // unmount previous root if exists
+      try {
+        const prev = (window as any).__boundariesRoot || (parent as any).__boundariesRoot
+        if (prev && typeof prev.unmount === 'function') prev.unmount()
+      } catch (e) { /* ignore */ }
+      const root: Root = createRoot(mount)
+      ;(window as any).__boundariesRoot = root
+      root.render(React.createElement(TwoLineCalendar, { startDate: startForComponent, offsets, targetElementName, onRequestScroll: (deltaWeeks: number) => {
+        // deltaWeeks is -1 or +1
+        const newStart = addDays(startForComponent, deltaWeeks * 7)
+        boundariesProcess(targetElementName, true, 0, newStart)
+      } }))
+    } catch (e) {
+      // fallback to old DOM builder
+      await createDaysElements(
+        offsets,
+        startForComponent,
+        boundariesInner,
+        today,
+        targetDate,
+        targetElementName,
+        flagShowNextWeek
+      )
+    }
   }
   processingFoundBoundaries = false
 }
@@ -177,10 +203,9 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
       }
       if (index === 0
         || index === 7)
-        //daySideElement作成    
-        //月を表示する場合
-        if (logseq.settings!.booleanBoundariesShowMonth === true)
-          monthDuplicate = daySideMonth(dayDate, boundariesInner, monthDuplicate) //daySideElement作成
+        //daySideElement作成
+        //月名は常に表示
+        monthDuplicate = daySideMonth(dayDate, boundariesInner, monthDuplicate) //daySideElement作成
 
       //dayElement作成
       // const isBooleanBeforeToday: boolean = isBefore(dayDate, today)
@@ -254,18 +279,16 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
       dayCell.addEventListener("click", ({ shiftKey }) => openPageFromPageName(dateFormatString, shiftKey))
 
       //20240115
-      //エントリーが存在するかどうかのインディケーターを表示する
-      if (logseq.settings!.booleanBoundariesIndicator === true)
-        await indicator(dateFormatString, dayOfMonthElement)
+      //エントリーが存在するかどうかのインディケーターを表示する（常に表示）
+      await indicator(dateFormatString, dayOfMonthElement)
 
     } finally {
       boundariesInner.appendChild(dayCell)
       if (index === 6
         || index === 13) {
         //daySideElement作成    
-        //週番号を表示する場合
-        if (logseq.settings!.booleanBoundariesShowWeekNumber === true)
-          daySideWeekNumber(dayDate, boundariesInner)
+        //週番号は常に表示
+        daySideWeekNumber(dayDate, boundariesInner)
         weekScrollButtons(index, boundariesInner, targetElementName, startDate)
       }
     }

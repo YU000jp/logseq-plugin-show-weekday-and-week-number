@@ -442,6 +442,42 @@ export const userColor = (dayDate: Date, titleElement: HTMLElement) => {
   return returnEventName
 }
 
+/**
+ * Compute user color information for a given date without mutating DOM.
+ * Returns an object with optional color, fontWeight and eventName (possibly multi-line).
+ */
+export const getUserColorData = (dayDate: Date): { color?: string; fontWeight?: string; eventName?: string } => {
+  if (logseq.settings!.userColorList as string === "") return {}
+  let returnEventName: string = ""
+  const list = logseq.settings!.userColorList as string
+  const userColorList = list.includes("\n") ? list.split("\n") : [list]
+  for (const userColorItem of userColorList) {
+    const [dateString, eventName] = userColorItem.split("::")
+    if (!dateString) continue
+    if (
+      (dateString.split("/").length === 3 && (format(dayDate, "yyyy/MM/dd") === dateString || format(dayDate, "yyyy/M/d") === dateString))
+      || (dateString.split("/").length === 2 && (format(dayDate, "MM/dd") === dateString || format(dayDate, "M/d") === dateString))
+    ) {
+      if (returnEventName === "") {
+        returnEventName = eventName
+      } else {
+        returnEventName = `${returnEventName}\n${eventName}`
+      }
+    }
+  }
+  if (returnEventName === "") return {}
+  return { color: logseq.settings!.choiceUserColor as string, fontWeight: "800", eventName: returnEventName }
+}
+
+/**
+ * Get weekend color for a DayShortCode (e.g., 'Sun','Mon',...)
+ * Returns a CSS color string or undefined.
+ */
+export const getWeekendColor = (day: string) => {
+  const color = colorMap[logseq.settings!["userWeekend" + day as keyof typeof logseq.settings] as string]
+  return color
+}
+
 export const getDayOfWeekName = (journalDate: Date): string => {
   return logseq.settings!.booleanDayOfWeek
     ? new Intl.DateTimeFormat(

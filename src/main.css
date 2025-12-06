@@ -164,17 +164,7 @@ body {
                                         &+div.desc-item[data-key="boundariesBottom"] {
                                             display: none;
 
-                                            &+div.desc-item[data-key="booleanBoundariesShowMonth"] {
-                                                display: none;
-
-                                                &+div.desc-item[data-key="booleanBoundariesShowWeekNumber"] {
-                                                    display: none;
-
-                                                    &+div.desc-item[data-key="booleanBoundariesHolidays"] {
-                                                        display: none;
-                                                    }
-                                                }
-                                            }
+                                            /* Month / WeekNumber UI controls removed; always show these in Two-line calendar */
                                         }
                                     }
                                 }
@@ -364,7 +354,7 @@ body {
                 &>#boundariesInner {
                     display: flex;
                     margin-top: 0.1em;
-                    min-width: 40em;
+                    min-width: 30em;
                     width: min-content;
                     margin-left: auto;
                     margin-right: auto;

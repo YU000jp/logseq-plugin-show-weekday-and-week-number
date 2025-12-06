@@ -75,56 +75,41 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
     }, 500)
 }
 
-//月間カレンダーを作成する
+// 月間カレンダーを作成する（マウントポイントの作成に限定）
 const createCalendar = async (targetDate: Date, preferredDateFormat: string, innerElement: HTMLDivElement, flag?: { singlePage?: boolean, weekly?: boolean }) => {
-    // Weeklyフラグの場合は週間表示フラグを立てる
+    // Keep weekly flag and currentCalendarDate module state
     flagWeekly = flag?.weekly === true ? true : false
+    currentCalendarDate = targetDate
 
-    currentCalendarDate = targetDate // 更新
-
-    // Create container element and render React component into it
-        const calendarElement: HTMLElement = parent.document.createElement('div')
-    calendarElement.className = 'nav-calendar-react-wrapper'
-    calendarElement.id = 'left-calendar-root'
-        // if an existing root element already exists under innerElement, unmount/remove it first
-        try {
-            const existingRoot = parent.document.getElementById('left-calendar-root') as HTMLElement | null
-            if (existingRoot) {
-                // try to unmount any stored root reference
-                try {
-                    const prevRoot = (window as any).__leftCalendarRoot || (parent as any).__leftCalendarRoot
-                    if (prevRoot && typeof prevRoot.unmount === 'function') prevRoot.unmount()
-                } catch (e) { /* ignore */ }
-                existingRoot.remove()
-            }
-        } catch (e) { /* ignore */ }
+    // Ensure a single React mount point exists inside the inner element.
+    // Do not attempt to move/remove legacy elements here; leave that to cleanup logic.
+    let calendarElement = parent.document.getElementById('left-calendar-root') as HTMLElement | null
+    if (!calendarElement) {
+        calendarElement = parent.document.createElement('div')
+        calendarElement.className = 'nav-calendar-react-wrapper'
+        calendarElement.id = 'left-calendar-root'
         innerElement.appendChild(calendarElement)
+    }
 
-    // Render React MonthlyCalendar into created element
     try {
-        // store root so it can be unmounted by removeCalendarAndNav
-        (window as any).__leftCalendarRoot = (window as any).__leftCalendarRoot || null
-        const root: Root = createRoot(calendarElement)
-        ;(window as any).__leftCalendarRoot = root
-        root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag }))
-        // mark initialized on parent so concurrent callers can check
+        // Create or reuse root stored on the parent/window
+        const existingRoot = (window as any).__leftCalendarRoot || (parent as any).__leftCalendarRoot || null
+        if (existingRoot && typeof existingRoot.render === 'function') {
+            // Re-render into existing root
+            existingRoot.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
+        } else {
+            const root: Root = createRoot(calendarElement)
+            ;(window as any).__leftCalendarRoot = root
+            root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
+        }
         try { (parent as any).__leftCalendarInitialized = true } catch (e) { /* ignore */ }
     } catch (e) {
         console.error('Failed to render MonthlyCalendar React component', e)
     }
-
-
-    // Removed debug/test output block to reduce clutter in production code
 }
 
 //カレンダーとナビゲーションを削除 (再描画時に使用)
 const removeCalendarAndNav = () => {
-
-    //.leftCalendarHolidayAlertを削除
-    const leftCalendarHolidayAlerts = parent.document.querySelectorAll(".leftCalendarHolidayAlert") as NodeListOf<HTMLDivElement>
-    if (leftCalendarHolidayAlerts)
-        for (const leftCalendarHolidayAlert of leftCalendarHolidayAlerts)
-            leftCalendarHolidayAlert.remove()
 
     // Unmount React root if exists
     try {
@@ -135,11 +120,10 @@ const removeCalendarAndNav = () => {
         }
     } catch (e) { /* ignore */ }
 
-    // #left-calendarを削除 (legacy)
-    removeElementById("left-calendar")
-    removeElementById("left-calendar-root")
+    // Remove the container that holds the calendar (created by loadLeftCalendar)
+    removeElementById(keyLeftCalendarContainer)
 
-    // Clear parent-scoped flags to allow re-creation later
+    // Unset parent-scoped flags so creation can happen again
     try {
         ;(parent as any).__leftCalendarCreating = false
         ;(parent as any).__leftCalendarInitialized = false
@@ -148,11 +132,25 @@ const removeCalendarAndNav = () => {
 
 export const refreshMonthlyCalendar = async (targetDate: Date, singlePage: boolean, weekly: boolean) => {
     const innerElement: HTMLDivElement | null = parent.document.getElementById("left-calendar-inner") as HTMLDivElement | null
+    const preferredDateFormat = await getConfigPreferredDateFormat()
+    // If React root exists, update it by re-rendering with new props instead of unmounting
+    try {
+        const root = (window as any).__leftCalendarRoot as any
+        if (root && typeof root.render === 'function') {
+            root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag: { singlePage, weekly }, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = weekly === true } }))
+            // update module-level state
+            currentCalendarDate = targetDate
+            flagWeekly = weekly === true
+            return
+        }
+    } catch (e) { /* ignore and fallback to recreate */ }
+
     if (innerElement) {
+        // fallback: remove and recreate
         removeCalendarAndNav()
         createCalendar(
             targetDate,
-            await getConfigPreferredDateFormat(),
+            preferredDateFormat,
             innerElement,
             { singlePage, weekly })
     }

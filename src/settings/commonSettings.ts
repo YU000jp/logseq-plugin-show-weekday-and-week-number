@@ -77,14 +77,6 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
     description: t("Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text."),
   },
   {
-    key: SettingKeys.booleanBoundariesIndicator,
-    title: t("Show indicator of journal entries") + "🆙",
-    type: "boolean",
-    default: true,
-    //ページが存在する場合に、インディケーターを表示する
-    description: "",
-  },
-  {
     key: SettingKeys.boundariesWeekStart,
     title: t("Week start (Unset: by the selected format)"),
     type: "enum",

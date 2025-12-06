@@ -3,7 +3,7 @@ import { addDays, Day, eachDayOfInterval, getISOWeek, getWeek, isSameDay, isSame
 import { format } from 'date-fns/format'
 import { t } from 'logseq-l10n'
 import { separate } from '../journals/nav'
-import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, shortDayNames, userColor, colorMap, resolveColorChoice, toTranslucent } from '../lib'
+import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, shortDayNames, colorMap, resolveColorChoice, toTranslucent, getUserColorData, getWeekendColor } from '../lib'
 import { applyWeekendColor } from '../calendar/boundaries'
 import { getHolidays } from '../lib/holidays'
 import { findPageUuid } from '../lib/query/advancedQuery'
@@ -12,6 +12,7 @@ type Props = {
   targetDate: Date
   preferredDateFormat: string
   flag?: { singlePage?: boolean, weekly?: boolean }
+  onTargetDateChange?: (date: Date) => void
 }
 
 const WeeklyCell: React.FC<{ date: Date, ISO: boolean, weekStartsOn: Day }> = ({ date, ISO, weekStartsOn }) => {
@@ -19,8 +20,12 @@ const WeeklyCell: React.FC<{ date: Date, ISO: boolean, weekStartsOn: Day }> = ({
   return <td style={{ fontSize: '0.85em' }}>{weekNumber}</td>
 }
 
-export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate, preferredDateFormat, flag }) => {
+export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate, preferredDateFormat, flag, onTargetDateChange }) => {
   const [targetDate, setTargetDate] = useState<Date>(initialTargetDate)
+  // If parent updates the prop targetDate (via refresh), sync internal state
+  useEffect(() => {
+    setTargetDate(initialTargetDate)
+  }, [initialTargetDate])
   const today = new Date()
   const year = targetDate.getFullYear()
   const month = targetDate.getMonth() + 1
@@ -44,27 +49,25 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
     const [alerts, setAlerts] = useState<Array<{ date: Date, text: string, isToday: boolean }>>([]);
     const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
     const [weekExistsMap, setWeekExistsMap] = useState<Record<string, boolean>>({});
-  
-    const cellRefs = React.useRef<Map<string, HTMLTableCellElement | null>>(new Map());
-    // remove any legacy alerts injected outside React to avoid duplicates
-    useEffect(() => {
-      try {
-        const existing = parent.document.querySelectorAll('.leftCalendarHolidayAlert') as NodeListOf<HTMLElement>
-        if (existing && existing.length > 0) existing.forEach(e => e.remove())
-      } catch (e) { /* ignore in environments without parent */ }
-    }, [])
+    const [userColorMap, setUserColorMap] = useState<Record<string, { color?: string; fontWeight?: string; eventName?: string }>>({})
   useEffect(() => {
-    // check page existence and holidays for displayed days
+    // check page existence, holidays, and compute userColor data for displayed days
     const run = async () => {
       const pMap: Record<string, boolean> = {}
       const hMap: Record<string, string> = {}
       const wMap: Record<string, boolean> = {}
+      const uMap: Record<string, { color?: string; fontWeight?: string; eventName?: string }> = {}
       for (const d of eachDays) {
         const pageName = format(d, preferredDateFormat)
         if (pageName) {
           try { pMap[pageName] = await findPageUuid(pageName) as boolean } catch { pMap[pageName] = false }
           try { hMap[pageName] = await getHolidays(d) } catch { hMap[pageName] = '' }
         }
+        // compute user color data (pure, no DOM mutation)
+        try {
+          const info = getUserColorData(d)
+          if (info && info.eventName) uMap[d.toISOString()] = info
+        } catch (e) { /* ignore */ }
       }
       // check weekly pages for each week's start
       if (logseq.settings!.booleanWeeklyJournal === true) {
@@ -78,47 +81,31 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
       setPageExistsMap(pMap)
       setHolidayMap(hMap)
       setWeekExistsMap(wMap)
+      setUserColorMap(uMap)
     }
     run()
   }, [preferredDateFormat, targetDate])
 
-  // After render, apply userColor to actual TD elements and build alerts list
+  // Build alerts list using computed holidayMap and userColorMap (no DOM mutations)
   useEffect(() => {
     const newAlerts: Array<{ date: Date, text: string, isToday: boolean }> = []
     for (const d of eachDays) {
-      const key = d.toISOString()
-      const el = cellRefs.current.get(key)
-      if (!el) continue
-      // Apply userColor (mutates element styles) and get eventName
-      try {
-        const eventName = userColor(d, el as HTMLElement)
-        const isTodayFlag = isToday(d)
-        // collect unique messages per date via a Set (dedupe)
-        const msgs: Set<string> = new Set()
-        if (eventName) {
-          for (const ev of eventName.split('\n')) msgs.add(ev.trim())
-        }
-        // holidays
-        const pageName = format(d, preferredDateFormat)
-        const holiday = pageName ? holidayMap[pageName] || '' : ''
-        if (holiday) {
-          if ((logseq.settings!.lcHolidaysAlert === 'Today only' && isTodayFlag) || logseq.settings!.lcHolidaysAlert === 'Monthly')
-            for (const h of holiday.split('\n')) msgs.add(h.trim())
-        }
-
-        // push deduped and ordered: user events first, then holidays
-        for (const m of Array.from(msgs)) newAlerts.push({ date: d, text: m, isToday: isTodayFlag })
-
-        // enhance tooltip/title on the cell: show user events, holiday, then page name
-        const titleParts: string[] = []
-        if (eventName) titleParts.push(...eventName.split('\n').map(s => s.trim()).filter(Boolean))
-        if (holiday) titleParts.push(...holiday.split('\n').map(s => s.trim()).filter(Boolean))
-        if (pageName) titleParts.push(pageName)
-        if (titleParts.length > 0) el.title = titleParts.join('\n')
-      } catch (e) { /* ignore */ }
+      const isTodayFlag = isToday(d)
+      const msgs: Set<string> = new Set()
+      const u = userColorMap[d.toISOString()]
+      if (u && u.eventName) {
+        for (const ev of u.eventName.split('\n')) msgs.add(ev.trim())
+      }
+      const pageName = format(d, preferredDateFormat)
+      const holiday = pageName ? holidayMap[pageName] || '' : ''
+      if (holiday) {
+        if ((logseq.settings!.lcHolidaysAlert === 'Today only' && isTodayFlag) || logseq.settings!.lcHolidaysAlert === 'Monthly')
+          for (const h of holiday.split('\n')) msgs.add(h.trim())
+      }
+      for (const m of Array.from(msgs)) newAlerts.push({ date: d, text: m, isToday: isTodayFlag })
     }
     setAlerts(newAlerts)
-  }, [holidayMap, pageExistsMap, targetDate])
+  }, [holidayMap, pageExistsMap, userColorMap, targetDate])
 
   // Group alerts by date for UI (yyyy-MM-dd)
   const groupedAlerts = useMemo(() => {
@@ -136,24 +123,18 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 
   const toggleGroup = (k: string) => setCollapsedGroups(s => ({ ...s, [k]: !s[k] }))
 
-  // apply weekday-specific color to rendered TDs when appropriate
-  useEffect(() => {
-    for (const d of eachDays) {
-      const key = d.toISOString()
-      const el = cellRefs.current.get(key)
-      if (!el) continue
-      try {
-        if (logseq.settings?.booleanWeekendsColor === true) {
-          // applyWeekendColor actually reads per-day settings (userWeekendMon..Sun)
-          applyWeekendColor(el as HTMLElement, shortDayNames[d.getDay()])
-        }
-      } catch (e) { /* ignore */ }
-    }
-  }, [holidayMap, pageExistsMap, targetDate])
+  // No direct DOM mutation: weekend color will be applied via getWeekendColor in render
 
   const onPrev = () => setTargetDate(d => { const n = new Date(d); n.setMonth(n.getMonth() - 1); return n })
   const onNext = () => setTargetDate(d => { const n = new Date(d); n.setMonth(n.getMonth() + 1); return n })
   const onThis = () => setTargetDate(new Date())
+
+  // notify parent when internal date changes
+  useEffect(() => {
+    try {
+      if (onTargetDateChange) onTargetDateChange(targetDate)
+    } catch (e) { /* ignore */ }
+  }, [targetDate])
 
   return (
     <div id="left-calendar" className="flex flex-col items-start" style={{ minWidth: '220px', overflowX: 'auto' }}>
@@ -221,27 +202,41 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
                 let holidayClass = ''
                 if (holiday && logseq.settings!.booleanLcHolidays === true) {
                   const cssColor = resolveColorChoice(logseq.settings!.choiceHolidaysColor as string | undefined)
-                  // apply a subtle background using translucent version when possible
                   const bg = toTranslucent(cssColor, 0.12)
                   style.backgroundColor = bg
-                  // make the date number bolder for emphasis
                   style.fontWeight = '700'
                   holidayClass = ' lc-holiday'
                 }
 
-                // compute inline style for date number (underline when page exists and indicator setting enabled)
+                // compute inline style for date number (underline when page exists)
                 const dayNumberInlineStyle: React.CSSProperties = {}
-                if (exists && logseq.settings!.booleanBoundariesIndicator === true) {
+                if (exists) {
                   dayNumberInlineStyle.textDecoration = 'underline'
                 }
+
+                // apply userColor (computed) and weekend color (computed) without DOM mutation
+                const u = userColorMap[key]
+                if (u && u.color) {
+                  dayNumberInlineStyle.color = u.color
+                  dayNumberInlineStyle.fontWeight = u.fontWeight as any || dayNumberInlineStyle.fontWeight
+                } else if (logseq.settings?.booleanWeekendsColor === true) {
+                  const wk = getWeekendColor(shortDayNames[date.getDay()])
+                  if (wk) dayNumberInlineStyle.color = wk
+                }
+
+                // build title from user events, holiday, then page name
+                const titleParts: string[] = []
+                if (u && u.eventName) titleParts.push(...u.eventName.split('\n').map(s => s.trim()).filter(Boolean))
+                if (holiday) titleParts.push(...holiday.split('\n').map(s => s.trim()).filter(Boolean))
+                if (pageName) titleParts.push(pageName)
+                const combinedTitle = titleParts.length > 0 ? titleParts.join('\n') : undefined
 
                 return (
                   <td
                     key={key}
-                    ref={(el) => cellRefs.current.set(key, el)}
                     onClick={(e) => pageName && openPageFromPageName(pageName, (e as any).shiftKey)}
                     className={`${pageName ? 'cursor' : ''} lc-day-cell${holidayClass}`}
-                    title={holiday !== '' ? `${holiday}\n${pageName}` : pageName}
+                    title={combinedTitle ?? pageName}
                     style={style}
                   >
                     <span className="lc-day-number" style={dayNumberInlineStyle}>{date.getDate()}</span>
@@ -254,7 +249,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
       </table>
       {/* Alerts section (similar to appendHolidayAlert) */}
       <div id="left-calendar-alerts" style={{ marginTop: '0.5rem', width: '100%' }}>
-        {Object.keys(groupedAlerts).length === 0 && <div className="text-sm text-gray-500 ml-2">{t('No alerts')}</div>}
+        {Object.keys(groupedAlerts).length === 0 && <div className="text-sm ml-2" style={{ color: 'var(--ls-ui-fg-muted)' }}>{t('No alerts')}</div>}
         {Object.entries(groupedAlerts).map(([k, items]) => {
           const first = items[0]
           const headerLabel = first.isToday ? t('Today') : localizeMonthDayString(first.date)
@@ -268,7 +263,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
               {!collapsed && (
                 <div style={{ marginTop: '0.25rem', paddingLeft: '0.5rem' }}>
                   {items.map((a, i) => (
-                    <div key={i} className="text-sm text-gray-500 leftCalendarHolidayAlert" style={{ marginBottom: 4 }}>
+                    <div key={i} className="text-sm leftCalendarHolidayAlert" style={{ marginBottom: 4, color: 'var(--ls-ui-fg-muted)' }}>
                       {a.text}
                     </div>
                   ))}
