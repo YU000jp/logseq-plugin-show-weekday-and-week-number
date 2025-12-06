@@ -17,9 +17,8 @@ import {
   getWeekStartOn,
   getWeeklyNumberFromDate,
   getWeeklyNumberString,
-  toTranslucent,
-  resolveColorChoice,
 } from '../lib'
+import { computeCellBackground, computeDayNumberStyle, UserColorInfo } from '../lib/calendarUtils'
 import { separate } from '../journals/nav'
 
 type Props = {
@@ -127,13 +126,10 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
               // Do not dim or shrink cells for days from other months — keep uniform appearance.
               if (checkIsToday) { cellStyle.border = `2px solid ${(logseq.settings as any).boundariesHighlightColorToday}`; cellStyle.borderRadius = '50%' }
 
-              if (holiday && (logseq.settings as any).booleanBoundariesHolidays === true) {
-                const cssColor = resolveColorChoice((logseq.settings as any).choiceHolidaysColor as string | undefined)
-                cellStyle.backgroundColor = toTranslucent(cssColor, 0.12)
-                cellStyle.fontWeight = '700'
-              }
-
               const u = getUserColorData(d)
+              const bgInfo = computeCellBackground(u as UserColorInfo | undefined, holiday, (logseq.settings as any).booleanBoundariesHolidays === true, (logseq.settings as any).choiceHolidaysColor as string | undefined, (logseq.settings as any).choiceUserColor as string | undefined)
+              if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor
+              if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any
 
               const titleParts: string[] = []
               if (u && u.eventName) titleParts.push(...u.eventName.split('\n').map(s => s.trim()).filter(Boolean))
@@ -144,13 +140,8 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
               if (pageName && pageExistsMap[pageName]) {
                 dayNumberInlineStyle.textDecoration = 'underline'
               }
-              if (u && u.color) {
-                dayNumberInlineStyle.color = u.color
-                dayNumberInlineStyle.fontWeight = u.fontWeight as any || dayNumberInlineStyle.fontWeight
-              } else if ((logseq.settings as any)?.booleanWeekendsColor === true) {
-                const wk = getWeekendColor(shortDayNames[d.getDay()])
-                if (wk) dayNumberInlineStyle.color = wk
-              }
+              const dnStyle = computeDayNumberStyle(u as UserColorInfo | undefined, d.getDay(), (logseq.settings as any)?.booleanWeekendsColor === true)
+              Object.assign(dayNumberInlineStyle, dnStyle)
 
               return (
                 <td key={key} onClick={onCellClickFactory(pageName)} className={`${pageName ? 'cursor' : ''} lc-day-cell`} title={titleParts.length > 0 ? titleParts.join('\n') : pageName} style={cellStyle}>
@@ -227,13 +218,10 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
               // Do not dim or shrink cells for days from other months — keep uniform appearance.
               if (checkIsToday) { cellStyle.border = `2px solid ${(logseq.settings as any).boundariesHighlightColorToday}`; cellStyle.borderRadius = '50%' }
 
-              if (holiday && (logseq.settings as any).booleanBoundariesHolidays === true) {
-                const cssColor = resolveColorChoice((logseq.settings as any).choiceHolidaysColor as string | undefined)
-                cellStyle.backgroundColor = toTranslucent(cssColor, 0.12)
-                cellStyle.fontWeight = '700'
-              }
-
               const u = getUserColorData(d)
+              const bgInfo = computeCellBackground(u as UserColorInfo | undefined, holiday, (logseq.settings as any).booleanBoundariesHolidays === true, (logseq.settings as any).choiceHolidaysColor as string | undefined, (logseq.settings as any).choiceUserColor as string | undefined)
+              if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor
+              if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any
               const titleParts: string[] = []
               if (u && u.eventName) titleParts.push(...u.eventName.split('\n').map(s => s.trim()).filter(Boolean))
               if (holiday) titleParts.push(...holiday.split('\n').map(s => s.trim()).filter(Boolean))

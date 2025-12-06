@@ -3,7 +3,8 @@ import { addDays, Day, eachDayOfInterval, getISOWeek, getWeek, isSameDay, isSame
 import { format } from 'date-fns/format'
 import { t } from 'logseq-l10n'
 import { separate } from '../journals/nav'
-import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, shortDayNames, colorMap, resolveColorChoice, toTranslucent, getUserColorData, getWeekendColor } from '../lib'
+import { getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthDayString, localizeMonthString, openPageFromPageName, shortDayNames, colorMap, getUserColorData, resolveColorChoice, toTranslucent } from '../lib'
+import { computeCellBackground, computeDayNumberStyle, computeAlertBackground, UserColorInfo } from '../lib/calendarUtils'
 import { applyWeekendColor } from '../calendar/boundaries'
 import { getHolidays } from '../lib/holidays'
 import { findPageUuid } from '../lib/query/advancedQuery'
@@ -209,21 +210,11 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
                 if (checkIsToday) { style.border = `2px solid ${logseq.settings!.boundariesHighlightColorToday}`; style.borderRadius = '50%' }
                 if (flag?.singlePage === true && isSameDay(date, initialTargetDate)) style.border = `3px solid ${logseq.settings!.boundariesHighlightColorSinglePage}`
                 if (flag?.weekly === true && (ISO ? isSameISOWeek(date, initialTargetDate) : isSameWeek(date, initialTargetDate, { weekStartsOn }))) style.borderBottom = `3px solid ${logseq.settings!.boundariesHighlightColorSinglePage}`
-                // apply user event background (user color) preferentially, otherwise highlight holiday according to plugin setting
-                let holidayClass = ''
-                if (u && u.color) {
-                  const cssColor = resolveColorChoice(u.color as string | undefined)
-                  const bg = toTranslucent(cssColor, 0.12)
-                  style.backgroundColor = bg
-                  style.fontWeight = u.fontWeight as any || style.fontWeight
-                  holidayClass = ' lc-user-event'
-                } else if (holiday && logseq.settings!.booleanLcHolidays === true) {
-                  const cssColor = resolveColorChoice(logseq.settings!.choiceHolidaysColor as string | undefined)
-                  const bg = toTranslucent(cssColor, 0.12)
-                  style.backgroundColor = bg
-                  style.fontWeight = '700'
-                  holidayClass = ' lc-holiday'
-                }
+                            // determine cell background and class via shared utility
+                            const bgInfo = computeCellBackground(u as UserColorInfo | undefined, holiday, logseq.settings!.booleanLcHolidays === true, logseq.settings!.choiceHolidaysColor as string | undefined, logseq.settings!.choiceUserColor as string | undefined)
+                            let holidayClass = bgInfo.className || ''
+                            if (bgInfo.backgroundColor) style.backgroundColor = bgInfo.backgroundColor
+                            if (bgInfo.fontWeight) style.fontWeight = bgInfo.fontWeight as any
 
                 // compute inline style for date number (underline when page exists)
                 const dayNumberInlineStyle: React.CSSProperties = {}
@@ -231,14 +222,9 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
                   dayNumberInlineStyle.textDecoration = 'underline'
                 }
 
-                // apply userColor (computed) and weekend color (computed) without DOM mutation
-                if (u && u.color) {
-                  dayNumberInlineStyle.color = u.color
-                  dayNumberInlineStyle.fontWeight = u.fontWeight as any || dayNumberInlineStyle.fontWeight
-                } else if (logseq.settings?.booleanWeekendsColor === true) {
-                  const wk = getWeekendColor(shortDayNames[date.getDay()])
-                  if (wk) dayNumberInlineStyle.color = wk
-                }
+                // apply userColor and weekend color via shared utility
+                const dnStyle = computeDayNumberStyle(u as UserColorInfo | undefined, date.getDay(), logseq.settings?.booleanWeekendsColor === true)
+                Object.assign(dayNumberInlineStyle, dnStyle)
 
                 // build title from user events, holiday, then page name
                 const titleParts: string[] = []
@@ -278,26 +264,14 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
               </div>
               {!collapsed && (
                 <div style={{ marginTop: '0.25rem', paddingLeft: '0.5rem' }}>
-                  {items.map((a, i) => {
-                    // determine background: prefer user color for user-sourced alerts
-                    let itemBg = holidaysBg
-                    if (a.source === 'user') {
-                      const u = userColorMap[a.date.toISOString()]
-                      if (u && u.color) {
-                        const cssColor = resolveColorChoice(u.color as string | undefined)
-                        itemBg = toTranslucent(cssColor, 0.12)
-                      } else {
-                        // fallback to global user color choice
-                        const cssColor = resolveColorChoice(logseq.settings!.choiceUserColor as string | undefined)
-                        itemBg = toTranslucent(cssColor, 0.12)
-                      }
-                    }
-                    return (
-                      <div key={i} className="text-sm leftCalendarHolidayAlert" style={{ marginBottom: 4, color: 'var(--ls-ui-fg-muted)', backgroundColor: itemBg, padding: '4px 6px', borderRadius: 6 }}>
-                        {a.text}
-                      </div>
-                    )
-                  })}
+                    {items.map((a, i) => {
+                      const itemBg = computeAlertBackground(a.source, a.date.toISOString(), userColorMap, holidaysBg, logseq.settings!.choiceUserColor as string | undefined)
+                      return (
+                        <div key={i} className="text-sm leftCalendarHolidayAlert" style={{ marginBottom: 4, color: 'var(--ls-ui-fg-muted)', backgroundColor: itemBg, padding: '4px 6px', borderRadius: 6 }}>
+                          {a.text}
+                        </div>
+                      )
+                    })}
                 </div>
               )}
             </div>
