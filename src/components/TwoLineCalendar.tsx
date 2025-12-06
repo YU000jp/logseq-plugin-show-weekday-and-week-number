@@ -160,9 +160,15 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
             {/* second row: leftmost cell used to display short month name when enabled */}
             <td style={{ verticalAlign: 'middle', textAlign: 'center', fontSize: '0.9em', padding: '4px' }}>
               {(() => {
-                // use the first displayed day to determine the month label (short)
-                const monthLabel = localizeMonthString(days[0], false)
-                // build month page name like `yyyy/MM` or `yyyy-MM` depending on separator
+                // determine month label: if both displayed two-week rows share the same month,
+                // show the localized short month name; otherwise show numeric range like "11--12".
+                const monthLabel = (() => {
+                  const firstMonth = days[0].getMonth() + 1
+                  const secondMonth = days[7] ? days[7].getMonth() + 1 : firstMonth
+                  if (firstMonth === secondMonth) return localizeMonthString(days[0], false)
+                  return `${String(firstMonth).padStart(2, '0')}-${String(secondMonth).padStart(2, '0')}`
+                })()
+                // build month page name like `yyyy/MM` or `yyyy-MM` depending on separator (use first displayed day)
                 const monthPageName = format(days[0], `yyyy${separate()}MM`)
                 if (monthPageName.length === 7) {
                   return (
