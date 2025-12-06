@@ -6,8 +6,7 @@ import { currentPageIsMonthlyJournal } from "./journals/monthlyJournal"
 import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
-import { getDateFromJournalDay } from "./lib/lib"
-import { advancedQuery, queryCodeGetJournalDayFromOriginalName } from "./lib/query/advancedQuery"
+import { getDateFromJournalDay, advancedQuery, queryCodeGetJournalDayFromOriginalName } from "./lib"
 
 // Journal Titleの処理
 let processingJournalTitlePage: Boolean = false

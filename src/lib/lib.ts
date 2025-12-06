@@ -5,6 +5,7 @@ import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
 import { SettingKeys } from "../settings/SettingKeys"
 import { getPageBlocks, doesPageExist, findPageUuid } from "./query/advancedQuery"
 import { booleanLogseqMdModel } from ".."
+import { DayShortCode } from "../types"
 
 // Lightweight built-in confirm dialog implemented with <dialog>, falling back to a simple overlay
 // Uses `logseq-l10n`'s `t()` for translations.
@@ -152,7 +153,6 @@ export const showConfirmDialog = (title: string, text: string, opts?: { confirmT
 
 
 export const shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as DayShortCode[]
-export type DayShortCode = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun"
 
 export const colorMap: { [key: string]: string } = {
   blue: 'var(--ls-wb-stroke-color-blue)',

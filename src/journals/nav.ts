@@ -1,7 +1,7 @@
 import { addWeeks, eachDayOfInterval, format, getWeeksInMonth, isSameMonth, subWeeks } from "date-fns"
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat } from ".."
-import { getWeeklyNumberFromDate, localizeDayOfWeekDayString, localizeMonthString, openPageFromPageName } from "../lib/lib"
+import { getWeeklyNumberFromDate, localizeDayOfWeekDayString, localizeMonthString, openPageFromPageName } from "../lib"
 
 
 export const createNavLink = (text: string, pageName: string) => {

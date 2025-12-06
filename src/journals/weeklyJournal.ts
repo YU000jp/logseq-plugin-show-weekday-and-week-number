@@ -3,8 +3,8 @@ import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshMonthlyCalendar } from '../calendar/left-calendar'
-import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib/lib'
-import { findPageUuid } from '../lib/query/advancedQuery'
+import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib'
+import { findPageUuid } from '../lib'
 import { separate, weeklyJournalCreateNav } from './nav'
 import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
 

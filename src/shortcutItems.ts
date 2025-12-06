@@ -1,5 +1,5 @@
 import { AppUserConfigs, BlockEntity, IBatchBlock } from "@logseq/libs/dist/LSPlugin"
-import { getQuarterFromWeekNumber, getWeeklyNumberFromDate, getWeeklyNumberString } from "./lib/lib"
+import { getQuarterFromWeekNumber, getWeeklyNumberFromDate, getWeeklyNumberString } from "./lib"
 import { addMonths, addWeeks, addYears, endOfYear, format, startOfMonth, } from "date-fns"
 import { separate } from "./journals/nav"
 
