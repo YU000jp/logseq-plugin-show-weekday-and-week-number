@@ -448,3 +448,33 @@ body {
         }
     }
 }
+
+/* Hover effects for calendar day cells (left calendar and two-line calendar) */
+.lc-day-cell {
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.lc-day-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    background-color: var(--ls-secondary-background-color);
+    z-index: 6;
+}
+
+.lc-day-cell:hover .lc-day-number {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 700;
+}
+
+/* Ensure two-line calendar (fixed table) gets the same hover behavior */
+.two-line-calendar-table td.lc-day-cell {
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.two-line-calendar-table td.lc-day-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    background-color: var(--ls-secondary-background-color);
+    z-index: 6;
+}
