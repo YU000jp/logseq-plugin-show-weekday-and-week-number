@@ -44,6 +44,9 @@ export const handleSettingsUpdate = () => {
 
   logseq.onSettingsChanged((newSet: LSPluginBaseInfo["settings"], oldSet: LSPluginBaseInfo["settings"]) => {
 
+    // Ensure we can detect essential changes for potential forced refresh
+    const _essentialNow = isEssentialSettingsAltered(oldSet, newSet)
+
     // プラグイン設定画面の更新が必要なケース
     if (newSet.booleanLeftCalendar != oldSet.booleanLeftCalendar
       || newSet.booleanMonthlyJournal != oldSet.booleanMonthlyJournal
@@ -92,7 +95,8 @@ export const handleSettingsUpdate = () => {
           SettingKeys.booleanBoundariesAll,
           SettingKeys.booleanBoundaries,
           SettingKeys.booleanJournalsBoundaries,
-          SettingKeys.booleanBoundariesOnWeeklyJournal
+          SettingKeys.booleanBoundariesOnWeeklyJournal,
+          SettingKeys.booleanBoundariesOnMonthlyJournal
         ]
         if (boundaryKeys.some(key => oldSet[key] !== newSet[key])) {
           if (boundaryKeys.some(key => oldSet[key] === true && newSet[key] === false)) {
@@ -196,7 +200,19 @@ export const handleSettingsUpdate = () => {
 
       //CAUTION: 日付形式が変更された場合は、re-indexをおこなうので、問題ないが、言語設定が変更された場合は、その設定は、すぐには反映されない。プラグインの再読み込みが必要になるが、その頻度がかなり少ないので問題ない。
 
-      if (processingSettingsChanged) return
+    // Additionally, ensure left calendar refresh runs for essential setting changes
+    // even if earlier branches didn't call refreshMonthlyCalendar (defensive).
+    try {
+      if (_essentialNow === true || oldSet.userColorList !== newSet.userColorList || oldSet.choiceUserColor !== newSet.choiceUserColor) {
+        // Only refresh if left calendar is visible or previously initialized
+        const leftInitialized = (parent as any).__leftCalendarInitialized || (window as any).__leftCalendarInitialized
+        if (newSet.booleanLeftCalendar === true || leftInitialized) {
+          setTimeout(() => refreshMonthlyCalendar(currentCalendarDate, false, false), 50)
+        }
+      }
+    } catch (e) { /* ignore */ }
+
+    if (processingSettingsChanged) return
       processingSettingsChanged = true
       getUserConfig()
       // reset processing flag after a short debounce so repeated setting changes are handled
@@ -221,6 +237,10 @@ const ApplyBoundarySettingsOnChange = (newSet: LSPluginBaseInfo["settings"]) => 
           if (newSet.booleanBoundariesOnWeeklyJournal === true
             && parent.document.body.querySelector("#main-content-container div.page.relative>div.relative") as Node)
             invokeBoundaryHandler("weeklyJournal")
+          else
+            if (newSet.booleanBoundariesOnMonthlyJournal === true
+              && parent.document.body.querySelector("#main-content-container div.page.relative>div.relative") as Node)
+              invokeBoundaryHandler("weeklyJournal")
     },
       100)
 }

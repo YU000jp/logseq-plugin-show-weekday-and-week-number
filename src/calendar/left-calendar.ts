@@ -98,12 +98,12 @@ const createCalendar = async (targetDate: Date, preferredDateFormat: string, inn
             const existingContainer = (parent as any).__leftCalendarRootContainer || (window as any).__leftCalendarRootContainer || null
             if (existingRoot && existingContainer === calendarElement && typeof existingRoot.render === 'function') {
                 // Re-render into existing root attached to the same container
-                existingRoot.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
+                existingRoot.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, settingsUpdateKey: Date.now(), onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
             } else {
                 const root: Root = createRoot(calendarElement)
                 ;(parent as any).__leftCalendarRoot = root
                 ;(parent as any).__leftCalendarRootContainer = calendarElement
-                root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
+                root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, settingsUpdateKey: Date.now(), onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
             }
         try { (parent as any).__leftCalendarInitialized = true } catch (e) { /* ignore */ }
     } catch (e) {
@@ -144,7 +144,7 @@ export const refreshMonthlyCalendar = async (targetDate: Date, singlePage: boole
         const root = (parent as any).__leftCalendarRoot || (window as any).__leftCalendarRoot
         const rootContainer = (parent as any).__leftCalendarRootContainer || (window as any).__leftCalendarRootContainer || null
         if (root && rootContainer && rootContainer.id === 'left-calendar-root' && typeof root.render === 'function') {
-            root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag: { singlePage, weekly }, onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = weekly === true } }))
+            root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag: { singlePage, weekly }, settingsUpdateKey: Date.now(), onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = weekly === true } }))
             // update module-level state
             currentCalendarDate = targetDate
             flagWeekly = weekly === true

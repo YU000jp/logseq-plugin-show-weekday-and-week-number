@@ -14,6 +14,7 @@ type Props = {
   preferredDateFormat: string
   flag?: { singlePage?: boolean, weekly?: boolean }
   onTargetDateChange?: (date: Date) => void
+  settingsUpdateKey?: number
 }
 
 const WeeklyCell: React.FC<{ date: Date, ISO: boolean, weekStartsOn: Day }> = ({ date, ISO, weekStartsOn }) => {
@@ -21,7 +22,7 @@ const WeeklyCell: React.FC<{ date: Date, ISO: boolean, weekStartsOn: Day }> = ({
   return <td style={{ fontSize: '0.85em' }}>{weekNumber}</td>
 }
 
-export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate, preferredDateFormat, flag, onTargetDateChange }) => {
+export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate, preferredDateFormat, flag, onTargetDateChange, settingsUpdateKey }) => {
   const [targetDate, setTargetDate] = useState<Date>(initialTargetDate)
   // If parent updates the prop targetDate (via refresh), sync internal state
   useEffect(() => {
@@ -85,7 +86,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
       setUserColorMap(uMap)
     }
     run()
-  }, [preferredDateFormat, targetDate])
+  }, [preferredDateFormat, targetDate, settingsUpdateKey])
 
   // Build alerts list using computed holidayMap and userColorMap (no DOM mutations)
   useEffect(() => {
