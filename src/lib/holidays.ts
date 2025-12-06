@@ -1,13 +1,13 @@
-import Holidays from "date-holidays"
 import { HolidayUtil, Lunar } from 'lunar-typescript'
 import { getConfigPreferredLanguage } from ".."
+import { resolveColorChoice, toTranslucent } from './lib'
 
 
-let holidaysBundle: Holidays | null // バンドルを作成するための変数
+let holidaysBundle: any | null // バンドルを作成するための変数
 let alreadyHolidayBundle: boolean = false // プラグイン設定変更時にバンドルを更新するためのフラグ
 
 // date-holidaysのバンドルを作成する
-export const getHolidaysBundle = (userLanguage: string, flag?: { settingsChanged?: boolean, already?: boolean }) => {
+export const getHolidaysBundle = async (userLanguage: string, flag?: { settingsChanged?: boolean, already?: boolean }) => {
 
   if (flag
     && flag.already === true
@@ -24,9 +24,13 @@ export const getHolidaysBundle = (userLanguage: string, flag?: { settingsChanged
 
   userLanguage = (logseq.settings!.holidaysCountry as string || "US: United States of America").split(":")[0] //プラグイン設定で指定された言語を取得する
 
+  // dynamically import date-holidays to avoid bundling it in the main chunk
+  const HolidaysModule = await import('date-holidays')
+  const Holidays = (HolidaysModule && (HolidaysModule as any).default) ? (HolidaysModule as any).default : HolidaysModule
+
   if (holidaysBundle === null
     || alreadyHolidayBundle === false)
-    holidaysBundle = new Holidays(userLanguage, logseq.settings!.holidaysState as string, logseq.settings!.holidaysRegion as string, { types: ["public"] }) // バンドルを作成する 公共の祝日のみに限定する
+    holidaysBundle = new (Holidays as any)(userLanguage, logseq.settings!.holidaysState as string, logseq.settings!.holidaysRegion as string, { types: ["public"] }) // バンドルを作成する 公共の祝日のみに限定する
   else
     holidaysBundle.init(userLanguage) // プラグイン設定変更時にバンドルを更新する
   alreadyHolidayBundle = true
@@ -44,11 +48,15 @@ export const lunarString = (targetDate: Date, dayElement: HTMLSpanElement, addTo
   const getHoliday = HolidayUtil.getHoliday(targetDate.getFullYear(), targetDate.getMonth() + 1, targetDate.getDate()) // year, month, day
   const getHolidayName = getHoliday ? getHoliday.getName() : undefined
   const string = (Lunar.fromDate(targetDate).getDayInChinese() as string)
-  if (getHolidayName) {
-    if (addToElementTip === true)
-      dayElement.title = string + ` (${getHolidayName})` + "\n"// 中国の祝日
-    dayElement.style.border = `2px solid var(${logseq.settings!.choiceHolidaysColor as string || "--highlight-bg-color"})`
-  } else
+    if (getHolidayName) {
+      if (addToElementTip === true)
+        dayElement.title = string + ` (${getHolidayName})` + "\n"// 中国の祝日
+      const cssColor = resolveColorChoice(logseq.settings!.choiceHolidaysColor as string | undefined)
+      const bg = toTranslucent(cssColor, 0.12)
+      // Highlight holiday by applying a subtle background and making the text bold
+      dayElement.style.backgroundColor = bg
+      dayElement.style.fontWeight = '700'
+    } else
     dayElement.title = string + "\n"// 祝日がない場合は、旧暦 (中国の伝統的な暦) を表示する 
   return string
 }
@@ -56,7 +64,6 @@ export const lunarString = (targetDate: Date, dayElement: HTMLSpanElement, addTo
 
 // For World holidays
 export const holidaysWorld = (targetDate: Date, dayElement: HTMLSpanElement, addToElementTip: boolean): string => {
-
   const holidaysBundle = exportHolidaysBundle()
   if (!holidaysBundle) return ""
   const checkHoliday = holidaysBundle.isHoliday(targetDate)
@@ -64,12 +71,16 @@ export const holidaysWorld = (targetDate: Date, dayElement: HTMLSpanElement, add
   if (checkHoliday !== false
     && checkHoliday[0].type === "public") {
     const holidayName = checkHoliday[0].name
-    if (holidayName) {
-      if (addToElementTip === true)
-        dayElement.title = holidayName + "\n"
-      dayElement.style.border = `2px solid var(${logseq.settings!.choiceHolidaysColor as string || "--highlight-bg-color"})`
-      return holidayName
-    }
+      if (holidayName) {
+        if (addToElementTip === true)
+          dayElement.title = holidayName + "\n"
+        const cssColor = resolveColorChoice(logseq.settings!.choiceHolidaysColor as string | undefined)
+        const bg = toTranslucent(cssColor, 0.12)
+        // Highlight holiday by applying a subtle background and making the text bold
+        dayElement.style.backgroundColor = bg
+        dayElement.style.fontWeight = '700'
+        return holidayName
+      }
   }
   return ""
 }

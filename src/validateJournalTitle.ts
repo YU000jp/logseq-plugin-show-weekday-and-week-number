@@ -96,10 +96,10 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
 }
 
 const moveForPageTitleElement = (titleElement: HTMLElement) => {
-  const dateInfoElement: HTMLSpanElement = document.createElement("span")
+  const dateInfoElement: HTMLSpanElement = parent.document.createElement("span")
   dateInfoElement.classList.add("showWeekday")
   titleElement.insertAdjacentElement("afterend", dateInfoElement)
-  const secondElement: HTMLSpanElement = document.createElement("span")
+  const secondElement: HTMLSpanElement = parent.document.createElement("span")
   secondElement.style.width = "50%"
   titleElement.parentElement!.insertAdjacentElement("afterend", secondElement)
 }

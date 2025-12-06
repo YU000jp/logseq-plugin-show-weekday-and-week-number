@@ -2,7 +2,7 @@ import { PageEntity } from '@logseq/libs/dist/LSPlugin.user'
 import { addDays, format, isFriday, isSameDay, isSaturday, isSunday, isThursday, isToday, isWednesday, startOfISOWeek, startOfWeek } from 'date-fns' //https://date-fns.org/
 import { t } from "logseq-l10n"
 import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from '..'
-import { holidaysWorld, lunarString, DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor, doesPageExist, doesPageFileExist, findPageUuid, getCurrentPageJournalDay } from '../lib'
+import { holidaysWorld, lunarString, DayShortCode, addEventListenerOnce, colorMap, createElementWithClass, getDateFromJournalDay, getRelativeDateString, getWeekStartOn, getWeeklyNumberFromDate, getWeeklyNumberString, localizeDayOfWeekString, localizeMonthString, openPageFromPageName, shortDayNames, userColor, findPageUuid, doesPageFileExist, getCurrentPageJournalDay } from '../lib'
 import { separate } from '../journals/nav'
 
 
@@ -47,19 +47,19 @@ export const boundariesProcess = async (targetElementName: string, remove: boole
     //スクロールの場合とそうでない場合でweekBoundariesを作成するかどうかを判定する
     let weekBoundaries: HTMLDivElement
     if (selectStartDate) {
-      if (targetElementName === "weeklyJournal") {
-        weekBoundaries = parent.document.getElementById("weekBoundaries") as HTMLDivElement | null || document.createElement('div')
+        if (targetElementName === "weeklyJournal") {
+        weekBoundaries = parent.document.getElementById("weekBoundaries") as HTMLDivElement | null || parent.document.createElement('div')
         weekBoundaries.id = 'weekBoundaries'
       } else
         weekBoundaries = parent.document.getElementById("weekBoundaries") as HTMLDivElement
     } else {
-      weekBoundaries = document.createElement('div')
+      weekBoundaries = parent.document.createElement('div')
       weekBoundaries.id = 'weekBoundaries'
     }
     firstElement.insertBefore(weekBoundaries, firstElement.firstChild)
 
     //weekBoundariesにelementを追加する
-    const boundariesInner: HTMLDivElement = document.createElement('div')
+    const boundariesInner: HTMLDivElement = parent.document.createElement('div')
     boundariesInner.id = 'boundariesInner'
 
     let targetDate: Date//今日の日付もしくはそのページの日付を求める
@@ -171,7 +171,7 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
     const dayCell = createElementWithClass('span', 'day')
     try {
       if (index === 7) {
-        const element: HTMLDivElement = document.createElement('div')
+        const element: HTMLDivElement = parent.document.createElement('div')
         element.style.width = "100%"
         boundariesInner.append(element)
       }
@@ -187,7 +187,7 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
       const isBooleanToday: boolean = isToday(dayDate)
       const isBooleanTargetSameDay: boolean = isSameDay(targetDate, dayDate)
       dayCell.classList.add('day')
-      const dayOfWeekElement: HTMLSpanElement = document.createElement('span')
+      const dayOfWeekElement: HTMLSpanElement = parent.document.createElement('span')
       dayOfWeekElement.classList.add('dayOfWeek')
       dayOfWeekElement.innerText = localizeDayOfWeekString(dayDate, false) // 曜日を取得する
 
@@ -212,7 +212,7 @@ const createDaysElements = async (days: number[], startDate: Date, boundariesInn
       }
 
       dayCell.appendChild(dayOfWeekElement)
-      const dayOfMonthElement: HTMLSpanElement = document.createElement('span')
+      const dayOfMonthElement: HTMLSpanElement = parent.document.createElement('span')
       dayOfMonthElement.classList.add('dayOfMonth')
       dayOfMonthElement.innerText = `${dayDate.getDate()}`
       dayCell.appendChild(dayOfMonthElement)

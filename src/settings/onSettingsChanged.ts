@@ -5,7 +5,7 @@ import { invokeBoundaryHandler } from "../calendar/invokeBoundaryHandler"
 import { removeBoundaries } from "../calendar/boundaries"
 import { removeTitleQuery } from "../dailyJournalDetails"
 import { keyThisWeekPopup, weeklyEmbed } from "../journals/weeklyJournal"
-import { getHolidaysBundle, removeHolidaysBundle, doesPageExist, removeElementById, removeProvideStyle } from "../lib"
+import { getHolidaysBundle, removeHolidaysBundle, findPageUuid, removeElementById, removeProvideStyle } from "../lib"
 import { SettingKeys } from "./SettingKeys"
 import { currentCalendarDate, keyLeftCalendarContainer, loadLeftCalendar, refreshMonthlyCalendar } from "../calendar/left-calendar"
 import { settingsTemplate } from "./settings"
@@ -196,7 +196,8 @@ export const handleSettingsUpdate = () => {
       if (processingSettingsChanged) return
       processingSettingsChanged = true
       getUserConfig()
-      setTimeout(() => processingSettingsChanged === false, 1000)
+      // reset processing flag after a short debounce so repeated setting changes are handled
+      setTimeout(() => { processingSettingsChanged = false }, 1000)
 
     }
   })
@@ -237,7 +238,7 @@ const convertWeekNumberToSlash = async () => {
     for (const week of weekList) {
       const weekNumber = week.toString().padStart(2, "0")
       const pageName = `${year}-W${weekNumber}`
-      if (await doesPageExist(pageName)) {
+      if (await findPageUuid(pageName)) {
         logseq.Editor.renamePage(pageName, `${year}/W${weekNumber}`)
         console.log(`Page ${year}-W${weekNumber} has been renamed to ${year}/W${weekNumber}.`)
       }
@@ -264,7 +265,7 @@ const convertWeekToQuarterFormat = async (newSeparate: "/" | "-", revert: boolea
       if (revert === true) {
         const weekNumberQuarter = quarterIdentifiers[Math.floor((week - 1) / 13)]
         const pageName = `${year}${oldSeparate}${weekNumberQuarter}${oldSeparate}W${weekNumber}`
-        if (await doesPageExist(pageName)) {
+        if (await findPageUuid(pageName)) {
           logseq.Editor.renamePage(pageName, `${year}${newSeparate}W${weekNumber}`)
           console.log(`Page ${pageName} renamed to ${year}${newSeparate}W${weekNumber}.`)
         }
@@ -272,7 +273,7 @@ const convertWeekToQuarterFormat = async (newSeparate: "/" | "-", revert: boolea
           console.log(`Page ${pageName} does not exist.`)
       } else {
         const pageName = `${year}${newSeparate}W${weekNumber}`
-        if (await doesPageExist(pageName)) {
+        if (await findPageUuid(pageName)) {
           //四半世紀を入れる
           const weekNumberQuarter = quarterIdentifiers[Math.floor((week - 1) / 13)]
           logseq.Editor.renamePage(pageName, `${year}${oldSeparate}${weekNumberQuarter}${oldSeparate}W${weekNumber}`)

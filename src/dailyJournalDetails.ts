@@ -10,7 +10,7 @@ import { separate } from "./journals/nav"
 let processingBehind: boolean = false
 
 const createLinkElement = (text: string, title: string, onClick: (ev: MouseEvent) => void): HTMLAnchorElement => {
-  const link = document.createElement("a")
+  const link = parent.document.createElement("a")
   link.textContent = text
   link.title = title
   link.addEventListener("click", onClick)
@@ -18,7 +18,7 @@ const createLinkElement = (text: string, title: string, onClick: (ev: MouseEvent
 }
 
 const createSpanElement = (id: string, textContent: string, style: string = ""): HTMLSpanElement => {
-  const spanElement = document.createElement("span")
+  const spanElement = parent.document.createElement("span")
   spanElement.id = id
   spanElement.textContent = textContent
   if (style) spanElement.style.cssText = style
@@ -66,7 +66,7 @@ const createBaseLineElement = (journalDate: Date): HTMLSpanElement => {
   const printHtmlWeekNumber = getWeekNumberHtml(journalDate)
   const relativeTime = getRelativeTimeHtml(journalDate)
 
-  const dateInfoElement: HTMLSpanElement = document.createElement("span")
+  const dateInfoElement: HTMLSpanElement = parent.document.createElement("span")
   dateInfoElement.classList.add("showWeekday")
   dateInfoElement.innerHTML = logseq.settings!.booleanDayOfWeek
     ? logseq.settings!.booleanWeekendsColor

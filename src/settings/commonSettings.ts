@@ -71,10 +71,10 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   {
     key: SettingKeys.choiceHolidaysColor,
     title: t("Holidays > Highlight Color"),
-    type: "enum",
-    enumChoices: highlightColors,
-    default: "--highlight-bg-color",
-    description: "default: `--highlight-bg-color`",
+    type: "string",
+    inputAs: "color",
+    default: "#ef4444",
+    description: t("Pick a color to highlight holidays. You can also use CSS variable names like '--highlight-bg-color' by editing the setting text."),
   },
   {
     key: SettingKeys.booleanBoundariesIndicator,

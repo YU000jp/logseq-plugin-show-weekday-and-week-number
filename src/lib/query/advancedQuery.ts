@@ -38,14 +38,9 @@ export const queryCodeGetJournalDayFromOriginalName = createBaseQuery("journal-d
 export const queryCodeGetFileFromOriginalName = createBaseQuery("file")
 export const queryCodeGetUuidFromOriginalName = createBaseQuery("uuid")
 
-export const doesPageExist = async (pageName: string): Promise<boolean> => {
+export const findPageUuid = async (pageName: string): Promise<PageEntity["uuid"] | false> => {
   const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(queryCodeGetUuidFromOriginalName, `"${pageName}"`)
-  return !!result?.[0]?.uuid
-}
-
-export const findPageUuid = async (pageName: string): Promise<PageEntity["uuid"] | null> => {
-  const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(queryCodeGetUuidFromOriginalName, `"${pageName}"`)
-  return result?.[0]?.uuid ?? null
+  return result?.[0]?.uuid ?? false
 }
 
 export const doesPageFileExist = async (pageName: string): Promise<boolean> => {

@@ -211,7 +211,7 @@ body {
                         &>#left-calendar {
                             margin-left: 0.2em;
                             white-space: nowrap;
-                            overflow: visible;
+                            overflow-x: auto;
                             font-size: 0.86em;
 
                             &>table {
@@ -221,7 +221,9 @@ body {
                                 margin-top: 0.5em;
                                 margin-bottom: 0.5em;
                                 white-space: nowrap;
-                                width: 295px;
+                                width: auto; /* allow table to expand to fit content */
+                                min-width: 295px; /* keep reasonable minimum */
+                                overflow-x: visible;
                                 border: 2px solid var(--ls-border-color);
                                 box-shadow: 0 0 7px var(--ls-border-color);
 
@@ -243,6 +245,64 @@ body {
                                         background-color: var(--ls-secondary-background-color);
                                         box-shadow: 0 0 10px var(--ls-tertiary-background-color);
                                     }
+                                }
+
+                                /* Light border and hover effect for left calendar day cells */
+                                &>tbody>tr>td.lc-day-cell {
+                                    transition: background-color 0.12s ease, box-shadow 0.12s ease;
+                                }
+
+                                /* Holiday highlight: style date number when cell has lc-holiday */
+                                &>tbody>tr>td.lc-day-cell.lc-holiday {
+                                    /* color and underline are applied inline to resolve the chosen CSS variable per-cell */
+                                }
+
+                                &>tbody>tr>td.lc-day-cell.lc-holiday .lc-day-number {
+                                    font-weight: 700;
+                                    text-underline-offset: 3px;
+                                }
+
+                                /* Ensure day cells do not wrap and make the date number slightly smaller */
+                                &>tbody>tr>td.lc-day-cell {
+                                    position: relative;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 0.4rem;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: clip;
+                                    font-size: 0.98em; /* slightly smaller than before */
+                                }
+
+                                /* Dot indicator for journal/page existence */
+                                &>tbody>tr>td.lc-day-cell>.indicator {
+                                    width: 0.56em;
+                                    height: 0.56em;
+                                    border-radius: 50%;
+                                    position: absolute;
+                                    right: 6px;
+                                    top: 6px;
+                                    display: inline-block;
+                                    background-color: var(--ls-wb-stroke-color-default, currentColor);
+                                    opacity: 0.98;
+                                    z-index: 3;
+                                    border: 1px solid rgba(255,255,255,0.85);
+                                    box-shadow: 0 0 0 2px rgba(0,0,0,0.06);
+                                }
+
+                                &>tbody>tr>td.lc-day-cell .lc-day-number {
+                                    display: inline-block;
+                                    font-size: 0.92em; /* smaller date number */
+                                    line-height: 1;
+                                    white-space: nowrap;
+                                }
+
+                                &>thead>tr>th {
+                                    /* ensure weekday headers do not wrap and are slightly smaller */
+                                    white-space: nowrap;
+                                    font-size: 0.78em;
+                                    padding: 0.35em;
                                 }
                             }
 

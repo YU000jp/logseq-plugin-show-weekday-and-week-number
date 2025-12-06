@@ -5,7 +5,7 @@ import { getWeeklyNumberFromDate, localizeDayOfWeekDayString, localizeMonthStrin
 
 
 export const createNavLink = (text: string, pageName: string) => {
-      const link = document.createElement("a")
+      const link = parent.document.createElement("a")
       link.textContent = text
       link.classList.add("text-sm")
       link.title = pageName
@@ -38,7 +38,7 @@ export const createNavLinkWeekNumber = (day: Date, ISO: boolean, configWeekNumbe
 
 
 export const spanFreeSpace = (text: string, flag?: { sm?: true }) => {
-      const space = document.createElement("span")
+      const space = parent.document.createElement("span")
       space.style.paddingRight = "0.88em"
       space.textContent = text
       if (flag && flag.sm)
@@ -83,7 +83,7 @@ const getPageRelativeElement = async (): Promise<HTMLDivElement | null> => {
 }
 
 const createNavElement = (id: string) =>
-      Object.assign(document.createElement("div"), {
+      Object.assign(parent.document.createElement("div"), {
             id,
             className: "flex justify-center items-center text-sm",
             // style: {

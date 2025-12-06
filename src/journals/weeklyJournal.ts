@@ -74,7 +74,7 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
         }, 300)
 
     // もしページが存在しなかったら作成する
-    const pageUuid = await findPageUuid(match[0]) as PageEntity["uuid"] | null
+    const pageUuid = await findPageUuid(match[0]) as PageEntity["uuid"] | false
     if (pageUuid) {
         // ページが存在した場合
         const pageBlockTree = await logseq.Editor.getPageBlocksTree(pageUuid) as { content: BlockEntity["content"] }[] | null
