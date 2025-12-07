@@ -478,3 +478,75 @@ body {
     background-color: var(--ls-secondary-background-color);
     z-index: 6;
 }
+
+/* Modal for editing user events */
+.lc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.36);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Ensure the modal overlay is on top of everything in Logseq */
+    z-index: 10 !important;
+    padding-top: -4vh;
+}
+.lc-modal {
+    background: var(--ls-main-content-background, var(--ls-primary-background-color, #fff));
+    color: var(--ls-ui-fg, inherit);
+    border: 1px solid var(--ls-border-color);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    padding: 1rem;
+    width: min(720px, 92%);
+    max-height: 80vh;
+    overflow: auto;
+    border-radius: 8px;
+    /* Put modal content above overlay children if needed */
+    z-index: 10 !important;
+}
+
+/* When editing inline, hide the calendar table so editor can occupy the space */
+#left-calendar.lc-hidden-for-edit > table {
+    display: none;
+}
+
+.lc-inline-editor {
+    background: var(--ls-main-content-background, var(--ls-primary-background-color, #fff));
+    border: 1px solid var(--ls-border-color);
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* Style textarea in inline editor: border and background tuned to theme */
+.lc-inline-editor textarea.lc-inline-textarea {
+    width: 100%;
+    min-height: 10rem; /* kept similar to inline style */
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--ls-border-color);
+    border-radius: 6px;
+    background: var(--ls-main-content-background, var(--ls-primary-background-color, #fff));
+    color: var(--ls-ui-fg, inherit);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Focus ring to improve keyboard visibility */
+.lc-inline-editor textarea.lc-inline-textarea:focus {
+    outline: 2px solid color-mix(in srgb, var(--ls-primary-background-color, #ffd54f) 40%, transparent);
+}
+
+/* Slightly darker overlay in dark themes */
+body.theme-dark .lc-modal-overlay,
+body.dark .lc-modal-overlay {
+    background: rgba(0,0,0,0.6);
+}
+
+/* Ensure inputs inside modal adapt to theme */
+.lc-modal input,
+.lc-modal textarea,
+.lc-modal button {
+    color: var(--ls-ui-fg, inherit);
+    background: var(--ls-main-content-background, var(--ls-primary-background-color, #fff));
+    border-color: var(--ls-border-color);
+}

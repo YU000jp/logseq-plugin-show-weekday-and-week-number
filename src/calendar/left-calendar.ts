@@ -37,6 +37,7 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
         summaryElement.className = "header items-center pl-4"
         summaryElement.style.cursor = "row-resize"
         summaryElement.style.backgroundColor = "var(--ls-tertiary-background-color)"
+        summaryElement.style.zIndex = "0"
         summaryElement.innerText = t("Monthly Calendar") // タイトルを入れる
         summaryElement.title = pluginName // プラグイン名を入れる
         const innerElement: HTMLDivElement = parent.document.createElement("div")
