@@ -350,24 +350,11 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
     }
     return
   }
-
-  // Non-shift click: for MD model (file-based) ensure existence check similar to DB model
-  const mdModel = booleanLogseqMdModel() as boolean
-  if (mdModel === true) {
-    // file-based repos may not expose a DB uuid; check file existence
-    const exists = await doesPageFileExist(pageName).catch(() => false)
-    if (exists) {
-      logseq.App.pushState('page', { name: pageName })
-    } else {
-      await promptCreateIfMissing()
-    }
+  const page = await findPageUuid(pageName) as PageEntity["uuid"] | false
+  if (page) {
+    logseq.App.pushState('page', { name: pageName })
   } else {
-    const page = await findPageUuid(pageName) as PageEntity["uuid"] | false
-    if (page) {
-      logseq.App.pushState('page', { name: pageName })
-    } else {
-      await promptCreateIfMissing()
-    }
+    await promptCreateIfMissing()
   }
 }
 
