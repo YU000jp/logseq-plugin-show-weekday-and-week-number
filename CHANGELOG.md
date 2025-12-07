@@ -1,3 +1,10 @@
+# [1.69.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.68.0...v1.69.0) (2025-12-07)
+
+
+### Features
+
+* **Add:** native month and date pickers to calendars ([1231505](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/12315057e4fbd67509404e9a3ace0e89f814132c))
+
 # [1.68.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.67.0...v1.68.0) (2025-12-07)
 
 
