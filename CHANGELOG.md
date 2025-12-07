@@ -1,3 +1,11 @@
+# [1.68.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.67.0...v1.68.0) (2025-12-07)
+
+
+### Features
+
+* Add hover effects to calendar day cells ([1ff4105](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/1ff41050383db698f42b8a7a6d3d58d62e569a61))
+* **Add:** inline user event editor to MonthlyCalendar ([627cf65](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/627cf653a485a1534ba73c954db8815db58ecb52))
+
 # [1.67.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.66.0...v1.67.0) (2025-12-06)
 
 
