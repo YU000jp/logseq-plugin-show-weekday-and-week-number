@@ -1,23 +1,37 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { addDays, format, isToday, startOfMonth, startOfISOWeek, startOfWeek, eachDayOfInterval, getISOWeek, getWeek, isSameYear, isSameDay, isSameISOWeek, isSameWeek } from "date-fns";
+import {
+	addDays,
+	format,
+	isToday,
+	startOfMonth,
+	startOfISOWeek,
+	startOfWeek,
+	eachDayOfInterval,
+	getISOWeek,
+	getWeek,
+	isSameYear,
+	isSameDay,
+	isSameISOWeek,
+	isSameWeek,
+} from "date-fns";
 import { t } from "logseq-l10n";
 import {
-    openPageFromPageName,
-    getUserColorData,
-    shortDayNames,
-    colorMap,
-    resolveColorChoice,
-    toTranslucent,
-    localizeDayOfWeekString,
+	openPageFromPageName,
+	getUserColorData,
+	shortDayNames,
+	colorMap,
+	resolveColorChoice,
+	toTranslucent,
+	localizeDayOfWeekString,
 	localizeMonthString,
 	localizeMonthDayString,
 	getWeeklyNumberFromDate,
-    getWeeklyNumberString,
+	getWeeklyNumberString,
 } from "../lib";
 import { separate } from "../journals/nav";
 
 // local Day type (0=Sun..6=Sat) — keep as a simple alias where used in this component
-type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6
+type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 import { computeCellBackground, computeDayNumberStyle, computeAlertBackground, UserColorInfo } from "../lib/calendarUtils";
 import { applyWeekendColor } from "../calendar/boundaries";
 import { getHolidays } from "../lib/holidays";
@@ -66,6 +80,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 	const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 	const [weekExistsMap, setWeekExistsMap] = useState<Record<string, boolean>>({});
 	const [userColorMap, setUserColorMap] = useState<Record<string, { color?: string; fontWeight?: string; eventName?: string }>>({});
+	const monthInputRef = useRef<HTMLInputElement | null>(null);
 	// Inline editor state for editing user events (replaces modal)
 	const [showInlineEditor, setShowInlineEditor] = useState<boolean>(false);
 	const [editorText, setEditorText] = useState<string>((logseq.settings!.userColorList as string) || "");
@@ -266,7 +281,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 			n.setMonth(n.getMonth() + 1);
 			return n;
 		});
-	const onThis = () => setTargetDate(new Date());
+	// const onThis = () => setTargetDate(new Date());
 
 	// notify parent when internal date changes
 	useEffect(() => {
@@ -293,21 +308,55 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 								{"<"}
 							</button>
 						</th>
+						<th style={{ position: "absolute", left: "1em", top: 0 }}>
+							<button
+								className="cursor"
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+									// prefer showPicker when available, fallback to click()
+									if (monthInputRef.current) {
+										try {
+											(monthInputRef.current as any).showPicker?.();
+										} catch {}
+										if (!(monthInputRef.current as any).showPicker) monthInputRef.current.click();
+									}
+								}}
+								style={{
+									marginLeft: 8,
+									padding: "2px 6px",
+									fontSize: "0.85em",
+									borderRadius: 6,
+									border: "1px solid var(--ls-border-color)",
+									background: "none",
+								}}>
+								📅
+							</button>
+						</th>
 						<th
-							colSpan={enableWeekNumber ? 4 : 3}
+							colSpan={enableWeekNumber ? 5 : 4}
 							className="cursor"
 							title={formatYearMonthTargetDate}
 							onClick={(e) => openPageFromPageName(formatYearMonthTargetDate, (e as any).shiftKey)}
 							style={{ fontSize: headerFontSize }}>
-							{localizeMonthLong + (isSameYear(targetDate, today) ? "" : ` ${year}`)}
-						</th>
-						<th colSpan={2}>
-							<button
-								className="cursor"
-								title={formatYearMonthThisMonth}
-								onClick={onThis}>
-								{"<> "}
-							</button>
+							<div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+								<span>{localizeMonthLong + (isSameYear(targetDate, today) ? "" : ` ${year}`)}</span>
+								{/* hidden native month input to let user pick year+month without extra UI libs */}
+								<input
+									type="month"
+									ref={monthInputRef}
+									style={{ display: "none" }}
+									value={`${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}`}
+									onClick={(e) => e.stopPropagation()}
+									onChange={(e) => {
+										const v = (e.target as HTMLInputElement).value;
+										if (!v) return;
+										const [y, m] = v.split("-");
+										const d = new Date(Number(y), Number(m) - 1, 1);
+										setTargetDate(d);
+									}}
+								/>
+							</div>
 						</th>
 						<th>
 							<button
@@ -483,7 +532,10 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 							value={editorText}
 							onChange={(e) => setEditorText((e.target as HTMLTextAreaElement).value)}
 							style={{ width: "100%", minHeight: 240, marginBottom: 8 }}
-							title="{t('Enter multiple lines in the textarea.')}"
+							title={t("Enter multiple lines in the textarea.")}
+							placeholder={t("Enter here")}
+
+
 						/>
 						<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
 							{/* サンプル挿入ボタンを設置したい */}
@@ -495,7 +547,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 									//サンプルの値を現在のtextareaの値の最後尾に挿入
 									setEditorText((prev) => (prev ? prev + "\n" + sample : sample));
 								}}
-								style={{ padding: "6px 10px", width: '100%' }}>
+								style={{ padding: "6px 10px", width: "100%" }}>
 								{t("Insert Sample")}
 							</button>
 							<button
@@ -503,7 +555,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 								onClick={() => {
 									setShowInlineEditor(false);
 								}}
-								style={{ padding: "6px 10px", width: '100%' }}>
+								style={{ padding: "6px 10px", width: "100%" }}>
 								{t("Cancel")}
 							</button>
 							<button
@@ -519,7 +571,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 										setShowInlineEditor(false);
 									}
 								}}
-								style={{ padding: "6px 10px", width: '100%' }}>
+								style={{ padding: "6px 10px", width: "100%" }}>
 								{t("Confirm")}
 							</button>
 						</div>
