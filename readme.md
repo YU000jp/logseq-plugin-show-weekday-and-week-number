@@ -47,7 +47,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 ### Journal Boundaries Calendar 🗓️
 
 - Smooth access to previous and subsequent dates on a single date page or journals, Weekly Journal.
-  1. Show indicator (dot) of journal entries
+  1. Show indicator (line) of journal entries
   1. Highlight holidays for the country
      > Show Lunar-calendar date for Chinese
 
