@@ -6,6 +6,14 @@
 * **Add:** Add journal page preview tooltip to calendars ([8669740](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/8669740157e57a3247ba4f72a55f4b27d1aca611))
 * Improve DB graph journal page creation and add tooltips ([6645297](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/66452973f523bf0a86a2b28325ef9028042cca58))
 
+# [1.70.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.69.1...v1.70.0) (2025-12-13)
+
+
+### Features
+
+* **Add:** Add journal page preview tooltip to calendars ([8669740](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/8669740157e57a3247ba4f72a55f4b27d1aca611))
+* Improve DB graph journal page creation and add tooltips ([6645297](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/66452973f523bf0a86a2b28325ef9028042cca58))
+
 ## [1.69.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.69.0...v1.69.1) (2025-12-13)
 
 
