@@ -1,3 +1,11 @@
+## [1.69.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.69.0...v1.69.1) (2025-12-13)
+
+
+### Bug Fixes
+
+* **bug:** Cannot open journal pages ([9954785](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/99547853caeab029122665e00719e56c10dd171f))
+* **bug:** Unable to display the monthly calendar ([8a51bb3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/8a51bb35ef141499750da2fc48b5ccc623455dfe))
+
 # [1.69.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.68.0...v1.69.0) (2025-12-07)
 
 
