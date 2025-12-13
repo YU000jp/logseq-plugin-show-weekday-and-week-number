@@ -30,7 +30,7 @@ const ensureModalStyle = () => {
   parent.document.head.appendChild(style)
 }
 
-const escapeHtml = (unsafe: string) => {
+export const escapeHtml = (unsafe: string) => {
   return String(unsafe)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

@@ -4,6 +4,7 @@ import { t } from "logseq-l10n";
 import { getConfigPreferredDateFormat } from "..";
 import { getHolidays } from "../lib/holidays";
 import { findPageUuid } from "../lib/query/advancedQuery";
+import JournalPreview, { useJournalPreview } from "./JournalPreview";
 import {
 	openPageFromPageName,
 	getUserColorData,
@@ -31,6 +32,58 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 	const [preferredDateFormat, setPreferredDateFormat] = useState<string>("yyyy/MM/dd");
 	const [pageExistsMap, setPageExistsMap] = useState<Record<string, boolean>>({});
 	const [holidayMap, setHolidayMap] = useState<Record<string, string>>({});
+
+	// tooltip state
+	const [hoverPage, setHoverPage] = useState<string | undefined>(undefined);
+	const [tooltipPos, setTooltipPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+	const { html: hoverHtml } = useJournalPreview(hoverPage, preferredDateFormat);
+
+	useEffect(() => {
+		const id = "lc-journal-tooltip-root"
+		try {
+			const doc = parent.document
+			let el = doc.getElementById(id) as HTMLDivElement | null
+			if (!hoverPage) {
+				if (el) el.remove()
+				return
+			}
+			if (!el) {
+				el = doc.createElement("div")
+				el.id = id
+				doc.body.appendChild(el)
+			}
+			el.style.position = "fixed"
+			// shift 1em to the right to avoid overlapping the cursor/cell
+			const em = parseFloat(getComputedStyle(doc.documentElement).fontSize || "16") || 16
+			el.style.left = `${tooltipPos.left + em}px`
+			el.style.top = `${tooltipPos.top}px`
+			el.style.zIndex = "99999"
+			const bodyStyle = getComputedStyle(doc.body)
+			el.style.background = bodyStyle.backgroundColor || "rgba(255,255,255,1)"
+			el.style.color = bodyStyle.color || "var(--ls-ui-fg)"
+			el.style.boxShadow = "0 6px 18px rgba(0,0,0,0.15)"
+			// increase opacity to make background less transparent
+			el.style.opacity = "1"
+			// reduce font-size for tooltip content
+			el.style.fontSize = "0.85em"
+			el.style.padding = "10px"
+			el.style.borderRadius = "8px"
+			el.style.maxWidth = "420px"
+			el.style.maxHeight = "360px"
+			el.style.overflow = "auto"
+			el.style.pointerEvents = "auto"
+			if (hoverHtml) el.innerHTML = hoverHtml
+			else el.textContent = hoverPage
+		} catch (e) {
+			// ignore
+		}
+		return () => {
+			try {
+				const el = parent.document.getElementById("lc-journal-tooltip-root") as HTMLDivElement | null
+				if (el) el.remove()
+			} catch (e) {}
+		}
+	}, [hoverPage, hoverHtml, tooltipPos])
 
 	useEffect(() => {
 		const run = async () => {
@@ -106,7 +159,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 	return (
 		<div
 			className="two-line-calendar-root"
-			style={{ padding: "6px" }}>
+			style={{ padding: "6px", position: "relative" }}>
 			<table
 				className="two-line-calendar-table"
 				style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
@@ -198,7 +251,16 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									key={key}
 									onClick={onCellClickFactory(pageName)}
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
-									title={titleParts.length > 0 ? titleParts.join("\n") : pageName}
+									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
+									onMouseEnter={(e) => {
+										if (pageName) {
+											setHoverPage(pageName)
+											const rect = (e.target as HTMLElement).getBoundingClientRect()
+											setTooltipPos({ left: rect.right + 8, top: rect.top })
+										}
+									}}
+									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+									onMouseLeave={() => setHoverPage(undefined)}
 									style={cellStyle}>
 									<span
 										className="lc-day-number"
@@ -400,7 +462,16 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									key={key}
 									onClick={() => pageName && openPageFromPageName(pageName, false)}
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
-									title={titleParts.length > 0 ? titleParts.join("\n") : pageName}
+									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
+									onMouseEnter={(e) => {
+										if (pageName) {
+											setHoverPage(pageName)
+											const rect = (e.target as HTMLElement).getBoundingClientRect()
+											setTooltipPos({ left: rect.right + 8, top: rect.top })
+										}
+									}}
+									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+									onMouseLeave={() => setHoverPage(undefined)}
 									style={cellStyle}>
 									<span
 										className="lc-day-number"
@@ -422,6 +493,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 					</tr>
 				</tbody>
 			</table>
+
 		</div>
 	);
 };
