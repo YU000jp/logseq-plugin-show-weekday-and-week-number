@@ -252,12 +252,7 @@ export const getJournalTitleSelector = (): string =>
 
 
 export const getLeftSidebarFooterSelector = (): string =>
-  logseqDbGraph ?
-    // DBグラフ用 および DBモデルかつfile-basedグラフ用
-    "#left-sidebar>div.left-sidebar-inner div.sidebar-contents-container"
-    :
-    // MDモデル用
-    "#left-sidebar>div.left-sidebar-inner footer.create"
+  "#left-sidebar>div.left-sidebar-inner :is(footer.create,div.sidebar-contents-container)"
 
 
 logseq.ready(main).catch(console.error)
