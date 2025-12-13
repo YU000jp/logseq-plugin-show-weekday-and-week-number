@@ -4,6 +4,7 @@ import { t } from "logseq-l10n"
 import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
 import { SettingKeys } from "../settings/SettingKeys"
 import { getPageBlocks, findPageUuid, doesPageFileExist } from "./query/advancedQuery"
+import { booleanDbGraph } from ".."
 import { booleanLogseqMdModel } from ".."
 import { DayShortCode } from "../types"
 
@@ -308,7 +309,9 @@ export const createSettingButton = (): HTMLButtonElement => {
   button.title = t("Open plugin setting")
   button.style.marginLeft = "1em"
   button.addEventListener("click", () => {
-    logseq.showSettingsUI()
+    ;(async () => {
+      try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ }
+    })()
   })
   return button
 }
@@ -324,6 +327,16 @@ export const createLinkMonthlyLink = (linkString: string, pageName: string, elem
 
 export const openPageFromPageName = async (pageName: string, shiftKey: boolean) => {
   // Helper to prompt user to create page when it does not exist
+  const isJournalPageName = (name: string) => {
+    if (!name) return false
+    // yyyy/MM/dd or yyyy-MM-dd (allow single-digit month/day)
+    const dRegex = /^\d{4}([\/\-])\d{1,2}\1\d{1,2}$/
+    // yyyy/MM or yyyy-MM (monthly journal)
+    const mRegex = /^\d{4}([\/\-])\d{1,2}$/
+    // weekly patterns: contains Wnn like 2024/W01 or 2024-W01 or 2024/Q1/W01 variants
+    const wRegex = /W\d{2}/
+    return dRegex.test(name) || wRegex.test(name) || mRegex.test(name)
+  }
   const promptCreateIfMissing = async (): Promise<void> => {
     logseq.UI.showMsg(`Page "${pageName}" does not exist.`, 'warning', { timeout: 5000 })
     const confirmed = await showConfirmDialog(
@@ -332,9 +345,49 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
       { confirmText: t('Confirm'), cancelText: t('Cancel') }
     )
     if (confirmed) {
-      //ページが存在しない場合は、ページを作成する
-      await logseq.Editor.createPage(pageName, {}, { createFirstBlock: true, redirect: true })
-      logseq.UI.showMsg(t("Page created successfully."), 'success', { timeout: 2000 })
+        // DB graph: block-based pages should not use slash-containing journal names.
+        if (booleanDbGraph() && pageName.includes('/')) {
+          // Regexes for date-like and weekly patterns
+          const dRegex = /^\d{4}([\/\-])\d{1,2}\1\d{1,2}$/
+          const mRegex = /^\d{4}([\/\-])\d{1,2}$/
+          const wRegex = /W\d{2}/
+
+          // Allow monthly journal names (yyyy/MM or yyyy-MM) to be created on DB graphs
+          if (mRegex.test(pageName)) {
+            // permit creation — fall through to creation logic below
+          }
+          // If it's a daily-like name (yyyy/MM/dd), instruct user to change Logseq app date format.
+          else if (dRegex.test(pageName)) {
+            await showConfirmDialog(
+              t('Cannot create daily journal'),
+              `${t('Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.')}
+\n${t('Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.')}`,
+              { confirmText: t('Open settings'), cancelText: t('Cancel') }
+            )
+            try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ }
+            return
+          }
+          // If it's a weekly-like name that contains a slash, instruct to change plugin settings to non-slash format
+          else if (wRegex.test(pageName) && pageName.includes('/')) {
+            await showConfirmDialog(
+              t('Cannot create weekly journal'),
+              `${t('Your graph is a DB graph. Weekly journal names containing slashes cannot be created.')}
+\n${t('Please change the week-number format in plugin settings to a format without slashes and try again.')}`,
+              { confirmText: t('Open plugin settings'), cancelText: t('Cancel') }
+            )
+            try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ }
+            return
+          }
+          // For other slash-containing names on DB graphs, do not auto-create; warn and abort.
+          else {
+            logseq.UI.showMsg(t('Cannot create page with slash in name on DB graph.'), 'warning', { timeout: 4000 })
+            return
+          }
+        }
+        //ページが存在しない場合は、ページを作成する
+        const createName = booleanDbGraph() && isJournalPageName(pageName) ? `${pageName} #journal` : pageName
+        await logseq.Editor.createPage(createName, {}, { createFirstBlock: true, redirect: true })
+        logseq.UI.showMsg(t("Page created successfully."), 'success', { timeout: 2000 })
     } else {
       logseq.UI.showMsg(t("Cancelled"), "warning")
     }

@@ -61,8 +61,8 @@ export const handleSettingsUpdate = () => {
           settingsTemplate(newSet, booleanDbGraph(), booleanLogseqMdModel(),
             newSet.holidaysCountry as string
           ))
-        setTimeout(() => {
-          logseq.showSettingsUI()
+        setTimeout(async () => {
+          try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ }
         }, 100)
       }, 10)
     }

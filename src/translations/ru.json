@@ -124,5 +124,11 @@
   "Decide the colour of Saturday.": "Выберите цвет для субботы.",
   "Decide the colour of Sunday.": "Выберите цвет для воскресенья.",
   "User event": "Событие пользователя",
-  "No alerts": "Нет оповещений"
+  "No alerts": "Нет оповещений",
+  "Cannot create daily journal": "Не удалось создать дневной журнал",
+  "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "Ваш граф — DB-граф. Страницы с косой чертой в имени (например yyyy/MM/dd) нельзя создать.",
+  "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Пожалуйста, измените формат даты в приложении Logseq на формат с дефисами (рекомендуется: yyyy-MM-dd) и попробуйте снова.",
+  "Cannot create weekly journal": "Не удалось создать недельный журнал",
+  "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Ваш граф — DB-граф. Имена недельных журналов, содержащие косые черты, нельзя создать.",
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "Пожалуйста, измените формат номера недели в настройках плагина на формат без косых черт и попробуйте снова."
 }

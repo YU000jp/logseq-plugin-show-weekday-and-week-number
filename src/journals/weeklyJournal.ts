@@ -4,7 +4,8 @@ import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib'
-import { findPageUuid } from '../lib'
+import { findPageUuid, showConfirmDialog } from '../lib'
+import { booleanDbGraph } from '..'
 import { getWeekStartOn } from '../lib'
 import { separate, weeklyJournalCreateNav } from './nav'
 import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
@@ -93,7 +94,20 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
     } else {
         console.log("Weekly Journal page not found") //ページが見つからない場合はログを出す
         // ページが存在しない場合は作成する
-        const pageEntity = await logseq.Editor.createPage(match[0], {}, { redirect: false, createFirstBlock: false, journal: false }) as { uuid: BlockEntity["uuid"] } | null
+        // If DB graph and weekly page name contains a slash, abort and prompt user to change plugin settings
+        if (booleanDbGraph() && match[0].includes('/')) {
+            await showConfirmDialog(
+                t('Cannot create weekly journal'),
+                `${t('Your graph is a DB graph. Weekly journal names containing slashes cannot be created.')}
+\n${t('Please change the week-number format in plugin settings to a format without slashes and try again.')}`,
+                { confirmText: t('Open plugin settings'), cancelText: t('Cancel') }
+            )
+            try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ }
+            return
+        }
+
+        const createName = booleanDbGraph() && /W\d{2}/.test(match[0]) ? `${match[0]} #journal` : match[0]
+        const pageEntity = await logseq.Editor.createPage(createName, {}, { redirect: false, createFirstBlock: false, journal: false }) as { uuid: BlockEntity["uuid"] } | null
         if (pageEntity) {
             console.log("Weekly Journal page created") //ページが作成された場合はログを出す
             processingWeeklyJournal = true//処理中フラグを立てる ここからreturnする場合は必ずfalseにすること

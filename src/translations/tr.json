@@ -118,5 +118,11 @@
   "Decide the colour of Saturday.": "Cumartesi için renk seçin.",
   "Decide the colour of Sunday.": "Pazar için renk seçin.",
   "User event": "Kullanıcı etkinliği",
-  "No alerts": "Uyarı yok"
+  "No alerts": "Uyarı yok",
+  "Cannot create daily journal": "Günlük günlük oluşturulamıyor",
+  "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "Grafiğiniz bir DB grafiğidir. İsimde eğik çizgi bulunan sayfalar (örn. yyyy/MM/dd) oluşturulamaz.",
+  "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Logseq uygulamasının tarih formatını tire kullanacak şekilde değiştirin (önerilen: yyyy-MM-dd) ve tekrar deneyin.",
+  "Cannot create weekly journal": "Haftalık günlük oluşturulamıyor",
+  "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Grafiğiniz bir DB grafiğidir. İsmi eğik çizgi içeren haftalık günlük adları oluşturulamaz.",
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "Eklenti ayarlarında hafta numarası formatını eğik çizgi içermeyen bir formata değiştirin ve tekrar deneyin."
 }

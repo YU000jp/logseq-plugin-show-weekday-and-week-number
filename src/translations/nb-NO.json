@@ -124,5 +124,11 @@
   "Decide the colour of Saturday.": "Bestem fargen for lørdag.",
   "Decide the colour of Sunday.": "Bestem fargen for søndag.",
   "User event": "Brukerhendelse",
-  "No alerts": "Ingen varsler"
+  "No alerts": "Ingen varsler",
+  "Cannot create daily journal": "Kan ikke opprette daglig journal",
+  "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "Grafen din er en DB-graf. Sider med skråstreker i navnet (f.eks. yyyy/MM/dd) kan ikke opprettes.",
+  "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Endre Logseq-applikasjonens datoformat til å bruke bindestreker (anbefalt: yyyy-MM-dd) og prøv igjen.",
+  "Cannot create weekly journal": "Kan ikke opprette ukentlig journal",
+  "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Grafen din er en DB-graf. Ukentlige journalnavn som inneholder skråstreker kan ikke opprettes.",
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "Endre uke-nummerformatet i plugin-innstillingene til et format uten skråstreker og prøv igjen."
 }

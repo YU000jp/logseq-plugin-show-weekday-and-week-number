@@ -118,5 +118,11 @@
     "Decide the colour of Saturday.": "Rozhodnite o farbe soboty.",
     "Decide the colour of Sunday.": "Rozhodnite o farbe nedele.",
     "User event": "Udalosť používateľa",
-    "No alerts": "Žiadne upozornenia"
+    "No alerts": "Žiadne upozornenia",
+    "Cannot create daily journal": "Nie je možné vytvoriť denný denník",
+    "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "Váš graf je DB graf. Stránky s lomkami v názve (napr. yyyy/MM/dd) nie je možné vytvoriť.",
+    "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Zmeňte formát dátumu v aplikácii Logseq na formát s pomlčkami (odporúčané: yyyy-MM-dd) a skúste to znova.",
+    "Cannot create weekly journal": "Nie je možné vytvoriť týždenný denník",
+    "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Váš graf je DB graf. Názvy týždenných denníkov obsahujúce lomky nie je možné vytvoriť.",
+    "Please change the week-number format in plugin settings to a format without slashes and try again.": "Zmeňte formát čísla týždňa v nastaveniach pluginu na formát bez lomiek a skúste to znova."
   }

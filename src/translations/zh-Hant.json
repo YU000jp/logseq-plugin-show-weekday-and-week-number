@@ -118,5 +118,11 @@
   "Decide the colour of Saturday.": "選擇星期六的顏色。",
   "Decide the colour of Sunday.": "選擇星期日的顏色。",
   "User event": "使用者活動",
-  "No alerts": "沒有提醒"
+  "No alerts": "沒有提醒",
+  "Cannot create daily journal": "無法建立每日日誌",
+  "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "您的圖表是 DB 圖。名稱中包含斜線的頁面（例如 yyyy/MM/dd）無法建立。",
+  "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "請將 Logseq 應用的日期格式更改為使用連字元（建議：yyyy-MM-dd），然後再試一次。",
+  "Cannot create weekly journal": "無法建立每週日誌",
+  "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "您的圖表是 DB 圖。包含斜線的每週日誌名稱無法建立。",
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "請在外掛設定中將週數格式更改為不包含斜線的格式，然後再試一次。"
 }

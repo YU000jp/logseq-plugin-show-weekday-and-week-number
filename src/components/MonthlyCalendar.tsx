@@ -394,6 +394,15 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 							className="cursor"
 							title={formatYearMonthTargetDate}
 							onClick={(e) => openPageFromPageName(formatYearMonthTargetDate, (e as any).shiftKey)}
+							onMouseEnter={(e) => {
+								if (formatYearMonthTargetDate) {
+									setHoverPage(formatYearMonthTargetDate)
+									const rect = (e.target as HTMLElement).getBoundingClientRect()
+									setTooltipPos({ left: rect.right + 8, top: rect.top })
+								}
+							}}
+							onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+							onMouseLeave={() => setHoverPage(undefined)}
 							style={{ fontSize: headerFontSize }}>
 							<div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
 								<span>{localizeMonthLong + (isSameYear(targetDate, today) ? "" : ` ${year}`)}</span>
@@ -459,6 +468,15 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 												<button
 													className={wkPageName ? "cursor" : ""}
 													onClick={(e) => openPageFromPageName(wkPageName, (e as any).shiftKey)}
+													onMouseEnter={(e) => {
+														if (wkPageName) {
+															setHoverPage(wkPageName)
+															const rect = (e.target as HTMLElement).getBoundingClientRect()
+															setTooltipPos({ left: rect.right + 8, top: rect.top })
+														}
+													}}
+													onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+													onMouseLeave={() => setHoverPage(undefined)}
 													style={{
 														background: "none",
 														border: "none",

@@ -124,5 +124,11 @@
   "Decide the colour of Saturday.": "Bepaal de kleur van zaterdag.",
   "Decide the colour of Sunday.": "Bepaal de kleur van zondag.",
   "User event": "Gebeurtenis gebruiker",
-  "No alerts": "Geen meldingen"
+  "No alerts": "Geen meldingen",
+  "Cannot create daily journal": "Dagboek kan niet worden aangemaakt",
+  "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "Je graf is een DB-graf. Pagina's met schuine strepen in de naam (bijv. yyyy/MM/dd) kunnen niet worden aangemaakt.",
+  "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Wijzig het datumformaat van de Logseq-app naar een formaat met streepjes (aanbevolen: yyyy-MM-dd) en probeer het opnieuw.",
+  "Cannot create weekly journal": "Wekelijks dagboek kan niet worden aangemaakt",
+  "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Je graf is een DB-graf. Namen van wekelijkse dagboeken met schuine strepen kunnen niet worden aangemaakt.",
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "Wijzig het weeknummerformaat in de plugin-instellingen naar een formaat zonder schuine strepen en probeer het opnieuw."
 }

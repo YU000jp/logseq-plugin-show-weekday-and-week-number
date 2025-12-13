@@ -125,4 +125,10 @@
   "Decide the colour of Sunday.": "日曜日の色を決めてください。",
   "User event": "ユーザーイベント",
   "No alerts": "アラートはありません"
+  ,"Cannot create daily journal":"日次ジャーナルを作成できません"
+  ,"Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.":"このグラフはDBグラフです。名前にスラッシュ（例: yyyy/MM/dd）を含むページは作成できません。"
+  ,"Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.":"Logseq アプリの日時フォーマットをダッシュ形式（推奨: yyyy-MM-dd）に変更してから再試行してください。"
+  ,"Cannot create weekly journal":"週次ジャーナルを作成できません"
+  ,"Your graph is a DB graph. Weekly journal names containing slashes cannot be created.":"このグラフはDBグラフです。スラッシュを含む週次ジャーナル名は作成できません。"
+  ,"Please change the week-number format in plugin settings to a format without slashes and try again.":"プラグインの週番号フォーマットをスラッシュを含まない形式に変更してから再試行してください。"
 }

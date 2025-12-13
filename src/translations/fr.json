@@ -111,6 +111,12 @@
   "Use on Yearly Journal": "Utilisation dans le journal annuel"
     ,"Do you want to continue?": "Voulez-vous continuer?",
     "Create a new page.": "Créer une nouvelle page.",
+    "Cannot create daily journal": "Impossible de créer le journal quotidien.",
+    "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "Votre graphe est un DB-graph. Les pages dont le nom contient des slashs (ex. yyyy/MM/dd) ne peuvent pas être créées.",
+    "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Veuillez modifier le format de date de l’application Logseq pour utiliser des tirets (recommandé : yyyy-MM-dd) et réessayer.",
+    "Cannot create weekly journal": "Impossible de créer le journal hebdomadaire.",
+    "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Votre graphe est un DB-graph. Les noms de journaux hebdomadaires contenant des slashs ne peuvent pas être créés.",
+    "Please change the week-number format in plugin settings to a format without slashes and try again.": "Veuillez modifier le format du numéro de semaine dans les paramètres du plugin vers un format sans slash et réessayer.",
     "Confirm": "Confirmer",
     "Cancel": "Annuler",
     "Page created successfully.": "Page créée avec succès.",

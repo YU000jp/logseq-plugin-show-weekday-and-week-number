@@ -90,7 +90,7 @@ const main = async () => {
   setTimeout(() => {
     if (logseq.settings!.weekNumberFormat === undefined) {
       logseq.UI.showMsg("Select either \"US format\" or \"ISO format\"", "info", { timeout: 3000 })
-      setTimeout(() => logseq.showSettingsUI(), 300)
+      setTimeout(async () => { try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ } }, 300)
     }
   }, 3000)
 

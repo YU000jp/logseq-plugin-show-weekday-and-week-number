@@ -124,5 +124,11 @@
   "Decide the colour of Saturday.": "Decida a cor de sábado.",
   "Decide the colour of Sunday.": "Decida a cor de domingo.",
   "User event": "Evento do utilizador",
-  "No alerts": "Sem alertas"
+  "No alerts": "Sem alertas",
+  "Cannot create daily journal": "Não é possível criar o diário diário",
+  "Your graph is a DB graph. Pages with slashes in the name (e.g. yyyy/MM/dd) cannot be created.": "O seu grafo é um grafo DB. Páginas com barras no nome (por ex. yyyy/MM/dd) não podem ser criadas.",
+  "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Altere o formato de data da aplicação Logseq para usar traços (recomendado: yyyy-MM-dd) e tente novamente.",
+  "Cannot create weekly journal": "Não é possível criar o diário semanal",
+  "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "O seu grafo é um grafo DB. Nomes de diários semanais que contenham barras não podem ser criados.",
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "Altere o formato do número da semana nas definições do plugin para um formato sem barras e tente novamente."
 }

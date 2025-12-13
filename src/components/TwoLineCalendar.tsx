@@ -177,8 +177,16 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								return (logseq.settings as any).booleanWeeklyJournal === true ? (
 									<button
 										className="daySide daySideWeekNumber"
-										title={t("Week number: ") + weekPageName}
 										onClick={() => openPageFromPageName(weekPageName, false)}
+										onMouseEnter={(e) => {
+											if (weekPageName) {
+												setHoverPage(weekPageName)
+												const rect = (e.target as HTMLElement).getBoundingClientRect()
+												setTooltipPos({ left: rect.right + 8, top: rect.top })
+											}
+										}}
+										onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+										onMouseLeave={() => setHoverPage(undefined)}
 										style={{ ...weekElementStyle, cursor: "pointer", background: "none", border: "none" }}>
 										{weekNumLabel}
 									</button>
@@ -300,8 +308,16 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									return (
 										<button
 											className="daySide"
-											title={monthPageName}
 											onClick={handleMonthClick(monthPageName)}
+											onMouseEnter={(e) => {
+												if (monthPageName) {
+													setHoverPage(monthPageName)
+													const rect = (e.target as HTMLElement).getBoundingClientRect()
+													setTooltipPos({ left: rect.right + 8, top: rect.top })
+												}
+											}}
+											onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+											onMouseLeave={() => setHoverPage(undefined)}
 											style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontSize: "0.95em" }}>
 											{monthLabel}
 										</button>
@@ -384,8 +400,16 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								return (logseq.settings as any).booleanWeeklyJournal === true ? (
 									<button
 										className="daySide daySideWeekNumber"
-										title={t("Week number: ") + weekPageName}
 										onClick={() => openPageFromPageName(weekPageName, false)}
+										onMouseEnter={(e) => {
+											if (weekPageName) {
+												setHoverPage(weekPageName)
+												const rect = (e.target as HTMLElement).getBoundingClientRect()
+												setTooltipPos({ left: rect.right + 8, top: rect.top })
+											}
+										}}
+										onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
+										onMouseLeave={() => setHoverPage(undefined)}
 										style={{ ...weekElementStyle, cursor: "pointer", background: "none", border: "none" }}>
 										{weekNumLabel}
 									</button>

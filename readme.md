@@ -4,7 +4,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
 > [!NOTE]
 > - Works with Logseq v0.10.x (File system model)
-> - Only two-line and monthly calendars are supported in the Logseq db model. The others are not supported. [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+> - Only two-line and monthly calendars are supported in the Logseq db model. The others are not supported. Please note that due to the constraints of the Logseq API, date formats such as “yyyy/MM/dd” cannot be used as they are automatically converted into a library format. [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
 
 <div align="right">
 

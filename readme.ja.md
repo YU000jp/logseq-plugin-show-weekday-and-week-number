@@ -4,7 +4,7 @@ Logseqのジャーナルをもっとスマートにするプラグインです�
 
 > [!NOTE] 
 > - Logseq v0.10.x (ファイルシステムモデル) で動作します
-> - Logseq DBモデルでは、2行カレンダーおよび月間カレンダーのみ対応しています。そのほかは非対応です [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+> - Logseq DBモデルでは、2行カレンダーおよび月間カレンダーのみ対応しています。そのほかは非対応です。なお、Logseq APIの都合で「yyyy/MM/dd」のような日付フォーマットだと、ライブラリ化されてしまうのでそのフォーマットは使用できません [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
 
 
 <div align="right">

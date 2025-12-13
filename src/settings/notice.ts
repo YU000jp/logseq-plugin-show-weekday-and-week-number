@@ -16,7 +16,7 @@ export const notice = () => {
       It is on by default. If not required, turn it off via the plugin settings.
       
       `, "info", { timeout: 8500 })
-                  logseq.showSettingsUI() // 設定画面を表示する
+                  ;(async () => { try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ } })()
             }, 5000)
       }
 }
