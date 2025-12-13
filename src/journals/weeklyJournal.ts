@@ -106,7 +106,7 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
             return
         }
 
-        const createName = booleanDbGraph() && /W\d{2}/.test(match[0]) ? `${match[0]} #journal` : match[0]
+        const createName = booleanDbGraph() && /W\d{2}/.test(match[0]) ? `${match[0]} #Journal` : match[0]
         const pageEntity = await logseq.Editor.createPage(createName, {}, { redirect: false, createFirstBlock: false, journal: false }) as { uuid: BlockEntity["uuid"] } | null
         if (pageEntity) {
             console.log("Weekly Journal page created") //ページが作成された場合はログを出す

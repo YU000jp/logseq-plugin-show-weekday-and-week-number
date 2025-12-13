@@ -385,7 +385,7 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
           }
         }
         //ページが存在しない場合は、ページを作成する
-        const createName = booleanDbGraph() && isJournalPageName(pageName) ? `${pageName} #journal` : pageName
+        const createName = booleanDbGraph() && isJournalPageName(pageName) ? `${pageName} #Journal` : pageName
         await logseq.Editor.createPage(createName, {}, { createFirstBlock: true, redirect: true })
         logseq.UI.showMsg(t("Page created successfully."), 'success', { timeout: 2000 })
     } else {
