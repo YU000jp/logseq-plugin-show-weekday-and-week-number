@@ -30,7 +30,7 @@ import {
 } from "../lib"
 import { computeAlertBackground, computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils"
 import { getHolidays } from "../lib/holidays"
-import { getIcsEventsForDate, IcsEvent, loadIcsOnce } from "../lib/ics"
+import { getIcsEventsForDate, IcsEvent, loadIcsOnce } from "../lib"
 import { findPageUuid } from "../lib/query/advancedQuery"
 import { useJournalPreview } from "./JournalPreview"
 
@@ -45,7 +45,7 @@ type Props = {
 	settingsUpdateKey?: number;
 };
 
-type AlertItem = { date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string }
+type AlertItem = { date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string; ics?: IcsEvent }
 
 const WeeklyCell: React.FC<{ date: Date; ISO: boolean; weekStartsOn: Day }> = ({ date, ISO, weekStartsOn }) => {
 	const weekNumber = ISO ? getISOWeek(date) : getWeek(date, { weekStartsOn });
@@ -156,7 +156,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 
 	// Build alerts list using computed holidayMap and userColorMap (no DOM mutations)
 	useEffect(() => {
-		const newAlerts: Array<{ date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string }> = [];
+		const newAlerts: AlertItem[] = [];
 		for (const d of eachDays) {
 			const isTodayFlag = isToday(d);
 			// use a map to preserve source info; if same text exists for both user and holiday, prefer 'user'
@@ -176,21 +176,16 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						if (!msgs[k]) msgs[k] = "holiday";
 					}
 			}
-			// include ICS events
+			// include ICS events (added below with source='ics')
 			const icsKey = format(d, "yyyy-LL-dd")
 			const icsEvents = icsMap[icsKey] || []
-			for (const ev of icsEvents) {
-				const label = ev.isTodo ? `TODO: ${ev.summary}` : ev.summary
-				// do not overwrite user/holiday messages
-				if (!msgs[label]) msgs[label] = "holiday" as any // placeholder to avoid overwrite; we'll mark source='ics' later
-			}
 			for (const [m, src] of Object.entries(msgs)) newAlerts.push({ date: d, text: m, isToday: isTodayFlag, source: src });
 			// push ICS with proper source and description (avoid duplicate text)
 			for (const ev of icsEvents) {
 				const label = ev.isTodo ? `TODO: ${ev.summary}` : ev.summary
 				// if same text already present from user, skip; otherwise add as 'ics'
 				const already = newAlerts.find(a => a.date.getTime() === d.getTime() && a.text === label)
-				if (!already) newAlerts.push({ date: d, text: label, isToday: isTodayFlag, source: 'ics', description: ev.description, uid: ev.uid })
+				if (!already) newAlerts.push({ date: d, text: label, isToday: isTodayFlag, source: 'ics', description: ev.description, uid: ev.uid, ics: ev })
 			}
 		}
 		setAlerts(newAlerts);
@@ -309,6 +304,22 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 			} catch (e) {}
 		}
 	}, [hoverPage, hoverHtml, tooltipPos])
+
+	const formatIcsWhen = (ev?: IcsEvent) => {
+		if (!ev) return undefined
+		const start = ev.start || ev.date
+		const end = ev.end
+		if (ev.isAllDay) {
+			return t("All day")
+		}
+		try {
+			const startStr = format(start, "HH:mm")
+			const endStr = end ? format(end, "HH:mm") : undefined
+			return endStr ? `${startStr}–${endStr}` : startStr
+		} catch {
+			return undefined
+		}
+	}
 
 	const makeKey = (date: Date, text: string) => `${date.toISOString()}::${text}`;
 
@@ -790,20 +801,36 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 													borderRadius: 6,
 												}}>
 												<div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-													<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-														{a.source === 'ics' ? (
-															<button
-																className="cursor"
-																onClick={(e) => {
-																	e.stopPropagation();
-																	setExpandedIcs((s) => ({ ...s, [key]: !s[key] }));
-																}}
-																style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', flex: 1 }}>
-																<span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>{a.text}</span>
-															</button>
-														) : (
-															<span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>{a.text}</span>
-														)}
+													<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+														<div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+															<span
+																style={{
+																	fontSize: '0.72em',
+																	fontWeight: 700,
+																	letterSpacing: '0.04em',
+																	padding: '1px 6px',
+																	borderRadius: 999,
+																	border: '1px solid var(--ls-border-color)',
+																	color: 'var(--ls-ui-fg-muted)',
+																	background: 'var(--ls-secondary-background-color)',
+																	flex: '0 0 auto',
+																}}>
+																{a.source === 'holiday' ? 'HOL' : a.source === 'ics' ? 'ICS' : 'USR'}
+															</span>
+															{a.source === 'ics' ? (
+																<button
+																	className="cursor"
+																	onClick={(e) => {
+																		e.stopPropagation();
+																		setExpandedIcs((s) => ({ ...s, [key]: !s[key] }));
+																	}}
+																	style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', minWidth: 0, flex: 1 }}>
+																	<span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>{a.text}</span>
+																</button>
+															) : (
+																<span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>{a.text}</span>
+															)}
+														</div>
 														{a.source === "user" &&
 															(() => {
 																const pending = !!pendingRemovals[key];
@@ -830,9 +857,45 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 													</div>
 													{expandedIcs[key] && a.source === 'ics' && (
 														<div style={{ marginTop: 6, padding: 8, background: 'rgba(0,0,0,0.03)', borderRadius: 6, color: 'var(--ls-ui-fg)'}}>
-															<div style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: 4 }}>{a.text}</div>
-															{a.description ? <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85em' }}>{a.description}</div> : null}
-															{a.uid ? <div style={{ fontSize: '0.75em', marginTop: 6, color: 'var(--ls-ui-fg-muted)' }}>UID: {a.uid}</div> : null}
+															<div style={{ fontSize: '0.9em', fontWeight: 650, marginBottom: 6 }}>{a.text}</div>
+															{(() => {
+																const when = formatIcsWhen(a.ics)
+																const location = a.ics?.location
+																const status = a.ics?.status
+																const organizer = a.ics?.organizer
+																const desc = a.description
+																return (
+																	<div style={{ display: 'grid', gap: 6 }}>
+																		{when ? (
+																			<div style={{ fontSize: '0.82em', color: 'var(--ls-ui-fg-muted)' }}>
+																				<span style={{ fontWeight: 600 }}>{t("Time")}: </span>
+																				<span>{when}</span>
+																			</div>
+																		) : null}
+																		{location ? (
+																			<div style={{ fontSize: '0.82em', color: 'var(--ls-ui-fg-muted)' }}>
+																				<span style={{ fontWeight: 600 }}>{t("Location")}: </span>
+																				<span style={{ whiteSpace: 'pre-wrap' }}>{location}</span>
+																			</div>
+																		) : null}
+																		{status ? (
+																			<div style={{ fontSize: '0.82em', color: 'var(--ls-ui-fg-muted)' }}>
+																				<span style={{ fontWeight: 600 }}>{t("Status")}: </span>
+																				<span>{status}</span>
+																			</div>
+																		) : null}
+																		{organizer ? (
+																			<div style={{ fontSize: '0.82em', color: 'var(--ls-ui-fg-muted)' }}>
+																				<span style={{ fontWeight: 600 }}>{t("Organizer")}: </span>
+																				<span style={{ whiteSpace: 'pre-wrap' }}>{organizer}</span>
+																			</div>
+																		) : null}
+																		{desc ? (
+																			<div style={{ marginTop: 2, whiteSpace: 'pre-wrap', fontSize: '0.85em', color: 'var(--ls-ui-fg)' }}>{desc}</div>
+																		) : null}
+																	</div>
+																)
+															})()}
 														</div>
 													)}
 												</div>

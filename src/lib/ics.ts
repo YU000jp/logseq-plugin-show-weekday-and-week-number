@@ -2,8 +2,15 @@ export type IcsEvent = {
   uid?: string
   dateIso: string // yyyy-MM-dd
   date: Date
+  start?: Date
+  end?: Date
+  isAllDay?: boolean
   summary: string
   description?: string
+  location?: string
+  url?: string
+  organizer?: string
+  status?: string
   sourceUrl?: string
   isTodo?: boolean
 }
@@ -20,18 +27,18 @@ const normalizeDateIso = (d: Date) => {
   return `${y}-${m}-${day}`
 }
 
-const parseDateFromDt = (v: string) => {
+const parseDateFromDt = (v: string): { date: Date; isAllDay: boolean } | null => {
   // If value is a plain date YYYYMMDD (all-day), treat as local date (no timezone shift)
   if (/^\d{8}$/.test(v)) {
     const s = v
     const y = Number(s.slice(0, 4))
     const mo = Number(s.slice(4, 6)) - 1
     const d = Number(s.slice(6, 8))
-    return new Date(y, mo, d)
+    return { date: new Date(y, mo, d), isAllDay: true }
   }
   // Otherwise try to parse as ISO/datetime (handles TZ or Z)
   const dt = new Date(v)
-  if (!isNaN(dt.getTime())) return dt
+  if (!isNaN(dt.getTime())) return { date: dt, isAllDay: false }
   // fallback: try to find an 8-digit date inside the string and treat as local
   const m = v.match(/(\d{8})/)
   if (m) {
@@ -39,9 +46,18 @@ const parseDateFromDt = (v: string) => {
     const y = Number(s.slice(0, 4))
     const mo = Number(s.slice(4, 6)) - 1
     const d = Number(s.slice(6, 8))
-    return new Date(y, mo, d)
+    return { date: new Date(y, mo, d), isAllDay: true }
   }
   return null
+}
+
+const unescapeIcsText = (v?: string) => {
+  if (!v) return v
+  return String(v)
+    .replace(/\\n/g, "\n")
+    .replace(/\\,/g, ",")
+    .replace(/\\;/g, ";")
+    .replace(/\\\\/g, "\\")
 }
 
 const parseIcsText = (text: string, sourceUrl?: string) => {
@@ -65,19 +81,32 @@ const parseIcsText = (text: string, sourceUrl?: string) => {
     }
     if (line.startsWith("END:")) {
       const closing = line.slice(4)
-      if ((closing === "VEVENT" || closing === "VTODO") && cur.DTSTART && cur.SUMMARY) {
-        const dt = parseDateFromDt(cur.DTSTART)
-        if (dt) {
-          const ev: IcsEvent = {
-            uid: cur.UID,
-            date: dt,
-            dateIso: normalizeDateIso(dt),
-            summary: cur.SUMMARY || "(no summary)",
-            description: cur.DESCRIPTION,
-            sourceUrl,
-            isTodo: closing === "VTODO",
+      if (closing === "VEVENT" || closing === "VTODO") {
+        const startRaw = cur.DTSTART || cur.DUE
+        const endRaw = cur.DTEND
+        if (startRaw && cur.SUMMARY) {
+          const startParsed = parseDateFromDt(startRaw)
+          const endParsed = endRaw ? parseDateFromDt(endRaw) : null
+          if (startParsed) {
+            const dt = startParsed.date
+            const ev: IcsEvent = {
+              uid: cur.UID,
+              date: dt,
+              dateIso: normalizeDateIso(dt),
+              start: startParsed.date,
+              end: endParsed?.date,
+              isAllDay: startParsed.isAllDay,
+              summary: cur.SUMMARY || "(no summary)",
+              description: unescapeIcsText(cur.DESCRIPTION),
+              location: unescapeIcsText(cur.LOCATION),
+              url: unescapeIcsText(cur.URL),
+              organizer: unescapeIcsText(cur.ORGANIZER),
+              status: unescapeIcsText(cur.STATUS),
+              sourceUrl,
+              isTodo: closing === "VTODO",
+            }
+            out.push(ev)
           }
-          out.push(ev)
         }
       }
       inComponent = null

@@ -1,6 +1,7 @@
 // Barrel file for library exports
 export * from './lib'
 export * from './holidays'
+export * from './ics'
 export * from './query/advancedQuery'
 export * from '../types'
 
