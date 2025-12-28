@@ -597,10 +597,21 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 											// use custom tooltip instead of native title
 											aria-label={combinedTitle ?? pageName}
 											onMouseEnter={(e) => {
+												const rect = (e.target as HTMLElement).getBoundingClientRect()
+												setTooltipPos({ left: rect.right + 8, top: rect.top })
+												if (holiday) {
+													const text = holiday
+														.split("\n")
+														.map((s) => s.trim())
+														.filter(Boolean)
+														.join("\n");
+													const marker = "__HOL__::";
+													const payload = marker + encodeURIComponent(text || "") + "|||" + (pageName || "");
+													setHoverPage(payload)
+													return
+												}
 												if (pageName) {
 													setHoverPage(pageName)
-													const rect = (e.target as HTMLElement).getBoundingClientRect()
-													setTooltipPos({ left: rect.right + 8, top: rect.top })
 												}
 											}}
 											onMouseMove={(e) => {

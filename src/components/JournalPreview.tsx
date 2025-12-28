@@ -23,6 +23,8 @@ const simpleRender = (blocks: Array<{ content?: string }>) => {
   return `<div class='lc-jp-root'>${lines}</div>`
 }
 
+const HOL_MARKER = "__HOL__::";
+
 export const useJournalPreview = (pageName?: string, preferredDateFormat?: string) => {
   const [html, setHtml] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -32,10 +34,30 @@ export const useJournalPreview = (pageName?: string, preferredDateFormat?: strin
     const run = async () => {
       setLoading(true)
       try {
-        const uuid = await findPageUuid(pageName)
+        let holidayText: string | null = null
+        let actualPageName = pageName
+        if (pageName.startsWith(HOL_MARKER)) {
+          const rest = pageName.slice(HOL_MARKER.length)
+          const parts = rest.split("|||")
+          if (parts.length >= 2) {
+            try {
+              holidayText = decodeURIComponent(parts[0])
+            } catch (e) {
+              holidayText = parts[0]
+            }
+            actualPageName = parts.slice(1).join("|||")
+          }
+        }
+
+        const uuid = await findPageUuid(actualPageName)
         if (!mounted) return
         if (!uuid) {
-          setHtml(`<div style='color:var(--ls-ui-fg-muted)'>${escapeHtml(pageName)} not found</div>`)
+          // if page not found, still show holiday text if present
+          if (holidayText) {
+            setHtml(`<div style='font-weight:600;margin-bottom:6px'>${escapeHtml(holidayText)}</div><div style='color:var(--ls-ui-fg-muted)'>${escapeHtml(actualPageName)} not found</div>`)
+          } else {
+            setHtml(`<div style='color:var(--ls-ui-fg-muted)'>${escapeHtml(actualPageName)} not found</div>`)
+          }
           return
         }
         const tree = (await (window as any).logseq.Editor.getPageBlocksTree(uuid)) as Array<{ content?: string }> | null
@@ -44,16 +66,21 @@ export const useJournalPreview = (pageName?: string, preferredDateFormat?: strin
         let header = ""
         try {
           if (preferredDateFormat) {
-            const parsed = parse(pageName, preferredDateFormat, new Date())
+            const parsed = parse(actualPageName, preferredDateFormat, new Date())
             if (isValid(parsed)) {
               const rel = getRelativeDateString(parsed)
-              header = `<div style='font-weight:600;margin-bottom:6px'>${escapeHtml(pageName)} <span style='color:var(--ls-ui-fg-muted);font-weight:400;margin-left:6px'>${escapeHtml(rel)}</span></div>`
+              header = `<div style='font-weight:600;margin-bottom:6px'>${escapeHtml(actualPageName)} <span style='color:var(--ls-ui-fg-muted);font-weight:400;margin-left:6px'>${escapeHtml(rel)}</span></div>`
             }
           }
         } catch (e) {
           header = ""
         }
-        setHtml(header + simpleRender(tree || []))
+        // prepend holiday header if present
+        if (holidayText) {
+          setHtml(`<div style='font-weight:600;margin-bottom:6px'>${escapeHtml(holidayText)}</div>` + header + simpleRender(tree || []))
+        } else {
+          setHtml(header + simpleRender(tree || []))
+        }
       } catch (e) {
         setHtml(`<div style='color:var(--ls-error-color)'>Failed to load</div>`)
       } finally {
@@ -64,7 +91,7 @@ export const useJournalPreview = (pageName?: string, preferredDateFormat?: strin
     return () => {
       mounted = false
     }
-  }, [pageName])
+  }, [pageName, preferredDateFormat])
   return { html, loading }
 }
 

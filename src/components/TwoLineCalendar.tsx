@@ -259,10 +259,21 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
 									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
 									onMouseEnter={(e) => {
+										const rect = (e.target as HTMLElement).getBoundingClientRect()
+										setTooltipPos({ left: rect.right + 8, top: rect.top })
+										if (holiday) {
+											const text = holiday
+												.split("\n")
+												.map((s) => s.trim())
+												.filter(Boolean)
+												.join("\n");
+											const marker = "__HOL__::";
+											const payload = marker + encodeURIComponent(text || "") + "|||" + (pageName || "");
+											setHoverPage(payload)
+											return
+										}
 										if (pageName) {
 											setHoverPage(pageName)
-											const rect = (e.target as HTMLElement).getBoundingClientRect()
-											setTooltipPos({ left: rect.right + 8, top: rect.top })
 										}
 									}}
 									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
@@ -486,10 +497,21 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
 									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
 									onMouseEnter={(e) => {
+										const rect = (e.target as HTMLElement).getBoundingClientRect()
+										setTooltipPos({ left: rect.right + 8, top: rect.top })
+										if (holiday) {
+											const text = holiday
+												.split("\n")
+												.map((s) => s.trim())
+												.filter(Boolean)
+												.join("\n");
+											const marker = "__HOL__::";
+											const payload = marker + encodeURIComponent(text || "") + "|||" + (pageName || "");
+											setHoverPage(payload)
+											return
+										}
 										if (pageName) {
 											setHoverPage(pageName)
-											const rect = (e.target as HTMLElement).getBoundingClientRect()
-											setTooltipPos({ left: rect.right + 8, top: rect.top })
 										}
 									}}
 									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
