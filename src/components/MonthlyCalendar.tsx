@@ -19,6 +19,7 @@ import { separate } from "../journals/nav"
 import {
 	colorMap,
 	getUserColorData,
+	getRelativeDateString,
 	getWeeklyNumberFromDate,
 	getWeeklyNumberString,
 	localizeDayOfWeekString,
@@ -766,6 +767,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 				{Object.entries(groupedAlerts).map(([k, items]) => {
 					const first = items[0];
 					const headerLabel = first.isToday ? t("Today") : localizeMonthDayString(first.date);
+					const relativeLabel = first.isToday ? "" : getRelativeDateString(first.date, today);
 					const collapsed = collapsedGroups[k];
 					return (
 						<div
@@ -775,13 +777,22 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 								style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
 								onClick={() => toggleGroup(k)}>
 								<div style={{ fontSize: "0.9em", fontWeight: 600 }}>
-									{headerLabel} <span style={{ fontWeight: 400, marginLeft: 6, color: "var(--ls-ui-fg-muted)" }}>({items.length})</span>
+									{headerLabel}
+									<span style={{ fontWeight: 400, marginLeft: 6, color: "var(--ls-ui-fg-muted)" }}>({items.length})</span>
+									{relativeLabel && (
+										<span style={{ fontWeight: 400, marginLeft: 8, color: "var(--ls-ui-fg-muted)" }}>
+											({relativeLabel})
+										</span>
+									)}
 								</div>
 								<div style={{ fontSize: "0.9em", color: "var(--ls-ui-fg-muted)" }}>{collapsed ? "▸" : "▾"}</div>
 							</div>
 							{!collapsed && (
 								<div style={{ marginTop: "0.25rem", paddingLeft: "0.5rem" }}>
 									{items.map((a, i) => {
+										const isTodayItem = isSameDay(a.date, today);
+										const isYesterdayItem = isSameDay(a.date, addDays(today, -1));
+										const shouldHighlight = isTodayItem || isYesterdayItem;
 										const itemBg = computeAlertBackground(
 											a.source,
 											a.date.toISOString(),
@@ -799,10 +810,11 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 													justifyContent: "space-between",
 													alignItems: "center",
 													marginBottom: 4,
-													color: "var(--ls-ui-fg-muted)",
+													color: shouldHighlight ? "var(--ls-ui-fg)" : "var(--ls-ui-fg-muted)",
 													backgroundColor: itemBg,
 													padding: "4px 6px",
 													borderRadius: 6,
+													border: shouldHighlight ? `1px solid ${logseq.settings!.boundariesHighlightColorToday}` : "1px solid transparent",
 												}}>
 												<div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
 													<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -810,7 +822,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 															<span
 																style={{
 																	fontSize: '0.72em',
-																	fontWeight: 700,
+																	fontWeight: shouldHighlight ? 800 : 700,
 																	letterSpacing: '0.04em',
 																	padding: '1px 6px',
 																	borderRadius: 999,
