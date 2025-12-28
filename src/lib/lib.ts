@@ -1,12 +1,11 @@
 import { BlockEntity, BlockUUID, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { addDays, addWeeks, format, getISOWeek, getISOWeekYear, getWeek, getWeekYear, startOfISOWeek, startOfWeek } from "date-fns"
 import { t } from "logseq-l10n"
-import { enableWeekNumber, enableRelativeTime } from "../dailyJournalDetails"
-import { SettingKeys } from "../settings/SettingKeys"
-import { getPageBlocks, findPageUuid, doesPageFileExist } from "./query/advancedQuery"
 import { booleanDbGraph } from ".."
-import { booleanLogseqMdModel } from ".."
+import { enableRelativeTime, enableWeekNumber } from "../dailyJournalDetails"
+import { SettingKeys } from "../settings/SettingKeys"
 import { DayShortCode } from "../types"
+import { findPageUuid, getPageBlocks } from "./query/advancedQuery"
 
 // Lightweight built-in confirm dialog implemented with <dialog>, falling back to a simple overlay
 // Uses `logseq-l10n`'s `t()` for translations.

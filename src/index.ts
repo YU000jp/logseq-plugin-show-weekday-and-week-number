@@ -1,12 +1,12 @@
-import "@logseq/libs" //https://plugins-doc.logseq.com/
-import { t } from "logseq-l10n" //https://github.com/sethyuan/logseq-l10n
+import "@logseq/libs"; //https://plugins-doc.logseq.com/
+import { t } from "logseq-l10n"; //https://github.com/sethyuan/logseq-l10n
 import { removeBoundaries } from "./calendar/boundaries"
 import { invokeBoundaryHandler } from "./calendar/invokeBoundaryHandler"
 import { keyLeftCalendarContainer, loadLeftCalendar } from "./calendar/left-calendar"
 import { observer, observerMain, removeTitleQuery } from "./dailyJournalDetails"
 import { fetchJournalTitles } from "./fetchJournalTitles"
 import { weeklyEmbed } from "./journals/weeklyJournal"
-import { getHolidaysBundle, removeElementById, getCurrentPageUuid } from "./lib"
+import { getCurrentPageUuid, getHolidaysBundle, removeElementById } from "./lib"
 import { logseqModelCheck } from "./logseqModelCheck"
 import fileMainCSS from "./main.css?inline"
 import { mapLanguageCodeToCountry } from "./settings/languageCountry"

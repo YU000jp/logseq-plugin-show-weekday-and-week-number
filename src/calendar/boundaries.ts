@@ -1,11 +1,9 @@
-import { addDays, startOfISOWeek, startOfWeek } from 'date-fns' //https://date-fns.org/
-import { t } from "logseq-l10n"
-import { getWeekStartOn, getCurrentPageJournalDay, getDateFromJournalDay, DayShortCode, colorMap } from '../lib'
+import { addDays, startOfISOWeek, startOfWeek } from 'date-fns'; //https://date-fns.org/
 import React from 'react'
 import { createRoot, Root } from 'react-dom/client'
 import TwoLineCalendar from '../components/TwoLineCalendar'
+import { colorMap, DayShortCode, getCurrentPageJournalDay, getDateFromJournalDay, getWeekStartOn } from '../lib'
 import { ensureBoundariesMountPoint } from './boundariesMount'
-import { separate } from '../journals/nav'
 
 
 let processingFoundBoundaries: boolean = false
