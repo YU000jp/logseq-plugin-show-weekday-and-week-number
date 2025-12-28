@@ -5,7 +5,7 @@ import { invokeBoundaryHandler } from "../calendar/invokeBoundaryHandler"
 import { removeBoundaries } from "../calendar/boundaries"
 import { removeTitleQuery } from "../dailyJournalDetails"
 import { keyThisWeekPopup, weeklyEmbed } from "../journals/weeklyJournal"
-import { getHolidaysBundle, removeHolidaysBundle, findPageUuid, removeElementById, removeProvideStyle } from "../lib"
+import { getHolidaysBundle, removeHolidaysBundle, findPageUuid, removeElementById, removeProvideStyle, startIcsSync, stopIcsSync, clearIcsEvents } from "../lib"
 import { SettingKeys } from "./SettingKeys"
 import { currentCalendarDate, keyLeftCalendarContainer, loadLeftCalendar, refreshMonthlyCalendar } from "../calendar/left-calendar"
 import { settingsTemplate } from "./settings"
@@ -144,7 +144,10 @@ export const handleSettingsUpdate = () => {
               SettingKeys.booleanSettingsButton,
               SettingKeys.booleanMonthlyJournalLink,
               SettingKeys.underHolidaysAlert,
-              SettingKeys.booleanBesideJournalTitle
+              SettingKeys.booleanBesideJournalTitle,
+              // Daily journal details: event list visibility toggles
+              SettingKeys.booleanShowIcsEvents,
+              SettingKeys.booleanShowUserEvents
             ].some(key => oldSet[key] !== newSet[key])) {
               removeTitleQuery()
               setTimeout(() => fetchJournalTitles(newSet.booleanBesideJournalTitle as boolean), 500)
@@ -199,6 +202,51 @@ export const handleSettingsUpdate = () => {
       }
 
       //CAUTION: 日付形式が変更された場合は、re-indexをおこなうので、問題ないが、言語設定が変更された場合は、その設定は、すぐには反映されない。プラグインの再読み込みが必要になるが、その頻度がかなり少ないので問題ない。
+
+    // ICS settings changes: restart/stop sync and refresh calendars + event list.
+    // This keeps: left monthly calendar (cells + alerts), TwoLineCalendar (boundaries), and journal details in sync.
+    try {
+      const urlsChanged = oldSet[SettingKeys.lcIcsUrls] !== newSet[SettingKeys.lcIcsUrls]
+      const intervalChanged = oldSet[SettingKeys.lcIcsSyncInterval] !== newSet[SettingKeys.lcIcsSyncInterval]
+      const showIcsChanged = oldSet[SettingKeys.booleanShowIcsEvents] !== newSet[SettingKeys.booleanShowIcsEvents]
+
+      if (urlsChanged || intervalChanged || showIcsChanged) {
+        const raw = (newSet[SettingKeys.lcIcsUrls] as string) || ""
+        const urls = String(raw || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+        const interval = Number((newSet[SettingKeys.lcIcsSyncInterval] as any) ?? 60)
+
+        if (urls.length === 0) {
+          try { stopIcsSync() } catch (e) { /* ignore */ }
+          try { clearIcsEvents() } catch (e) { /* ignore */ }
+        } else {
+          // Start (or re-start) sync so caches update even when left calendar is disabled.
+          try { startIcsSync(urls, isFinite(interval) ? interval : 60) } catch (e) { /* ignore */ }
+        }
+
+        // Refresh left calendar if it exists/was initialized (updates cell highlights + alerts list)
+        try {
+          const leftInitialized = (parent as any).__leftCalendarInitialized || (window as any).__leftCalendarInitialized
+          if (newSet.booleanLeftCalendar === true || leftInitialized) {
+            setTimeout(() => refreshMonthlyCalendar(currentCalendarDate, false, false), 50)
+          }
+        } catch (e) { /* ignore */ }
+
+        // Refresh boundaries calendars (TwoLineCalendar) if currently shown
+        try {
+          const weekBoundaries = parent.document.getElementById("weekBoundaries") as HTMLDivElement | null
+          if (weekBoundaries) {
+            removeBoundaries()
+            ApplyBoundarySettingsOnChange(newSet)
+          }
+        } catch (e) { /* ignore */ }
+
+        // Refresh journal details line to reflect show/hide (and updated cached events)
+        try {
+          removeTitleQuery()
+          setTimeout(() => fetchJournalTitles(newSet.booleanBesideJournalTitle as boolean), 500)
+        } catch (e) { /* ignore */ }
+      }
+    } catch (e) { /* ignore */ }
 
     // Additionally, ensure left calendar refresh runs for essential setting changes
     // even if earlier branches didn't call refreshMonthlyCalendar (defensive).

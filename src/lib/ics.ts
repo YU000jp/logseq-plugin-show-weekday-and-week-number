@@ -20,6 +20,12 @@ let lastFetch = 0
 let intervalId: number | null = null
 let inflightPromise: Promise<IcsEvent[]> | null = null
 
+export const clearIcsEvents = () => {
+  mergedEvents = []
+  lastFetch = 0
+  inflightPromise = null
+}
+
 const normalizeDateIso = (d: Date) => {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, "0")

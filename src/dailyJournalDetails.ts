@@ -5,6 +5,7 @@ import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from "."
 import { fetchJournalTitles } from "./fetchJournalTitles"
 import { separate } from "./journals/nav"
 import { createLinkMonthlyLink, createSettingButton, exportHolidaysBundle, getDayOfWeekName, getQuarterFromWeekNumber, getRelativeDateString, getRelativeTimeHtml, getWeeklyNumberFromDate, getWeeklyNumberString, getWeekNumberHtml, localizeMonthString, openPageFromPageName, userColor } from "./lib"
+import { getIcsEventsForDate } from "./lib/ics"
 
 // プロセス中かどうかを判定するフラグ
 let processingBehind: boolean = false
@@ -51,6 +52,8 @@ export const dailyJournalDetails = async (dayDate: Date, titleElement: HTMLEleme
     baseLineElement.appendChild(createSettingButton())
 
   addUserColor(dayDate, titleElement)
+  addIcsEvents(dayDate, baseLineElement)
+  addUserEvents(dayDate, baseLineElement)
 
   setTimeout(() => processingBehind = false, 300)
 }
@@ -215,6 +218,26 @@ const enableUnderHolidayForWorldCountry = (journalDate: Date, baseLineElement: H
     }
   }
 }
+
+const addIcsEvents = async (dayDate: Date, baseLineElement: HTMLSpanElement) => {
+  if (logseq.settings!.booleanShowIcsEvents) {
+    const icsEvents = getIcsEventsForDate(dayDate);
+    icsEvents.forEach(event => {
+      const eventElement = createSpanElement("icsEvent", event.summary, "text-decoration: underline;");
+      baseLineElement.appendChild(eventElement);
+    });
+  }
+};
+
+const addUserEvents = (dayDate: Date, baseLineElement: HTMLSpanElement) => {
+  if (logseq.settings!.booleanShowUserEvents) {
+    const userEvent = userColor(dayDate, baseLineElement);
+    if (userEvent) {
+      const eventElement = createSpanElement("userEvent", userEvent, "text-decoration: underline;");
+      baseLineElement.appendChild(eventElement);
+    }
+  }
+};
 
 export const removeTitleQuery = () => {
   const titleBehindElements = parent.document.body.querySelectorAll("#main-content-container div:is(.journal,.is-journals) h1.title+span.showWeekday") as NodeListOf<HTMLElement>

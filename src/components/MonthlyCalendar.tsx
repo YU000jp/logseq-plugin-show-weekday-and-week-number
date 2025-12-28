@@ -146,9 +146,13 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						map[key] = getIcsEventsForDate(d)
 					}
 					setIcsMap(map)
+				} else {
+					// If URLs are cleared, drop stale ICS state immediately.
+					setIcsMap({})
 				}
 			} catch (e) {
 				// ignore
+				setIcsMap({})
 			}
 		};
 		run();

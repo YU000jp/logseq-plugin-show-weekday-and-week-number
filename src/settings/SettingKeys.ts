@@ -74,4 +74,6 @@ export const SettingKeys = {
   heading007: "heading007",
   booleanYearlyJournal: "booleanYearlyJournal",
   yearlyJournalTemplateName: "yearlyJournalTemplateName",
+  booleanShowIcsEvents: "booleanShowIcsEvents",
+  booleanShowUserEvents: "booleanShowUserEvents",
 }
