@@ -1,25 +1,23 @@
-import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
-import { addDays, format, isToday, startOfISOWeek, startOfWeek } from "date-fns";
-import { t } from "logseq-l10n";
-import { getConfigPreferredDateFormat } from "..";
-import { getHolidays } from "../lib/holidays";
-import { findPageUuid } from "../lib/query/advancedQuery";
-import JournalPreview, { useJournalPreview } from "./JournalPreview";
+import { addDays, format, isToday, startOfISOWeek, startOfWeek } from "date-fns"
+import { t } from "logseq-l10n"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { getConfigPreferredDateFormat } from ".."
+import { separate } from "../journals/nav"
 import {
-	openPageFromPageName,
 	getUserColorData,
 	getWeekendColor,
-	shortDayNames,
-	localizeDayOfWeekString,
-	localizeMonthString,
-	getDateFromJournalDay,
-	getCurrentPageJournalDay,
-	getWeekStartOn,
 	getWeeklyNumberFromDate,
 	getWeeklyNumberString,
-} from "../lib";
-import { computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils";
-import { separate } from "../journals/nav";
+	getWeekStartOn,
+	localizeDayOfWeekString,
+	localizeMonthString,
+	openPageFromPageName,
+	shortDayNames
+} from "../lib"
+import { computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils"
+import { getHolidays } from "../lib/holidays"
+import { findPageUuid } from "../lib/query/advancedQuery"
+import { useJournalPreview } from "./JournalPreview"
 
 type Props = {
 	startDate: Date;

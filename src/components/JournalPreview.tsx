@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
+import { isValid, parse } from "date-fns"
+import { useEffect, useState } from "react"
 import { escapeHtml, getRelativeDateString } from "../lib/lib"
 import { findPageUuid } from "../lib/query/advancedQuery"
-import { parse, isValid } from "date-fns"
 
 const clamp = (s: string, n = 1000) => (s.length > n ? s.slice(0, n) + "…" : s)
 

@@ -1,43 +1,41 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
 import {
 	addDays,
-	format,
-	isToday,
-	startOfMonth,
-	startOfISOWeek,
-	startOfWeek,
 	eachDayOfInterval,
+	format,
 	getISOWeek,
 	getWeek,
-	isSameYear,
 	isSameDay,
 	isSameISOWeek,
 	isSameWeek,
-} from "date-fns";
-import { t } from "logseq-l10n";
+	isSameYear,
+	isToday,
+	startOfISOWeek,
+	startOfMonth,
+	startOfWeek,
+} from "date-fns"
+import { t } from "logseq-l10n"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { separate } from "../journals/nav"
 import {
-	openPageFromPageName,
-	getUserColorData,
-	shortDayNames,
 	colorMap,
-	resolveColorChoice,
-	toTranslucent,
-	localizeDayOfWeekString,
-	localizeMonthString,
-	localizeMonthDayString,
+	getUserColorData,
 	getWeeklyNumberFromDate,
 	getWeeklyNumberString,
-} from "../lib";
-import { separate } from "../journals/nav";
+	localizeDayOfWeekString,
+	localizeMonthDayString,
+	localizeMonthString,
+	openPageFromPageName,
+	resolveColorChoice,
+	toTranslucent
+} from "../lib"
+import { computeAlertBackground, computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils"
+import { getHolidays } from "../lib/holidays"
+import { getIcsEventsForDate, IcsEvent, loadIcsOnce } from "../lib/ics"
+import { findPageUuid } from "../lib/query/advancedQuery"
+import { useJournalPreview } from "./JournalPreview"
 
 // local Day type (0=Sun..6=Sat) — keep as a simple alias where used in this component
 type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-import { computeCellBackground, computeDayNumberStyle, computeAlertBackground, UserColorInfo } from "../lib/calendarUtils";
-import { loadIcsOnce, getIcsEventsForDate, IcsEvent } from "../lib/ics";
-import { applyWeekendColor } from "../calendar/boundaries";
-import { getHolidays } from "../lib/holidays";
-import { findPageUuid } from "../lib/query/advancedQuery";
-import JournalPreview, { useJournalPreview } from "./JournalPreview";
 
 type Props = {
 	targetDate: Date;
