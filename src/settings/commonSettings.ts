@@ -189,7 +189,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.lcIcsUrls,
-    title: t("ICS calendar URLs (one per line)"),
+    title: t("ICS calendar URLs (one per line)") + " 🆕",
     type: "string",
     inputAs: "textarea",
     default: "",
@@ -197,7 +197,7 @@ export const commonSettings = (logseqSettings: LSPluginBaseInfo['settings'] | un
   },
   {
     key: SettingKeys.lcIcsSyncInterval,
-    title: t("ICS sync interval (minutes)"),
+    title: t("ICS sync interval (minutes)") + " 🆕",
     type: "number",
     default: 60,
     description: t("How often to refresh ICS feeds (in minutes)."),

@@ -102,14 +102,14 @@ export const dailyJournalSettings = (logseqSettings: LSPluginBaseInfo['settings'
         },
         {
           key: SettingKeys.booleanShowIcsEvents,
-          title: t("Show ICS events"),
+          title: t("Show ICS events") + " 🆕",
           type: "boolean" as const,
           default: false,
           description: t("Enable to display ICS calendar events in the journal details."),
         },
         {
           key: SettingKeys.booleanShowUserEvents,
-          title: t("Show user events"),
+          title: t("Show user events") + " 🆕",
           type: "boolean" as const,
           default: false,
           description: t("Enable to display user-defined events in the journal details."),
