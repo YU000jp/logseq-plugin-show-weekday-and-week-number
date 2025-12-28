@@ -33,6 +33,7 @@ import { separate } from "../journals/nav";
 // local Day type (0=Sun..6=Sat) — keep as a simple alias where used in this component
 type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 import { computeCellBackground, computeDayNumberStyle, computeAlertBackground, UserColorInfo } from "../lib/calendarUtils";
+import { loadIcsOnce, getIcsEventsForDate, IcsEvent } from "../lib/ics";
 import { applyWeekendColor } from "../calendar/boundaries";
 import { getHolidays } from "../lib/holidays";
 import { findPageUuid } from "../lib/query/advancedQuery";
@@ -45,6 +46,8 @@ type Props = {
 	onTargetDateChange?: (date: Date) => void;
 	settingsUpdateKey?: number;
 };
+
+type AlertItem = { date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string }
 
 const WeeklyCell: React.FC<{ date: Date; ISO: boolean; weekStartsOn: Day }> = ({ date, ISO, weekStartsOn }) => {
 	const weekNumber = ISO ? getISOWeek(date) : getWeek(date, { weekStartsOn });
@@ -77,10 +80,12 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 
 	const [pageExistsMap, setPageExistsMap] = useState<Record<string, boolean>>({});
 	const [holidayMap, setHolidayMap] = useState<Record<string, string>>({});
-	const [alerts, setAlerts] = useState<Array<{ date: Date; text: string; isToday: boolean; source?: "user" | "holiday" }>>([]);
+	const [alerts, setAlerts] = useState<Array<AlertItem>>([]);
 	const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 	const [weekExistsMap, setWeekExistsMap] = useState<Record<string, boolean>>({});
 	const [userColorMap, setUserColorMap] = useState<Record<string, { color?: string; fontWeight?: string; eventName?: string }>>({});
+	const [icsMap, setIcsMap] = useState<Record<string, IcsEvent[]>>({});
+	const [expandedIcs, setExpandedIcs] = useState<Record<string, boolean>>({});
 	const monthInputRef = useRef<HTMLInputElement | null>(null);
 	// Inline editor state for editing user events (replaces modal)
 	const [showInlineEditor, setShowInlineEditor] = useState<boolean>(false);
@@ -131,13 +136,29 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 			setHolidayMap(hMap);
 			setWeekExistsMap(wMap);
 			setUserColorMap(uMap);
+			// load ICS events for visible range (one-shot; live updates come from sync in left-calendar)
+			try {
+				const raw = (logseq.settings!.lcIcsUrls as string) || ""
+				const urls = String(raw || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+				if (urls.length > 0) {
+					await loadIcsOnce(urls)
+					const map: Record<string, IcsEvent[]> = {}
+					for (const d of eachDays) {
+						const key = format(d, "yyyy-LL-dd")
+						map[key] = getIcsEventsForDate(d)
+					}
+					setIcsMap(map)
+				}
+			} catch (e) {
+				// ignore
+			}
 		};
 		run();
 	}, [preferredDateFormat, targetDate, settingsUpdateKey]);
 
 	// Build alerts list using computed holidayMap and userColorMap (no DOM mutations)
 	useEffect(() => {
-		const newAlerts: Array<{ date: Date; text: string; isToday: boolean; source?: "user" | "holiday" }> = [];
+		const newAlerts: Array<{ date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string }> = [];
 		for (const d of eachDays) {
 			const isTodayFlag = isToday(d);
 			// use a map to preserve source info; if same text exists for both user and holiday, prefer 'user'
@@ -157,21 +178,36 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						if (!msgs[k]) msgs[k] = "holiday";
 					}
 			}
+			// include ICS events
+			const icsKey = format(d, "yyyy-LL-dd")
+			const icsEvents = icsMap[icsKey] || []
+			for (const ev of icsEvents) {
+				const label = ev.isTodo ? `TODO: ${ev.summary}` : ev.summary
+				// do not overwrite user/holiday messages
+				if (!msgs[label]) msgs[label] = "holiday" as any // placeholder to avoid overwrite; we'll mark source='ics' later
+			}
 			for (const [m, src] of Object.entries(msgs)) newAlerts.push({ date: d, text: m, isToday: isTodayFlag, source: src });
+			// push ICS with proper source and description (avoid duplicate text)
+			for (const ev of icsEvents) {
+				const label = ev.isTodo ? `TODO: ${ev.summary}` : ev.summary
+				// if same text already present from user, skip; otherwise add as 'ics'
+				const already = newAlerts.find(a => a.date.getTime() === d.getTime() && a.text === label)
+				if (!already) newAlerts.push({ date: d, text: label, isToday: isTodayFlag, source: 'ics', description: ev.description, uid: ev.uid })
+			}
 		}
 		setAlerts(newAlerts);
-	}, [holidayMap, pageExistsMap, userColorMap, targetDate]);
+	}, [holidayMap, pageExistsMap, userColorMap, icsMap, targetDate]);
 
 	// Group alerts by date for UI (yyyy-MM-dd)
 	const groupedAlerts = useMemo(() => {
-		const map: Record<string, Array<{ date: Date; text: string; isToday: boolean; source?: "user" | "holiday" }>> = {};
+		const map: Record<string, Array<AlertItem>> = {};
 		for (const a of alerts) {
 			const k = format(a.date, "yyyy-LL-dd");
 			map[k] = map[k] || [];
 			map[k].push(a);
 		}
 		// sort keys ascending
-		const ordered: Record<string, Array<{ date: Date; text: string; isToday: boolean; source?: "user" | "holiday" }>> = {};
+		const ordered: Record<string, Array<AlertItem>> = {};
 		Object.keys(map)
 			.sort()
 			.forEach((k) => {
@@ -696,6 +732,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 											holidaysBg,
 											logseq.settings!.choiceUserColor as string | undefined
 										);
+										const key = makeKey(a.date, a.text)
 										return (
 											<div
 												key={i}
@@ -710,31 +747,53 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 													padding: "4px 6px",
 													borderRadius: 6,
 												}}>
-												<span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>{a.text}</span>
-												{a.source === "user" &&
-													(() => {
-														const key = makeKey(a.date, a.text);
-														const pending = !!pendingRemovals[key];
-														return (
+												<div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+													<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+														{a.source === 'ics' ? (
 															<button
 																className="cursor"
-																aria-label={pending ? "Cancel removal" : "Remove"}
-																title={pending ? "Cancel" : "Remove"}
 																onClick={(e) => {
 																	e.stopPropagation();
-																	removeUserEvent(a.date, a.text);
+																	setExpandedIcs((s) => ({ ...s, [key]: !s[key] }));
 																}}
-																style={{
-																	background: "none",
-																	border: "none",
-																	color: pending ? "var(--ls-error-color, #ef4444)" : "var(--ls-ui-fg-muted)",
-																	fontSize: "0.9em",
-																	cursor: "pointer",
-																}}>
-																{pending ? "Cancel" : "×"}
+																style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left', flex: 1 }}>
+																<span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>{a.text}</span>
 															</button>
-														);
-													})()}
+														) : (
+															<span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 8 }}>{a.text}</span>
+														)}
+														{a.source === "user" &&
+															(() => {
+																const pending = !!pendingRemovals[key];
+																return (
+																	<button
+																		className="cursor"
+																		aria-label={pending ? "Cancel removal" : "Remove"}
+																		title={pending ? "Cancel" : "Remove"}
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			removeUserEvent(a.date, a.text);
+																		}}
+																		style={{
+																			background: "none",
+																			border: "none",
+																			color: pending ? "var(--ls-error-color, #ef4444)" : "var(--ls-ui-fg-muted)",
+																			fontSize: "0.9em",
+																			cursor: "pointer",
+																		}}>
+																		{pending ? "Cancel" : "×"}
+																	</button>
+																);
+															})()}
+													</div>
+													{expandedIcs[key] && a.source === 'ics' && (
+														<div style={{ marginTop: 6, padding: 8, background: 'rgba(0,0,0,0.03)', borderRadius: 6, color: 'var(--ls-ui-fg)'}}>
+															<div style={{ fontSize: '0.85em', fontWeight: 600, marginBottom: 4 }}>{a.text}</div>
+															{a.description ? <div style={{ whiteSpace: 'pre-wrap', fontSize: '0.85em' }}>{a.description}</div> : null}
+															{a.uid ? <div style={{ fontSize: '0.75em', marginTop: 6, color: 'var(--ls-ui-fg-muted)' }}>UID: {a.uid}</div> : null}
+														</div>
+													)}
+												</div>
 											</div>
 										);
 									})}

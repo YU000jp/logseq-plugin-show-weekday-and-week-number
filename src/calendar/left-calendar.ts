@@ -5,6 +5,7 @@ import { removeElementById } from "../lib"
 import React from 'react'
 import { createRoot, Root } from 'react-dom/client'
 import MonthlyCalendar from '../components/MonthlyCalendar'
+import { startIcsSync, stopIcsSync } from '../lib/ics'
 
 export const keyLeftCalendarContainer = "left-calendar-container"
 
@@ -107,6 +108,15 @@ const createCalendar = async (targetDate: Date, preferredDateFormat: string, inn
                 root.render(React.createElement(MonthlyCalendar, { targetDate, preferredDateFormat, flag, settingsUpdateKey: Date.now(), onTargetDateChange: (d: Date) => { currentCalendarDate = d; flagWeekly = flag?.weekly === true ? true : false } }))
             }
         try { (parent as any).__leftCalendarInitialized = true } catch (e) { /* ignore */ }
+        // start ICS sync if configured
+        try {
+            const raw = (logseq.settings && (logseq.settings as any).lcIcsUrls) || ""
+            const urls = String(raw || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+            const interval = (logseq.settings && (logseq.settings as any).lcIcsSyncInterval) || 60
+            if (urls.length > 0) startIcsSync(urls, Number(interval), (ev) => {
+                try { refreshMonthlyCalendar(currentCalendarDate, false, flagWeekly) } catch (e) { /* ignore */ }
+            })
+        } catch (e) { /* ignore */ }
     } catch (e) {
         console.error('Failed to render MonthlyCalendar React component', e)
     }
@@ -129,6 +139,9 @@ const removeCalendarAndNav = () => {
 
     // Remove the container that holds the calendar (created by loadLeftCalendar)
     removeElementById(keyLeftCalendarContainer)
+
+    // stop ICS sync if running
+    try { stopIcsSync() } catch (e) { /* ignore */ }
 
     // Unset parent-scoped flags so creation can happen again
     try {

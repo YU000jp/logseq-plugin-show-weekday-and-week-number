@@ -32,7 +32,7 @@ export const computeDayNumberStyle = (userInfo: UserColorInfo | undefined, dateD
 }
 
 // Determine alert item background (user alerts use user color; holiday alerts use holidaysBg)
-export const computeAlertBackground = (alertSource: 'user' | 'holiday' | undefined, dateIso: string, userColorMap: Record<string, UserColorInfo>, holidaysBg: string, choiceUserColor?: string) => {
+export const computeAlertBackground = (alertSource: 'user' | 'holiday' | 'ics' | undefined, dateIso: string, userColorMap: Record<string, UserColorInfo>, holidaysBg: string, choiceUserColor?: string) => {
   if (alertSource === 'user') {
     const u = userColorMap[dateIso]
     if (u && u.color) {
@@ -41,6 +41,10 @@ export const computeAlertBackground = (alertSource: 'user' | 'holiday' | undefin
     }
     const cssColor = resolveColorChoice(choiceUserColor)
     return toTranslucent(cssColor, 0.12)
+  }
+  if (alertSource === 'ics') {
+    const cssColor = resolveColorChoice(choiceUserColor)
+    return toTranslucent(cssColor, 0.08)
   }
   return holidaysBg
 }

@@ -46,6 +46,8 @@ export const SettingKeys = {
   booleanLcWeekNumber: "booleanLcWeekNumber",
   booleanLcHolidays: "booleanLcHolidays",
   lcHolidaysAlert: "lcHolidaysAlert",
+  lcIcsUrls: "lcIcsUrls",
+  lcIcsSyncInterval: "lcIcsSyncInterval",
   heading004: "heading004",
   booleanWeeklyJournal: "booleanWeeklyJournal",
   weeklyJournalTemplateName: "weeklyJournalTemplateName",
