@@ -1,3 +1,15 @@
+# [1.71.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.70.0...v1.71.0) (2025-12-28)
+
+
+### Bug Fixes
+
+* remove pnpm version from workflow to use packageManager field ([c37dcf7](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/c37dcf7a20de385ab112b69a41b43e2a7d372d59))
+
+
+### Features
+
+* **Add:** Add ICS calendar integration and sync to left calendar ([81af271](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/81af271d89c48569bcf5f2e6a18df9964e0ed210))
+
 # [1.70.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.69.1...v1.70.0) (2025-12-13)
 
 
