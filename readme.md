@@ -42,7 +42,8 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 - Display weekday and week numbers beside date titles
 - Example:
 
-   ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/f47b8948-5e7a-4e16-a5ae-6966672742b1)
+  > <img width="519" height="127" alt="image" src="https://github.com/user-attachments/assets/d448da22-7316-41ab-af35-675d5a839950" />
+
 
 ### Journal Boundaries Calendar 🗓️
 
@@ -53,11 +54,12 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
 1. **Two lines mini-Calendar**
 
-   > ![README用](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/114708ab-0389-4c46-b962-00cb25e2070a)
+   > <img width="426" height="113" alt="image" src="https://github.com/user-attachments/assets/fcf15e0b-c890-402a-91b4-af543640f047" />
+
 
  1. **Monthly Calendar** in left sidebar
 
-    > ![image](https://github.com/user-attachments/assets/6d0e4c0e-1960-4db4-b559-154300db164d)
+    > <img width="220" height="524" alt="image" src="https://github.com/user-attachments/assets/09366e6d-462d-4bee-ba89-0131bc389d6f" />
 
 ### Breadcrumb of Journal Links
 
