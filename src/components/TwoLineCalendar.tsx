@@ -7,6 +7,9 @@ import {
 	getHolidaysBundle,
 	getUserColorData,
 	getWeekendColor,
+	getIcsEventsForDate,
+	IcsEvent,
+	loadIcsOnce,
 	getWeeklyNumberFromDate,
 	getWeeklyNumberString,
 	getWeekStartOn,
@@ -31,6 +34,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 	const [preferredDateFormat, setPreferredDateFormat] = useState<string>("yyyy/MM/dd");
 	const [pageExistsMap, setPageExistsMap] = useState<Record<string, boolean>>({});
 	const [holidayMap, setHolidayMap] = useState<Record<string, string>>({});
+	const [icsMap, setIcsMap] = useState<Record<string, IcsEvent[]>>({});
 
 	// tooltip state
 	const [hoverPage, setHoverPage] = useState<string | undefined>(undefined);
@@ -97,6 +101,22 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 			setPreferredDateFormat(fmt);
 			const pMap: Record<string, boolean> = {};
 			const hMap: Record<string, string> = {};
+			const iMap: Record<string, IcsEvent[]> = {};
+
+			// Load ICS once (cached) and map events for displayed dates
+			try {
+				const raw = ((logseq.settings as any)?.lcIcsUrls as string) || "";
+				const urls = String(raw || "")
+					.split(/\r?\n/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+				if (urls.length > 0) {
+					await loadIcsOnce(urls);
+				}
+			} catch {
+				// ignore
+			}
+
 			for (const offset of offsets) {
 				const d = offset === 0 ? startDate : addDays(startDate, offset);
 				const pageName = format(d, fmt);
@@ -112,9 +132,16 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 						hMap[pageName] = "";
 					}
 				}
+				try {
+					const key = format(d, "yyyy-LL-dd");
+					iMap[key] = getIcsEventsForDate(d);
+				} catch {
+					// ignore
+				}
 			}
 			setPageExistsMap(pMap);
 			setHolidayMap(hMap);
+			setIcsMap(iMap);
 		};
 		run();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -210,6 +237,8 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 							const key = d.toISOString();
 							const pageName = format(d, preferredDateFormat);
 							const holiday = pageName ? holidayMap[pageName] || "" : "";
+							const icsKeyForCell = format(d, "yyyy-LL-dd");
+							const icsEventsForCell = icsMap[icsKeyForCell] || [];
 							const isOtherMonth = d.getMonth() !== startDate.getMonth();
 							const checkIsToday = isToday(d);
 							const cellStyle: React.CSSProperties = {
@@ -232,7 +261,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								(logseq.settings as any).booleanBoundariesHolidays === true,
 								(logseq.settings as any).choiceHolidaysColor as string | undefined,
 								(logseq.settings as any).choiceUserColor as string | undefined,
-								false
+								icsEventsForCell.length > 0
 							);
 							if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor;
 							if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any;
@@ -250,6 +279,13 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									...holiday
 										.split("\n")
 										.map((s) => s.trim())
+										.filter(Boolean)
+								);
+							if (icsEventsForCell.length > 0)
+								titleParts.push(
+									...icsEventsForCell
+										.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+										.map((s) => String(s || "").trim())
 										.filter(Boolean)
 								);
 							if (pageName) titleParts.push(pageName);
@@ -270,7 +306,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									onMouseEnter={(e) => {
 										const rect = (e.target as HTMLElement).getBoundingClientRect()
 										setTooltipPos({ left: rect.right + 8, top: rect.top })
-										if ((u && u.eventName) || holiday) {
+														if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
 											const extraLines: string[] = []
 											if (u && u.eventName) {
 												extraLines.push(
@@ -288,6 +324,14 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 														.filter(Boolean)
 												)
 											}
+															if (icsEventsForCell.length > 0) {
+																extraLines.push(
+																	...icsEventsForCell
+																		.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+																		.map((s) => String(s || "").trim())
+																		.filter(Boolean)
+																)
+															}
 											const marker = "__HOL__::";
 											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
 											setHoverPage(payload)
@@ -457,6 +501,8 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 							const key = d.toISOString();
 							const pageName = format(d, preferredDateFormat);
 							const holiday = pageName ? holidayMap[pageName] || "" : "";
+							const icsKeyForCell = format(d, "yyyy-LL-dd");
+							const icsEventsForCell = icsMap[icsKeyForCell] || [];
 							const isOtherMonth = d.getMonth() !== startDate.getMonth();
 							const checkIsToday = isToday(d);
 							const cellStyle: React.CSSProperties = {
@@ -479,7 +525,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								(logseq.settings as any).booleanBoundariesHolidays === true,
 								(logseq.settings as any).choiceHolidaysColor as string | undefined,
 								(logseq.settings as any).choiceUserColor as string | undefined,
-								false
+								icsEventsForCell.length > 0
 							);
 							if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor;
 							if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any;
@@ -496,6 +542,13 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									...holiday
 										.split("\n")
 										.map((s) => s.trim())
+										.filter(Boolean)
+								);
+							if (icsEventsForCell.length > 0)
+								titleParts.push(
+									...icsEventsForCell
+										.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+										.map((s) => String(s || "").trim())
 										.filter(Boolean)
 								);
 							if (pageName) titleParts.push(pageName);
@@ -521,7 +574,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									onMouseEnter={(e) => {
 										const rect = (e.target as HTMLElement).getBoundingClientRect()
 										setTooltipPos({ left: rect.right + 8, top: rect.top })
-										if (u && u.eventName || holiday) {
+														if (u && u.eventName || holiday || icsEventsForCell.length > 0) {
 											const extraLines: string[] = []
 											if (u && u.eventName) {
 												extraLines.push(
@@ -539,6 +592,14 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 														.filter(Boolean)
 												)
 											}
+															if (icsEventsForCell.length > 0) {
+																extraLines.push(
+																	...icsEventsForCell
+																		.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+																		.map((s) => String(s || "").trim())
+																		.filter(Boolean)
+																)
+															}
 											const marker = "__HOL__::";
 											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
 											setHoverPage(payload)

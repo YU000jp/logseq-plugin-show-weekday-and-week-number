@@ -50,23 +50,7 @@ export const leftCalendarSettings = (
       enumChoices: ["none", "Today only", "Monthly"],
       default: "Today only",
       description: "",
-    }
-    ,
-    {
-      key: SettingKeys.lcIcsUrls,
-      title: t("ICS calendar URLs (one per line)"),
-      type: "string",
-      inputAs: "textarea",
-      default: "",
-      description: t("Provide one or more HTTP(S) ICS/calendar URLs, separated by newlines."),
     },
-    {
-      key: SettingKeys.lcIcsSyncInterval,
-      title: t("ICS sync interval (minutes)"),
-      type: "number",
-      default: 60,
-      description: t("How often to refresh ICS feeds (in minutes)."),
-    }
   )
 
   return settings
