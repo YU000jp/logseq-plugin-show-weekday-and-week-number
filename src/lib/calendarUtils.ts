@@ -4,7 +4,14 @@ import type { CSSProperties } from 'react'
 export type UserColorInfo = { color?: string; fontWeight?: string; eventName?: string }
 
 // Compute cell background and class based on user event and holiday priority
-export const computeCellBackground = (userInfo: UserColorInfo | undefined, holidayText: string | undefined, isHolidayEnabled: boolean, choiceHolidaysColor?: string, choiceUserColor?: string) => {
+export const computeCellBackground = (
+  userInfo: UserColorInfo | undefined,
+  holidayText: string | undefined,
+  isHolidayEnabled: boolean,
+  choiceHolidaysColor?: string,
+  choiceUserColor?: string,
+  hasIcs?: boolean
+) => {
   if (userInfo && userInfo.color) {
     const cssColor = resolveColorChoice(userInfo.color)
     return { backgroundColor: toTranslucent(cssColor, 0.12), fontWeight: userInfo.fontWeight, className: 'lc-user-event' }
@@ -12,6 +19,11 @@ export const computeCellBackground = (userInfo: UserColorInfo | undefined, holid
   if (holidayText && isHolidayEnabled) {
     const cssColor = resolveColorChoice(choiceHolidaysColor)
     return { backgroundColor: toTranslucent(cssColor, 0.12), fontWeight: '700', className: 'lc-holiday' }
+  }
+  // if ICS events exist for this cell, use the user's configured choice color
+  if (hasIcs) {
+    const cssColor = resolveColorChoice(choiceUserColor)
+    return { backgroundColor: toTranslucent(cssColor, 0.12), fontWeight: undefined, className: 'lc-ics-event' }
   }
   return { backgroundColor: undefined, fontWeight: undefined, className: '' }
 }

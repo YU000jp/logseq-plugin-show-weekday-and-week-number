@@ -531,6 +531,8 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 								const key = date.toISOString();
 								const pageName = format(date, preferredDateFormat);
 								const holiday = pageName ? holidayMap[pageName] || "" : "";
+								const icsKeyForCell = format(date, "yyyy-LL-dd")
+								const icsEventsForCell = icsMap[icsKeyForCell] || []
 								const exists = pageName ? pageExistsMap[pageName] : false;
 								const u = userColorMap[key];
 								const isOtherMonth = date.getMonth() !== month - 1;
@@ -549,12 +551,14 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 								if (flag?.weekly === true && (ISO ? isSameISOWeek(date, initialTargetDate) : isSameWeek(date, initialTargetDate, { weekStartsOn })))
 									style.borderBottom = `3px solid ${logseq.settings!.boundariesHighlightColorSinglePage}`;
 								// determine cell background and class via shared utility
+								const hasIcs = icsEventsForCell.length > 0
 								const bgInfo = computeCellBackground(
 									u as UserColorInfo | undefined,
 									holiday,
 									logseq.settings!.booleanLcHolidays === true,
 									logseq.settings!.choiceHolidaysColor as string | undefined,
-									logseq.settings!.choiceUserColor as string | undefined
+									logseq.settings!.choiceUserColor as string | undefined,
+									hasIcs
 								);
 								let holidayClass = bgInfo.className || "";
 								if (bgInfo.backgroundColor) style.backgroundColor = bgInfo.backgroundColor;
@@ -586,6 +590,14 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 											.map((s) => s.trim())
 											.filter(Boolean)
 									);
+								if (icsEventsForCell.length > 0) {
+									titleParts.push(
+										...icsEventsForCell
+											.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+											.map((s) => String(s || "").trim())
+											.filter(Boolean)
+									)
+								}
 								if (pageName) titleParts.push(pageName);
 								const combinedTitle = titleParts.length > 0 ? titleParts.join("\n") : undefined;
 
@@ -599,14 +611,35 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 											onMouseEnter={(e) => {
 												const rect = (e.target as HTMLElement).getBoundingClientRect()
 												setTooltipPos({ left: rect.right + 8, top: rect.top })
-												if (holiday) {
-													const text = holiday
-														.split("\n")
-														.map((s) => s.trim())
-														.filter(Boolean)
-														.join("\n");
+												// If user/holiday/ICS exists, show them as a header in the tooltip (reuse existing marker parsing)
+												if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
+													const extraLines: string[] = []
+													if (u && u.eventName) {
+														extraLines.push(
+															...u.eventName
+																.split("\n")
+																.map((s) => s.trim())
+																.filter(Boolean)
+														)
+													}
+													if (holiday) {
+														extraLines.push(
+															...holiday
+																.split("\n")
+																.map((s) => s.trim())
+																.filter(Boolean)
+														)
+													}
+													if (icsEventsForCell.length > 0) {
+														extraLines.push(
+															...icsEventsForCell
+																.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+																.map((s) => String(s || "").trim())
+																.filter(Boolean)
+														)
+													}
 													const marker = "__HOL__::";
-													const payload = marker + encodeURIComponent(text || "") + "|||" + (pageName || "");
+													const payload = marker + encodeURIComponent(extraLines.join("\n")) + "|||" + (pageName || "");
 													setHoverPage(payload)
 													return
 												}

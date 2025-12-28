@@ -1,9 +1,10 @@
 import { addDays, format, isToday, startOfISOWeek, startOfWeek } from "date-fns"
 import { t } from "logseq-l10n"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getConfigPreferredDateFormat } from ".."
+import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from ".."
 import { separate } from "../journals/nav"
 import {
+	getHolidaysBundle,
 	getUserColorData,
 	getWeekendColor,
 	getWeeklyNumberFromDate,
@@ -86,6 +87,13 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 	useEffect(() => {
 		const run = async () => {
 			const fmt = await getConfigPreferredDateFormat();
+			// Ensure holiday bundle exists before computing holidays (first render can happen before bundle init elsewhere)
+			try {
+				const lang = await getConfigPreferredLanguage();
+				await getHolidaysBundle(lang, { already: true });
+			} catch {
+				// ignore
+			}
 			setPreferredDateFormat(fmt);
 			const pMap: Record<string, boolean> = {};
 			const hMap: Record<string, string> = {};
@@ -223,7 +231,8 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								holiday,
 								(logseq.settings as any).booleanBoundariesHolidays === true,
 								(logseq.settings as any).choiceHolidaysColor as string | undefined,
-								(logseq.settings as any).choiceUserColor as string | undefined
+								(logseq.settings as any).choiceUserColor as string | undefined,
+								false
 							);
 							if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor;
 							if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any;
@@ -261,14 +270,26 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									onMouseEnter={(e) => {
 										const rect = (e.target as HTMLElement).getBoundingClientRect()
 										setTooltipPos({ left: rect.right + 8, top: rect.top })
-										if (holiday) {
-											const text = holiday
-												.split("\n")
-												.map((s) => s.trim())
-												.filter(Boolean)
-												.join("\n");
+										if ((u && u.eventName) || holiday) {
+											const extraLines: string[] = []
+											if (u && u.eventName) {
+												extraLines.push(
+													...u.eventName
+														.split("\n")
+														.map((s) => s.trim())
+														.filter(Boolean)
+												)
+											}
+											if (holiday) {
+												extraLines.push(
+													...holiday
+														.split("\n")
+														.map((s) => s.trim())
+														.filter(Boolean)
+												)
+											}
 											const marker = "__HOL__::";
-											const payload = marker + encodeURIComponent(text || "") + "|||" + (pageName || "");
+											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
 											setHoverPage(payload)
 											return
 										}
@@ -457,7 +478,8 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								holiday,
 								(logseq.settings as any).booleanBoundariesHolidays === true,
 								(logseq.settings as any).choiceHolidaysColor as string | undefined,
-								(logseq.settings as any).choiceUserColor as string | undefined
+								(logseq.settings as any).choiceUserColor as string | undefined,
+								false
 							);
 							if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor;
 							if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any;
@@ -499,14 +521,26 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									onMouseEnter={(e) => {
 										const rect = (e.target as HTMLElement).getBoundingClientRect()
 										setTooltipPos({ left: rect.right + 8, top: rect.top })
-										if (holiday) {
-											const text = holiday
-												.split("\n")
-												.map((s) => s.trim())
-												.filter(Boolean)
-												.join("\n");
+										if (u && u.eventName || holiday) {
+											const extraLines: string[] = []
+											if (u && u.eventName) {
+												extraLines.push(
+													...u.eventName
+														.split("\n")
+														.map((s) => s.trim())
+														.filter(Boolean)
+												)
+											}
+											if (holiday) {
+												extraLines.push(
+													...holiday
+														.split("\n")
+														.map((s) => s.trim())
+														.filter(Boolean)
+												)
+											}
 											const marker = "__HOL__::";
-											const payload = marker + encodeURIComponent(text || "") + "|||" + (pageName || "");
+											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
 											setHoverPage(payload)
 											return
 										}
