@@ -1,129 +1,129 @@
-# AI生成向けドキュメントガイド — Show weekday and week-number 🧭
+# AI Generation Documentation Guide — Show weekday and week-number 🧭
 
-## 概要 ✅
-このドキュメントは、AI（チャットボットやコード生成ツール）を用いて本プラグインのドキュメント、翻訳、テスト、リファクタ提案、コードサマリなどを自動生成・補助するための仕様とテンプレートをまとめたものです。
-
----
-
-## 目次
-1. 目的と想定ユースケース
-2. 開発・ビルド情報（コマンド）
-3. アーキテクチャと主要ファイル一覧
-4. 設定（SettingKeys）と設定テンプレートの構成
-5. 翻訳（l10n）サポート一覧
-6. 公開API・エクスポート関数一覧（概要）
-7. 推奨AIプロンプト（生成テンプレート）
-8. 生成例（README・CHANGELOG・翻訳・テスト）
-9. 注意点・ベストプラクティス
+## Overview ✅
+This document outlines the specifications and templates for using AI (chatbots or code generation tools) to automatically generate or assist with documentation, translations, tests, refactoring suggestions, code summaries, and more for this plugin.
 
 ---
 
-## 1) 目的と想定ユースケース 💡
-- README やドキュメントの自動生成・改善
-- 多言語翻訳の補完（i18n の未翻訳キーを自動案出）
-- 公開APIの説明文や型注釈の生成
-- ユニットテスト・統合テストのスケッチ生成
-- リファクタリング候補の検出とコード修正提案
+## Table of Contents
+1. Purpose and Use Cases
+2. Development and Build Information (Commands)
+3. Architecture and Key Files
+4. Settings (SettingKeys) and Configuration Templates
+5. Translation (l10n) Support
+6. Public APIs and Exported Functions (Overview)
+7. Recommended AI Prompts (Templates)
+8. Examples (README, CHANGELOG, Translations, Tests)
+9. Notes and Best Practices
 
 ---
 
-## 2) 開発・ビルド情報 🔧
-- エントリ（Logseq manifest）: `package.json` の `logseq.main` → `./dist/index.html`
-- 開発サーバ:
-  - `pnpm dev` (内部: `vite`)
-- ビルド:
-  - `pnpm build` (開発モード) / `pnpm prod` (プロダクション)
-- 依存: `@logseq/libs`, `react`, `date-fns`, `date-holidays`, `logseq-l10n` など
+## 1) Purpose and Use Cases 💡
+- Automatically generate or improve README and documentation
+- Assist with multilingual translation (i18n) for untranslated keys
+- Generate descriptions and type annotations for public APIs
+- Sketch unit tests and integration tests
+- Detect refactoring opportunities and suggest code fixes
 
 ---
 
-## 3) アーキテクチャと主要ファイル一覧 🗂️
-- ルート
+## 2) Development and Build Information 🔧
+- Entry Point (Logseq manifest): `logseq.main` in `package.json` → `./dist/index.html`
+- Development Server:
+  - `pnpm dev` (internally uses `vite`)
+- Build:
+  - `pnpm build` (development mode) / `pnpm prod` (production mode)
+- Dependencies: `@logseq/libs`, `react`, `date-fns`, `date-holidays`, `logseq-l10n`, etc.
+
+---
+
+## 3) Architecture and Key Files 🗂️
+- Root
   - `index.html`, `package.json`, `vite.config.ts`, `tsconfig.json`
 - src/
-  - `index.ts` — プラグインのエントリ。`logseq.ready(main)` を実行し、設定の初期化、L10N読み込み、イベントハンドラ登録、CSS注入等を行う。
-  - `dailyJournalDetails.ts` — 日次ジャーナルタイトル横の表示ロジック（曜日・週番号・相対時間等）と DOM オブザーバ。
-  - `fetchJournalTitles.ts` — ページヘッダー上のジャーナルタイトルを走査して処理するユーティリティ。
-  - `lib/` — 汎用ユーティリティ。週番号計算、日付ローカライズ、DOMユーティリティ、ICS同期等。
-  - `calendar/` — Journal Boundaries と Left Calendar の実装（React コンポーネントを利用）。
-  - `components/` — React コンポーネント（`TwoLineCalendar`, `MonthlyCalendar`, `JournalPreview` 等）。
-  - `components/DayCell.tsx` — **新規**: 日セルの共通 UI（クリック、hover、スタイル、アクセシビリティ）。
-  - `hooks/useCalendarData.ts` — **新規**: ページ存在・祝日・ユーザ色をまとめて取得するフック（非同期）。
-  - `hooks/useIcsEvents.ts` — **新規**: ICS イベントを範囲内で読込・日付マップを返すフック。
-  - `hooks/useWeeklyPages.ts` — **新規**: 週ページ存在チェックを提供するフック（週番号 → ページ名の存在確認）。
-  - `journals/` — Weekly/Monthly/Quarterly/Yearly ジャーナルの生成・ナビゲーション。
-  - `settings/` — `SettingKeys`, 各セクションの設定テンプレート `settingsTemplate`。
-  - `translations/` — 言語 JSON、`l10nSetup.ts` による読み込み。
-  - `shortcutItems.ts` — Slash コマンド登録（週番号挿入など）。
+  - `index.ts` — Plugin entry point. Executes `logseq.ready(main)` to initialize settings, load L10N, register event handlers, inject CSS, etc.
+  - `dailyJournalDetails.ts` — Logic for displaying weekday, week number, relative time, etc., next to daily journal titles, along with a DOM observer.
+  - `fetchJournalTitles.ts` — Utility for scanning and processing journal titles in page headers.
+  - `lib/` — General utilities: week number calculations, date localization, DOM utilities, ICS synchronization, etc.
+  - `calendar/` — Implementation of Journal Boundaries and Left Calendar (using React components).
+  - `components/` — React components (`TwoLineCalendar`, `MonthlyCalendar`, `JournalPreview`, etc.).
+  - `components/DayCell.tsx` — **New**: Common UI for day cells (click, hover, styles, accessibility).
+  - `hooks/useCalendarData.ts` — **New**: Hook to fetch page existence, holidays, and user colors collectively (async).
+  - `hooks/useIcsEvents.ts` — **New**: Hook to load ICS events within a range and return a date map.
+  - `hooks/useWeeklyPages.ts` — **New**: Hook to check weekly page existence (week number → page name existence).
+  - `journals/` — Weekly/Monthly/Quarterly/Yearly journal generation and navigation.
+  - `settings/` — `SettingKeys`, configuration templates for each section (`settingsTemplate`).
+  - `translations/` — Language JSON files, loaded via `l10nSetup.ts`.
+  - `shortcutItems.ts` — Slash command registration (e.g., insert week number).
 
 ---
 
-## 4) 設定（SettingKeys）と設定テンプレート ⚙️
-- 全設定キーは `src/settings/SettingKeys.ts` に列挙されています（例: `booleanWeekNumber`, `weekNumberFormat`, `holidaysCountry`, ...）。
-- 各設定セクションは `src/settings/*Settings.ts`（`commonSettings`, `dailyJournalSettings`, `leftCalendarSettings`, `weeklyJournalSettings`, ...）で構成され、`settingsTemplate` で合成されます。
+## 4) Settings (SettingKeys) and Configuration Templates ⚙️
+- All setting keys are listed in `src/settings/SettingKeys.ts` (e.g., `booleanWeekNumber`, `weekNumberFormat`, `holidaysCountry`, ...).
+- Each settings section is structured in `src/settings/*Settings.ts` (`commonSettings`, `dailyJournalSettings`, `leftCalendarSettings`, `weeklyJournalSettings`, ...), and combined using `settingsTemplate`.
 
-**注意**: AI による説明生成では、各キーの型（boolean/string/選択肢）と既定値や説明文（`translations/*.json`）を参照してまとめると精度が上がります。
-
----
-
-## 5) 翻訳（l10n）サポート 🌐
-- サポート言語（`src/translations/` にある JSON をベース）:
-  - `ja`, `en` 相当はデフォルト（英語原文は README 等に存在）
-  - 他: `af`, `de`, `es`, `fr`, `id`, `it`, `ko`, `nb-NO`, `nl`, `pl`, `pt-BR`, `pt-PT`, `ru`, `sk`, `tr`, `uk`, `zh-CN`, `zh-Hant`
-- `src/translations/l10nSetup.ts` は Logseq のユーザー設定言語に基づいて該当ファイルのみを読み込みます。
-- AI による翻訳生成を行う際は、同一キーの既存訳を参照しつつ文体の一貫性（敬体/常体）を保つよう指示してください。
+**Note**: When generating explanations with AI, refer to the type (boolean/string/choice) of each key, along with default values and descriptions (from `translations/*.json`) to improve accuracy.
 
 ---
 
-## 6) 公開API・エクスポート関数（抜粋）📦
-（AI がドキュメントや説明コメントを生成する時に重要）
-- 基本設定取得:
+## 5) Translation (l10n) Support 🌐
+- Supported languages (based on JSON files in `src/translations/`):
+  - `ja`, `en` are defaults (English source text exists in README, etc.)
+  - Others: `af`, `de`, `es`, `fr`, `id`, `it`, `ko`, `nb-NO`, `nl`, `pl`, `pt-BR`, `pt-PT`, `ru`, `sk`, `tr`, `uk`, `zh-CN`, `zh-Hant`
+- `src/translations/l10nSetup.ts` loads only the relevant file based on the user’s Logseq language setting.
+- When generating translations with AI, ensure consistency in tone (formal/informal) by referencing existing translations.
+
+---
+
+## 6) Public APIs and Exported Functions (Excerpt) 📦
+(Important for AI-generated documentation or comments)
+- Basic Settings Retrieval:
   - `getConfigPreferredLanguage(): Promise<string>`
   - `getConfigPreferredDateFormat(): Promise<string>`
   - `getUserConfig(notFirst?: boolean)`
-- DOM / UI ヘルパ:
-  - `showConfirmDialog(title, text, opts?)`: カスタムダイアログ
+- DOM / UI Helpers:
+  - `showConfirmDialog(title, text, opts?)`: Custom dialog
   - `createSettingButton()` / `createLinkMonthlyLink()`
   - `createElementWithClass(tag, ...classes)` / `addEventListenerOnce()`
-- 日付 / 週番号処理:
+- Date / Week Number Processing:
   - `getWeeklyNumberFromDate(date, weekStartsOn)`
   - `getWeeklyNumberString(year, weekString, quarter)`
   - `getWeekStartOn()`
-  - `enableWeekNumber(journalDate, weekStartsOn)` (日次表示用)
+  - `enableWeekNumber(journalDate, weekStartsOn)` (for daily display)
   - `enableRelativeTime(journalDate)`
-- カレンダー／ホリデー:
+- Calendar / Holidays:
   - `getHolidaysBundle(userLanguage)` (`src/lib/holidays.ts`)
   - `exportHolidaysBundle()`
-- ジャーナル操作:
-  - `openPageFromPageName(pageName, shiftKey)` — 存在しない場合は確認ダイアログ→作成（DBグラフでの制約に注意）
-- その他: `removeBoundaries`, `weeklyEmbed` (style 提供) 等
+- Journal Operations:
+  - `openPageFromPageName(pageName, shiftKey)` — Prompts confirmation → creates page if it doesn’t exist (note DB graph constraints).
+- Others: `removeBoundaries`, `weeklyEmbed` (provides styles), etc.
 
 ---
 
-## 7) 推奨AIプロンプト（テンプレート）🤖
-以下のテンプレートを使ってAIにタスクを投げると効率的にドキュメントやコードを生成できます。
+## 7) Recommended AI Prompts (Templates) 🤖
+Use the following templates to efficiently generate documentation or code with AI.
 
-### A. README を更新する
+### A. Update README
 ```
 You are an expert technical writer. Based on the following file list and brief descriptions, generate an expanded README section for "Journal Boundaries" including usage steps, examples, and a short FAQ. Files: [list files]. Requirements: keep concise headings, include code snippets for settings, and Japanese translation suggestions.
 ```
 
-### B. 翻訳ファイルを生成
+### B. Generate Translation Files
 ```
 Generate a Japanese translation for the following English keys, keeping tone consistent with existing `ja.json`. Provide only the JSON object of key-value pairs. Existing ja.json includes phrasing samples: [...].
 ```
 
-### C. テストケースを提案
+### C. Suggest Test Cases
 ```
 Write unit test stubs (jest) for function `getWeeklyNumberFromDate` covering ISO vs US formats, invalid date inputs, and edge cases around year boundaries. Include test names and mock data.
 ```
 
-### D. コードドキュメント生成
+### D. Generate Code Documentation
 ```
 Generate TypeDoc-style comments for `src/lib/lib.ts` focusing on `getWeeklyNumberFromDate`, `getWeeklyNumberString`, and `getWeekStartOn`. Keep comments short and include param/return descriptions.
 ```
 
-### E. リファクタのドキュメント生成
+### E. Generate Refactoring Documentation
 ```
 You refactored calendar rendering by extracting common UI and data logic. Generate a short release note and a developer-facing summary (2-3 bullets) describing:
 - New files added: `components/DayCell.tsx`, `hooks/useCalendarData.ts`, `hooks/useIcsEvents.ts`, `hooks/useWeeklyPages.ts`.
@@ -134,17 +134,17 @@ Return only the Markdown content for insertion into `CHANGELOG.md` and `docs/AI_
 
 ---
 
-## 8) 生成例（短いテンプレ）✍️
-- README の節の例（英語/日本語）
-- ja.json の未翻訳キーに対する訳語候補
-- `jest` のテストスケッチ
-- `CHANGELOG` の自動生成用テンプレート（リリースノート）
+## 8) Examples (Short Templates) ✍️
+- Example README sections (English/Japanese)
+- Translation suggestions for untranslated keys in ja.json
+- Jest test sketches
+- CHANGELOG auto-generation templates (release notes)
 
 ---
 
-## 9) 注意点・ベストプラクティス ⚠️
-- Logseq の DB グラフとファイルベースグラフで挙動が異なる点（スラッシュを含むページ名の作成可否など）を必ずAI生成物に含める。
-- `logseq.settings` はランタイムでのみ存在するため、テストではモックすること。
-- i18n の文脈（UI 文言は短く、説明文は丁寧に）を保つようにプロンプトを工夫する。
+## 9) Notes and Best Practices ⚠️
+- Always include differences in behavior between Logseq’s DB graph and file-based graph (e.g., page names with slashes may or may not be creatable).
+- `logseq.settings` only exists at runtime, so mock it during tests.
+- When generating i18n content, ensure UI text is concise and descriptions are formal. Adjust prompts accordingly.
 
 ---
