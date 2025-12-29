@@ -76,12 +76,13 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
 - **Script Contributors**:  
   - [danilofaria](https://discuss.logseq.com/u/danilofaria/)  
-  - [ottodevs](https://discuss.logseq.com/u/ottodevs/)  
+  - [ottodevs](https://discuss.logseq.com/u/ottodevs/) 
+  > [Show week day and week number - discuss.logseq.com](https://discuss.logseq.com/t/show-week-day-and-week-number/12685/18) 
 - **Libraries Used**:  
   - [date-fns](https://date-fns.org/)  
   - [date-holidays](https://github.com/commenthol/date-holidays)  
   - [@6tail/lunar-typescript](https://github.com/6tail/lunar-typescript)  
-  - [@sethyuan/logseq-l10n](https://github.com/sethyuan/logseq-l10n)  
+  - @sethyuan/logseq-l10n 
 - **Icons**: [IonutNeagu - svgrepo.com](https://www.svgrepo.com/svg/490868/monday)  
 - **Author**: [YU000jp](https://github.com/YU000jp)  
 

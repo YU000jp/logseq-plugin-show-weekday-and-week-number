@@ -77,14 +77,15 @@ Logseqのジャーナルをもっとスマートにするプラグインです�
 
 ## 🛠️ 貢献とクレジット
 
-- **スクリプト提供者**:  
+- **スクリプト提供者**:
   - [danilofaria](https://discuss.logseq.com/u/danilofaria/)  
-  - [ottodevs](https://discuss.logseq.com/u/ottodevs/)  
+  - [ottodevs](https://discuss.logseq.com/u/ottodevs/)
+  > [曜日と週番号を表示 - discuss.logseq.com](https://discuss.logseq.com/t/show-week-day-and-week-number/12685/18)
 - **使用ライブラリ**:  
   - [date-fns](https://date-fns.org/)  
   - [date-holidays](https://github.com/commenthol/date-holidays)  
   - [@6tail/lunar-typescript](https://github.com/6tail/lunar-typescript)  
-  - [@sethyuan/logseq-l10n](https://github.com/sethyuan/logseq-l10n)  
+  - @sethyuan/logseq-l10n
 - **アイコン**: [IonutNeagu - svgrepo.com](https://www.svgrepo.com/svg/490868/monday)  
 - **製作者**: [YU000jp](https://github.com/YU000jp)  
 
