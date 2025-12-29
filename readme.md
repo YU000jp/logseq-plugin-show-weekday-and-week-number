@@ -18,7 +18,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 - Multi-language support.
 - Holiday highlighting.  
   > Powered by the [date-holidays](https://github.com/commenthol/date-holidays) library, supporting various countries worldwide.
-- External ICS (`*.ics`) integration.  
+- External ICS (`*.ics`) integration. 🆕
   > Import schedules from Google Calendar and others. Note: Google Calendar's TODO list does not provide ICS files.
 
 ### Daily Journal Enhancements

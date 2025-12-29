@@ -19,7 +19,7 @@ Logseqのジャーナルをもっとスマートにするプラグインです�
    - 多言語表記に対応
    - 祝日表記に対応
      > [date-holidays](https://github.com/commenthol/date-holidays)ライブラリを活用し、世界各国に対応しています。
-   - 外部ICS(`*.ics`)連携
+   - 外部ICS(`*.ics`)連携 🆕
       > Googleカレンダーなどから、予定を取り込むことが可能。ただし現時点で、GoogleカレンダーのTODOリストはICSを提供していない。
 
 ### デイリージャーナルの強化
