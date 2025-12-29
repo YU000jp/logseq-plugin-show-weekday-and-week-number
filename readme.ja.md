@@ -2,110 +2,90 @@
 
 Logseqのジャーナルをもっとスマートにするプラグインです。日付に曜日や週番号を追加して、カレンダー機能まで提供します。
 
-> [!NOTE] 
-> - Logseq v0.10.x (ファイルシステムモデル) で動作します
-> - Logseq DBモデルでは、2行カレンダーおよび月間カレンダーのみ対応しています。そのほかは非対応です。なお、Logseq APIの都合で「yyyy/MM/dd」のような日付フォーマットだと、ライブラリ化されてしまうのでそのフォーマットは使用できません [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
-
+> [!NOTE]   
+- Logseq v0.10.x (ファイルシステムモデル) で動作します。  
+- Logseq DBモデルでは、2行カレンダーおよび月間カレンダーのみ対応しています。[#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+   > 「yyyy/MM/dd」のような日付フォーマットは、Logseq APIの制約によりサポートされていません。
 
 <div align="right">
 
-[English](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/)/[日本語](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/blob/main/readme.ja.md) [![latest release version](https://img.shields.io/github/v/release/YU000jp/logseq-plugin-show-weekday-and-week-number)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/releases)[![License](https://img.shields.io/github/license/YU000jp/logseq-plugin-show-weekday-and-week-number?color=blue)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/YU000jp/logseq-plugin-show-weekday-and-week-number/total.svg)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/releases) 公開日 20230526
+[English](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/)/[日本語](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/blob/main/readme.ja.md)  
+[![最新リリース](https://img.shields.io/github/v/release/YU000jp/logseq-plugin-show-weekday-and-week-number)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/releases)  
+[![ライセンス](https://img.shields.io/github/license/YU000jp/logseq-plugin-show-weekday-and-week-number?color=blue)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/LICENSE)  
+[![ダウンロード数](https://img.shields.io/github/downloads/YU000jp/logseq-plugin-show-weekday-and-week-number/total.svg)](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/releases)  
+
 </div>
-
-## 🎯 プラグインでできること
-
-### 1️⃣ デイリージャーナルが見やすくなります
-- 日付の横に曜日と週番号などが表示されます。表示内容はカスタマイズできます。
-
-### 2️⃣ 使いやすいカレンダー機能
-- **コンパクトな2行カレンダー**
-   - ↑↓ボタンで週の切り替えができます
-   - クリックで月や週のジャーナルにジャンプ
-- **月間カレンダー** (左サイドバー) 🆕
-   - 祝日がハイライト表示されます
-   - ページがある日付が一目で分かります
-
-### 📖 ジャーナル機能の拡張
-- **週次/月次/四半期/年次ジャーナル**の自動生成とテンプレート適用
-- **ナビゲーションリンク**で他のジャーナルページに簡単アクセス 🆕
-
-### 🛠️ カスタマイズ可能な表示オプション
-- 曜日や週番号の表示内容を自由に設定可能
-- スラッシュコマンドで週番号などを簡単に挿入
-   > 詳細は[こちら](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Slash-Command)
 
 ---
 
-### 📌 詳細な機能説明
+## 🎯 主な機能
 
-#### デイリージャーナルの補完
-- 日付タイトルの横に曜日や週番号を表示
-- 表示例:
-   ![画像](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/f47b8948-5e7a-4e16-a5ae-6966672742b1)
+### デイリージャーナルの強化
+- 日付の横に曜日と週番号を表示します。  
+  表示例:  
+  ![デイリージャーナル例](https://github.com/user-attachments/assets/d448da22-7316-41ab-af35-675d5a839950)
 
-#### ジャーナル用カレンダー
-- 日誌や日付ページを開いているときに表示
-- 前後の日付に簡単アクセス (Shift+クリックでサイドバー表示)
-- 祝日対応のカレンダーとページ存在インジケーター付き
-   - **2行ミニカレンダー**:
+### カレンダー機能
+- **2行ミニカレンダー**: コンパクトなカレンダーで、簡単に週の移動やジャーナルへのアクセスが可能です。  
+  表示例:  
+  ![ミニカレンダー例](https://github.com/user-attachments/assets/fcf15e0b-c890-402a-91b4-af543640f047)
+- **月間カレンダー (左サイドバー)**: 祝日やジャーナルがある日付をハイライト表示します。  
+  表示例:  
+  ![月間カレンダー例](https://github.com/user-attachments/assets/09366e6d-462d-4bee-ba89-0131bc389d6f)
+- **ジャーナル境界機能**: 前後の日付のジャーナルに簡単に移動できます。また、中国の旧暦の日付も表示可能です。
 
-      ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/bf085523-89e7-4c2a-a7ef-9a260975bde8)
-   - **月間カレンダー (左サイドバー)**:
+### ジャーナル機能の拡張
+- **週次ジャーナル**: 週ごとの振り返りを自動化します。  
+  詳細は[週次ジャーナルドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Weekly-Journal)をご覧ください。  
+  表示例:  
+  ![週次ジャーナル例](https://github.com/user-attachments/assets/681ca83e-8295-4062-9e17-ec90ecee52e9)
+- **月次ジャーナル**: `[[2023/10]]`のようなページをテンプレート付きで生成します。  
+- **四半期/年次ジャーナル**: 月次または週次ジャーナルから階層リンクでアクセス可能です。  
 
-      ![image](https://github.com/user-attachments/assets/3f1c717b-82b0-4869-b9c2-6369d5a82b38)
-
-#### 週次ジャーナル (Weekly Journal)
-- 週番号リンクをクリックするとページが生成され、テンプレートが適用
-- 前後の週に簡単アクセス可能
-   > 詳細は[こちら](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/%E9%80%B1%E6%AC%A1%E3%82%B8%E3%83%A3%E3%83%BC%E3%83%8A%E3%83%AB-(Weekly-Journal))
-   - サンプル:
-   
-      ![image](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/assets/111847207/eb35708d-89e9-401d-a0b9-9ff8e49bb290)
-
-#### 月次ジャーナル (Monthly Journal)
-- ミニカレンダーのリンクをクリックすると`[[2023/10]]`のようなページが生成され、テンプレートが適用
-
-#### 四半期ジャーナル (Quarterly Journal) / 年次ジャーナル (Yearly Journal) 🆕
-- 月次または週次の階層リンクからアクセス可能
-- ページが生成され、テンプレートが適用
-   > 注: 四半期ジャーナルは、週次ジャーナルのページタイトルフォーマットが`yyyy/qqq/Www`もしくは`yyy-qqq-Www`の場合のみ有効
+### カスタマイズオプション
+- 曜日や週番号の表示形式を柔軟に設定可能です。
+- スラッシュコマンドで週番号を簡単に挿入できます。  
+  詳細は[スラッシュコマンドドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Slash-Command)をご覧ください。
 
 ---
 
 ## 🚀 使い方
 
-### 1. インストール方法
-1. マーケットプレイスを開く（右上の [...] から）
-3. 「Show weekday」で検索
-4. インストールをクリック
+### インストール方法
+1. Logseqを開きます。
+2. マーケットプレイスに移動します（右上の`...`をクリック）。
+3. 「Show weekday」で検索し、インストールをクリックします。
 
-### 2. はじめの設定（重要）
-1. プラグイン設定を開く
-2. **週番号の表示方式を選択**:
-   - `USフォーマット`: 日曜始まりの週
-   - `ISOフォーマット`: 月曜始まりの週
-   > 💡 日本では一般的にISOフォーマットが使われることが多いようです
+### 初期設定
+1. プラグイン設定を開きます。
+2. **週番号のフォーマットを選択**:  
+   - `USフォーマット`: 日曜始まりの週。  
+   - `ISOフォーマット`: 月曜始まりの週。  
+   詳細は[週番号フォーマットドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Week-number-format)をご覧ください。  
+3. 必要に応じて機能を有効化または無効化します。  
 
-3. お好みの機能をオン/オフ
-   - 各機能は後からでも変更できます
-   - 表示形式も自由にカスタマイズ可能
+---
 
-# ショーケース / 質問 / アイデア / ヘルプ
+## 💡 追加リソース
 
-> [ディスカッション](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/discussions) タブに移動して、この種の情報を質問したり見つけたりできます。
+- **ディスカッション**: [ディスカッションタブ](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/discussions)で質問やアイデアを共有できます。  
+- **関連プラグイン**:  
+  - [Flex Date Format プラグイン](https://github.com/YU000jp/logseq-plugin-flex-date-format)  
+  - [Default Template プラグイン](https://github.com/YU000jp/logseq-plugin-default-template)  
 
-- 関連
-  1. 日付リンクに含まれる曜日を、日本語表記にする
-     > [Flex date format プラグイン](https://github.com/YU000jp/logseq-plugin-flex-date-format)を利用してください。
-  1. 古い日付シングルページを開いたときに、ジャーナルテンプレートが適用されない
-     > [Default Template プラグイン](https://github.com/YU000jp/logseq-plugin-default-template)のジャーナルテンプレート補完機能を利用してください。
+---
 
-## 貢献 / クレジット
+## 🛠️ 貢献とクレジット
 
-- スクリプト > [曜日と週番号を表示 - discuss.logseq.com](https://discuss.logseq.com/t/show-week-day-and-week-number/12685/18) @[danilofaria](https://discuss.logseq.com/u/danilofaria/), @[ottodevs](https://discuss.logseq.com/u/ottodevs/)
-- ライブラリ > [date-fns](https://date-fns.org/)
-- ライブラリ > [date-holidays](https://github.com/commenthol/date-holidays) 祝日のハイライト
-- ライブラリ > [@sethyuan/ logseq-l10n](https://github.com/sethyuan/logseq-l10n) 翻訳機能
-- アイコン > [@IonutNeagu - svgrepo.com](https://www.svgrepo.com/svg/490868/monday)
-- 製作者 > [@YU000jp](https://github.com/YU000jp)
+- **スクリプト提供者**:  
+  - [danilofaria](https://discuss.logseq.com/u/danilofaria/)  
+  - [ottodevs](https://discuss.logseq.com/u/ottodevs/)  
+- **使用ライブラリ**:  
+  - [date-fns](https://date-fns.org/)  
+  - [date-holidays](https://github.com/commenthol/date-holidays)  
+  - [@6tail/lunar-typescript](https://github.com/6tail/lunar-typescript)  
+  - [@sethyuan/logseq-l10n](https://github.com/sethyuan/logseq-l10n)  
+- **アイコン**: [IonutNeagu - svgrepo.com](https://www.svgrepo.com/svg/490868/monday)  
+- **製作者**: [YU000jp](https://github.com/YU000jp)  
+
+---
