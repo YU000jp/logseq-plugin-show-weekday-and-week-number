@@ -36,7 +36,7 @@ Logseqのジャーナルをもっとスマートにするプラグインです�
 
 ### ジャーナル機能の拡張
 - **週次ジャーナル**: 週ごとの振り返りを自動化します。  
-  詳細は[週次ジャーナルドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Weekly-Journal)をご覧ください。  
+  詳細は[週次ジャーナルドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/%E9%80%B1%E6%AC%A1%E3%82%B8%E3%83%A3%E3%83%BC%E3%83%8A%E3%83%AB-(Weekly-Journal))をご覧ください。  
   表示例:  
   ![週次ジャーナル例](https://github.com/user-attachments/assets/681ca83e-8295-4062-9e17-ec90ecee52e9)
 - **月次ジャーナル**: `[[2023/10]]`のようなページをテンプレート付きで生成します。  
@@ -61,7 +61,7 @@ Logseqのジャーナルをもっとスマートにするプラグインです�
 2. **週番号のフォーマットを選択**:  
    - `USフォーマット`: 日曜始まりの週。  
    - `ISOフォーマット`: 月曜始まりの週。  
-   詳細は[週番号フォーマットドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Week-number-format)をご覧ください。  
+   詳細は[週番号フォーマットドキュメント](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/%E9%80%B1%E7%95%AA%E5%8F%B7%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88%E3%81%AE%E9%81%B8%E6%8A%9E%E8%82%A2-(Japanese))をご覧ください。  
 3. 必要に応じて機能を有効化または無効化します。  
 
 ---
