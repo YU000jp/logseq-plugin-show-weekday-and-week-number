@@ -4,8 +4,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
 > [!NOTE]  
 > - Compatible with Logseq v0.10.x (File system model).  
-> - Only two-line and monthly calendars are supported in the Logseq db model. [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
->    > Date formats like `yyyy/MM/dd` are not supported due to Logseq API constraints in the db model.
+> - Date formats like `yyyy/MM/dd` are not supported due to Logseq API constraints.
 
 <div align="right">
 
@@ -16,6 +15,11 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 ---
 
 ## 🎯 Features
+- Multi-language support.
+- Holiday highlighting.  
+  > Powered by the [date-holidays](https://github.com/commenthol/date-holidays) library, supporting various countries worldwide.
+- External ICS (`*.ics`) integration.  
+  > Import schedules from Google Calendar and others. Note: Google Calendar's TODO list does not provide ICS files.
 
 ### Daily Journal Enhancements
 - Display weekday and week numbers next to journal dates.  
@@ -23,7 +27,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
   ![Daily Journal Example](https://github.com/user-attachments/assets/d448da22-7316-41ab-af35-675d5a839950)
 
 ### Calendar Features
-   - Navigate between previous and next journal entries. Highlight holidays and lunar calendar dates (for Chinese users).
+- Navigate between previous and next journal entries.
 - **Two-line Mini Calendar**: Compact calendar with quick navigation and one-click journal access.  
   Example:  
   ![Mini Calendar Example](https://github.com/user-attachments/assets/fcf15e0b-c890-402a-91b4-af543640f047)
@@ -42,7 +46,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 ### Customization Options
 - Flexible settings for weekday and week number displays.
 - Slash commands for quick week number insertion.  
-  See [Slash Command Details](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Slash-Command).
+  See [Slash Command Documentation](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/wiki/Slash-Command).
 
 ---
 
