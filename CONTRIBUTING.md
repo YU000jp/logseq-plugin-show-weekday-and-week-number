@@ -1,20 +1,20 @@
 # Contributing
 
-簡潔なコントリビュート手順をまとめます。
+This document summarizes the contribution process.
 
-ローカルセットアップ（推奨）
-1. リポジトリをクローンする。
-2. 依存をインストールする: `pnpm install`（または `npm install`）。
-3. ビルド/開発: `pnpm build` または `pnpm dev`（プロジェクト固有のスクリプトがある場合）。
+Local Setup (Recommended)
+1. Clone the repository.
+2. Install dependencies: `pnpm install` (or `npm install`).
+3. Build/Develop: `pnpm build` or `pnpm dev` (if there are project-specific scripts).
 
-コード規約（簡易）
-- 既存スタイルに合わせる（スペース/インデント、命名規則）。
-- 新しいユーティリティは `src/lib/` に追加し、`src/lib/index.ts` へエクスポートを追加する。
-- 公開 API の変更（関数名・シグネチャ）を行う際は `ARCHITECTURE.md` を更新する。
+Code Guidelines (Simplified)
+- Follow the existing style (spaces/indentation, naming conventions).
+- Add new utilities to `src/lib/` and include exports in `src/lib/index.ts`.
+- Update `ARCHITECTURE.md` when making changes to the public API (function names, signatures).
 
-プルリクエスト
-- 小さな単位で PR を作成する。
-- 変更点を説明する短い要約（目的、影響範囲、回帰テストの有無）を添える。
+Pull Requests
+- Create PRs in small units.
+- Include a short summary of changes (purpose, scope, regression tests, if any).
 
-お問い合わせ
-- 大きな設計変更を提案する場合は Issue を作成して議論してください。
+Contact
+- For proposing major design changes, create an Issue to discuss.

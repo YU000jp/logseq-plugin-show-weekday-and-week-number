@@ -1,18 +1,18 @@
 # Architecture Overview
 
-このリポジトリは Logseq プラグイン「show-weekday-and-week-number」です。保守性と再利用性を高めるための簡潔なアーキテクチャ案内を示します。
+This repository is the Logseq plugin "show-weekday-and-week-number." Below is a concise architectural guide to enhance maintainability and reusability.
 
-主要なディレクトリ
-- `src/` - メインのソースコード。
-  - `lib/` - 汎用ユーティリティ（UI helper、日付計算、localize 等）。
-  - `journals/`, `calendar/`, `settings/`, `translations/` など、関心ごとに分離された機能モジュール。
+Main Directories
+- `src/` - Main source code.
+  - `lib/` - General utilities (UI helpers, date calculations, localization, etc.).
+  - Functional modules separated by concerns, such as `journals/`, `calendar/`, `settings/`, `translations/`.
 
-設計方針（短く）
-- ユーティリティは `src/lib` に集約する。共通の関数や型はここからエクスポートする。
-- 外部ファイルからは直接ファイルパスで import するのではなく、`src/lib/index.ts` のバレル経由でインポートする（例: `import { createElementWithClass } from '@/lib'`）。
-- 小さな関数を作りすぎない。複数箇所で使う処理のみ `lib` に上げる。
-- 破壊的変更は避け、公開 API（関数名と型）は安定させる。
+Design Principles (Brief)
+- Utilities are centralized in `src/lib`. Common functions and types are exported from here.
+- Avoid importing directly from external file paths; instead, use the barrel file `src/lib/index.ts` (e.g., `import { createElementWithClass } from '@/lib'`).
+- Avoid creating too many small functions. Only promote processes used in multiple places to `lib`.
+- Avoid breaking changes and stabilize the public API (function names and types).
 
-将来の改善案
-- `src/types.ts` を作成して共有型を一元化する。
-- テスト（ユニット）を追加して日付ロジックなどの正当性を保障する。
+Future Improvements
+- Create `src/types.ts` to centralize shared types.
+- Add unit tests to ensure the correctness of date logic.
