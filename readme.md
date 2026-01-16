@@ -2,9 +2,8 @@
 
 Make your Logseq journals smarter with weekdays, week numbers, and powerful calendar features!
 
-> [!NOTE]  
-> - Compatible with Logseq v0.10.x (File system model).  
-> - Date formats like `yyyy/MM/dd` are not supported due to Logseq API constraints.
+> [!NOTE]
+> - Compatible with Logseq file-based model. 
 
 <div align="right">
 
