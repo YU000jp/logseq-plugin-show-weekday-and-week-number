@@ -3,9 +3,7 @@
 Logseqのジャーナルをもっとスマートにするプラグインです。日付に曜日や週番号を追加して、カレンダー機能まで提供します。
 
 > [!NOTE]   
-> - Logseq v0.10.x (ファイルシステムモデル) で動作します。  
 > - Logseq DBモデルでは、2行カレンダーおよび月間カレンダーのみ対応しています。[#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
->    > 「yyyy/MM/dd」のような日付フォーマットは、Logseq APIの制約によりサポートされていません。
 
 <div align="right">
 
