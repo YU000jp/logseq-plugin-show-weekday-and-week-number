@@ -17,8 +17,8 @@ export const weeklyEmbed = () => logseq.provideStyle({ key: keyThisWeekPopup, st
 
 
 export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, match: RegExpMatchArray) => {
-    //yyyy-Wwwのページを開いた状態
 
+    //yyyy-Wwwのページを開いた状態
     const year = Number(match[1]) //2023
     const weekNumber = Number(match[2]) //27
     const weekNumberString = weekNumber.toString().padStart(2, "0") //27→"27"
@@ -75,16 +75,17 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
             handleScrolling(currentWeek, today, ISO)
         }, 300)
 
-    // もしページが存在しなかったら作成する
+    //ページの内容を確認する
     const pageUuid = await findPageUuid(match[0]) as PageEntity["uuid"] | false
     if (pageUuid) {
         // ページが存在した場合
         const pageBlockTree = await logseq.Editor.getPageBlocksTree(pageUuid) as { content: BlockEntity["content"] }[] | null
         if (pageBlockTree) {
             //コンテンツがある場合は処理を中断する
-            if (pageBlockTree.find((block) => block.content !== null)) // block.contentが空ではないブロックがひとつでもあったら処理を中断する
+            if (pageBlockTree.find((block) => block.content !== "")) // block.contentが空ではないブロックがひとつでもあったら処理を中断する
                 return
 
+            console.log("Weekly Journal page is empty, creating content...") //ページが空の場合はログを出す
             await new Promise(async (resolve) => {
                 await weeklyJournalCreateContent(weekStart, weekEnd, pageUuid)
                 resolve("Done")
@@ -94,20 +95,7 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
     } else {
         console.log("Weekly Journal page not found") //ページが見つからない場合はログを出す
         // ページが存在しない場合は作成する
-        // If DB graph and weekly page name contains a slash, abort and prompt user to change plugin settings
-        if (booleanDbGraph() && match[0].includes('/')) {
-            await showConfirmDialog(
-                t('Cannot create weekly journal'),
-                `${t('Your graph is a DB graph. Weekly journal names containing slashes cannot be created.')}
-\n${t('Please change the week-number format in plugin settings to a format without slashes and try again.')}`,
-                { confirmText: t('Open plugin settings'), cancelText: t('Cancel') }
-            )
-            try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ }
-            return
-        }
-
-        const createName = booleanDbGraph() && /W\d{2}/.test(match[0]) ? `${match[0]} #Journal` : match[0]
-        const pageEntity = await logseq.Editor.createPage(createName, {}, { redirect: false, createFirstBlock: false, journal: false }) as { uuid: BlockEntity["uuid"] } | null
+        const pageEntity = await logseq.Editor.createPage(match[0], {}, { redirect: false, createFirstBlock: false, journal: false }) as { uuid: BlockEntity["uuid"] } | null
         if (pageEntity) {
             console.log("Weekly Journal page created") //ページが作成された場合はログを出す
             processingWeeklyJournal = true//処理中フラグを立てる ここからreturnする場合は必ずfalseにすること
@@ -128,6 +116,8 @@ const weeklyJournalCreateContent = async (
     weekEnd: Date,
     pageUuid: BlockUUID,
 ) => {
+
+    console.log("Creating content for Weekly Journal...")
 
     let batchArray: IBatchBlock[] = [
         {// 空ブロック block 0

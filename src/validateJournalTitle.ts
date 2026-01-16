@@ -1,18 +1,20 @@
 import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { t } from "logseq-l10n"
+import { booleanLogseqMdModel } from "."
 import { refreshCalendarCheckSameMonth } from "./calendar/left-calendar"
 import { dailyJournalDetails } from "./dailyJournalDetails"
 import { currentPageIsMonthlyJournal } from "./journals/monthlyJournal"
 import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
-import { getDateFromJournalDay, advancedQuery, queryCodeGetJournalDayFromOriginalName } from "./lib"
+import { advancedQuery, getDateFromJournalDay, queryCodeGetJournalDayFromOriginalName } from "./lib"
 
 // Journal Titleの処理
 let processingJournalTitlePage: Boolean = false
 export const validateJournalTitle = async (titleElement: HTMLElement) => {
   if (!titleElement.textContent
     || processingJournalTitlePage === true
+    || titleElement.dataset.checked === "true"
     || titleElement.nextElementSibling?.className === "showWeekday") return // check if element already has date info
   processingJournalTitlePage = true
   try {
@@ -28,7 +30,8 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
 
 
     //Weekly Journal、Monthly Journal、Quarterly Journal、Yearly Journalのページかどうか
-    if (titleElement.classList.contains("journal-title") === false
+    if (booleanLogseqMdModel() === true //Logseq MDモデルでない場合のみ処理を行う
+      && titleElement.classList.contains("journal-title") === false
       && titleElement.classList.contains("title") === true
       && title.match(/^(\d{4})/) !== null // titleの先頭が2024から始まる場合のみチェックする
     ) {
@@ -46,20 +49,24 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
         currentPageIsWeeklyJournal(titleElement, match)
         titleElement.title = t("Weekly Journal")
       }
-      else if (match = title.match(/^(\d{4})\/(\d{2})$/)) { // 2023/01
-        currentPageIsMonthlyJournal(titleElement, match)
-        titleElement.title = t("Monthly Journal")
-      }
-      else if (match = title.match(/^(\d{4})\/[qQ](\d{1})$/)) { // 2023/Q1
-        currentPageIsQuarterlyJournal(titleElement, match)
-        titleElement.title = t("Quarterly Journal")
-      }
-      else if (match = title.match(/^(\d{4})$/)) { // 2023
-        currentPageIsYearlyJournal(titleElement, match)
-        titleElement.title = t("Yearly Journal")
-      } else {
-        refreshCalendarCheckSameMonth()
-      }
+      else
+        if (match = title.match(/^(\d{4})\/(\d{2})$/)) { // 2023/01
+          currentPageIsMonthlyJournal(titleElement, match)
+          titleElement.title = t("Monthly Journal")
+        }
+        else
+          if (match = title.match(/^(\d{4})\/[qQ](\d{1})$/)) { // 2023/Q1
+            currentPageIsQuarterlyJournal(titleElement, match)
+            titleElement.title = t("Quarterly Journal")
+          }
+          else
+            if (match = title.match(/^(\d{4})$/)) { // 2023
+              currentPageIsYearlyJournal(titleElement, match)
+              titleElement.title = t("Yearly Journal")
+            }
+            else {
+              refreshCalendarCheckSameMonth()
+            }
     } else {
       refreshCalendarCheckSameMonth()
     }
@@ -80,7 +87,7 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
     else {
       // Daily Journal Detailsの処理
       setTimeout(async () => {
-        const pageEntities = await advancedQuery(queryCodeGetJournalDayFromOriginalName, `"${title}"`) as { "journal-day": PageEntity["journalDay"]} [] | null
+        const pageEntities = await advancedQuery(queryCodeGetJournalDayFromOriginalName, `"${title}"`) as { "journal-day": PageEntity["journalDay"] }[] | null
         if (pageEntities && pageEntities.length > 0) {
           const journalDay = pageEntities[0]["journal-day"]
           if (journalDay)
