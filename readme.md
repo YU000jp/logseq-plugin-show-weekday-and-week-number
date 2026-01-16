@@ -3,7 +3,7 @@
 Make your Logseq journals smarter with weekdays, week numbers, and powerful calendar features!
 
 > [!NOTE]
-> - Compatible with Logseq file-based model. 
+> - When using the Logseq DB model, only the two-line calendar and monthly calendar are functional. [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
 
 <div align="right">
 
