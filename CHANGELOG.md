@@ -1,3 +1,10 @@
+## [1.71.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.71.0...v1.71.1) (2026-01-16)
+
+
+### Bug Fixes
+
+* **bug:** Fails to populate new week pages [#176](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/176) ([fab2e73](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/fab2e73542af63440f4d435db39d61c3d52be258))
+
 # [1.71.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.70.0...v1.71.0) (2025-12-28)
 
 
