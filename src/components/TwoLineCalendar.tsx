@@ -1,8 +1,8 @@
-import { addDays, format, isToday, startOfISOWeek, startOfWeek } from "date-fns"
-import { t } from "logseq-l10n"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from ".."
-import { separate } from "../journals/nav"
+import { addDays, format, isToday, startOfISOWeek, startOfWeek } from "date-fns";
+import { t } from "logseq-l10n";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from "..";
+import { separate } from "../journals/nav";
 import {
 	getHolidaysBundle,
 	getUserColorData,
@@ -16,12 +16,12 @@ import {
 	localizeDayOfWeekString,
 	localizeMonthString,
 	openPageFromPageName,
-	shortDayNames
-} from "../lib"
-import { computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils"
-import { getHolidays } from "../lib/holidays"
-import { findPageUuid } from "../lib/query/advancedQuery"
-import { useJournalPreview } from "./JournalPreview"
+	shortDayNames,
+} from "../lib";
+import { computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils";
+import { getHolidays } from "../lib/holidays";
+import { findPageUuid } from "../lib/query/advancedQuery";
+import { useJournalPreview } from "./JournalPreview";
 
 type Props = {
 	startDate: Date;
@@ -42,51 +42,51 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 	const { html: hoverHtml } = useJournalPreview(hoverPage, preferredDateFormat);
 
 	useEffect(() => {
-		const id = "lc-journal-tooltip-root"
+		const id = "lc-journal-tooltip-root";
 		try {
-			const doc = parent.document
-			let el = doc.getElementById(id) as HTMLDivElement | null
+			const doc = parent.document;
+			let el = doc.getElementById(id) as HTMLDivElement | null;
 			if (!hoverPage) {
-				if (el) el.remove()
-				return
+				if (el) el.remove();
+				return;
 			}
 			if (!el) {
-				el = doc.createElement("div")
-				el.id = id
-				doc.body.appendChild(el)
+				el = doc.createElement("div");
+				el.id = id;
+				doc.body.appendChild(el);
 			}
-			el.style.position = "fixed"
+			el.style.position = "fixed";
 			// shift 1em to the right to avoid overlapping the cursor/cell
-			const em = parseFloat(getComputedStyle(doc.documentElement).fontSize || "16") || 16
-			el.style.left = `${tooltipPos.left + em}px`
-			el.style.top = `${tooltipPos.top}px`
-			el.style.zIndex = "99999"
-			const bodyStyle = getComputedStyle(doc.body)
-			el.style.background = bodyStyle.backgroundColor || "rgba(255,255,255,1)"
-			el.style.color = bodyStyle.color || "var(--ls-ui-fg)"
-			el.style.boxShadow = "0 6px 18px rgba(0,0,0,0.15)"
+			const em = parseFloat(getComputedStyle(doc.documentElement).fontSize || "16") || 16;
+			el.style.left = `${tooltipPos.left + em}px`;
+			el.style.top = `${tooltipPos.top}px`;
+			el.style.zIndex = "99999";
+			const bodyStyle = getComputedStyle(doc.body);
+			el.style.background = bodyStyle.backgroundColor || "rgba(255,255,255,1)";
+			el.style.color = bodyStyle.color || "var(--ls-ui-fg)";
+			el.style.boxShadow = "0 6px 18px rgba(0,0,0,0.15)";
 			// increase opacity to make background less transparent
-			el.style.opacity = "1"
+			el.style.opacity = "1";
 			// reduce font-size for tooltip content
-			el.style.fontSize = "0.85em"
-			el.style.padding = "10px"
-			el.style.borderRadius = "8px"
-			el.style.maxWidth = "420px"
-			el.style.maxHeight = "360px"
-			el.style.overflow = "auto"
-			el.style.pointerEvents = "auto"
-			if (hoverHtml) el.innerHTML = hoverHtml
-			else el.textContent = hoverPage
+			el.style.fontSize = "0.85em";
+			el.style.padding = "10px";
+			el.style.borderRadius = "8px";
+			el.style.maxWidth = "420px";
+			el.style.maxHeight = "360px";
+			el.style.overflow = "auto";
+			el.style.pointerEvents = "auto";
+			if (hoverHtml) el.innerHTML = hoverHtml;
+			else el.textContent = hoverPage;
 		} catch (e) {
 			// ignore
 		}
 		return () => {
 			try {
-				const el = parent.document.getElementById("lc-journal-tooltip-root") as HTMLDivElement | null
-				if (el) el.remove()
+				const el = parent.document.getElementById("lc-journal-tooltip-root") as HTMLDivElement | null;
+				if (el) el.remove();
 			} catch (e) {}
-		}
-	}, [hoverPage, hoverHtml, tooltipPos])
+		};
+	}, [hoverPage, hoverHtml, tooltipPos]);
 
 	useEffect(() => {
 		const run = async () => {
@@ -159,11 +159,14 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 
 	const dateInputRef = useRef<HTMLInputElement | null>(null);
 
-	const onCellClickFactory = useCallback((pageName?: string) => {
-		return () => {
-			if (pageName) openPageFromPageName(pageName, false);
-		};
-	}, []);
+	const onCellClickFactory = useCallback(
+		(pageName?: string) => (e: React.MouseEvent) => {
+			return () => {
+				if (pageName) openPageFromPageName(pageName, (e as any).shiftKey);
+			};
+		},
+		[]
+	);
 
 	const handleMonthClick = useCallback(
 		(monthPageName: string) => (e: React.MouseEvent) => {
@@ -172,7 +175,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 		[]
 	);
 
-	const handleTodayClick = useCallback(async () => {
+	const handleTodayClick = useCallback(async (e: React.MouseEvent) => {
 		const desiredDate: Date = new Date();
 		if (onRequestScroll) {
 			const weekStartsOn: 0 | 1 | 6 = getWeekStartOn();
@@ -185,7 +188,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 			const deltaWeeks = Math.round(diffMs / (7 * 24 * 60 * 60 * 1000));
 			onRequestScroll(deltaWeeks);
 		} else {
-			openPageFromPageName(format(new Date(), preferredDateFormat), false);
+			openPageFromPageName(format(new Date(), preferredDateFormat), (e as any).shiftKey);
 		}
 	}, [onRequestScroll, preferredDateFormat, startDate]);
 
@@ -210,12 +213,12 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								return (logseq.settings as any).booleanWeeklyJournal === true ? (
 									<button
 										className="daySide daySideWeekNumber"
-										onClick={() => openPageFromPageName(weekPageName, false)}
+										onClick={(e) => openPageFromPageName(weekPageName, (e as any).shiftKey)}
 										onMouseEnter={(e) => {
 											if (weekPageName) {
-												setHoverPage(weekPageName)
-												const rect = (e.target as HTMLElement).getBoundingClientRect()
-												setTooltipPos({ left: rect.right + 8, top: rect.top })
+												setHoverPage(weekPageName);
+												const rect = (e.target as HTMLElement).getBoundingClientRect();
+												setTooltipPos({ left: rect.right + 8, top: rect.top });
 											}
 										}}
 										onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
@@ -304,17 +307,17 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
 									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
 									onMouseEnter={(e) => {
-										const rect = (e.target as HTMLElement).getBoundingClientRect()
-										setTooltipPos({ left: rect.right + 8, top: rect.top })
-														if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
-											const extraLines: string[] = []
+										const rect = (e.target as HTMLElement).getBoundingClientRect();
+										setTooltipPos({ left: rect.right + 8, top: rect.top });
+										if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
+											const extraLines: string[] = [];
 											if (u && u.eventName) {
 												extraLines.push(
 													...u.eventName
 														.split("\n")
 														.map((s) => s.trim())
 														.filter(Boolean)
-												)
+												);
 											}
 											if (holiday) {
 												extraLines.push(
@@ -322,23 +325,23 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 														.split("\n")
 														.map((s) => s.trim())
 														.filter(Boolean)
-												)
+												);
 											}
-															if (icsEventsForCell.length > 0) {
-																extraLines.push(
-																	...icsEventsForCell
-																		.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
-																		.map((s) => String(s || "").trim())
-																		.filter(Boolean)
-																)
-															}
+											if (icsEventsForCell.length > 0) {
+												extraLines.push(
+													...icsEventsForCell
+														.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+														.map((s) => String(s || "").trim())
+														.filter(Boolean)
+												);
+											}
 											const marker = "__HOL__::";
 											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
-											setHoverPage(payload)
-											return
+											setHoverPage(payload);
+											return;
 										}
 										if (pageName) {
-											setHoverPage(pageName)
+											setHoverPage(pageName);
 										}
 									}}
 									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
@@ -385,9 +388,9 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 											onClick={handleMonthClick(monthPageName)}
 											onMouseEnter={(e) => {
 												if (monthPageName) {
-													setHoverPage(monthPageName)
-													const rect = (e.target as HTMLElement).getBoundingClientRect()
-													setTooltipPos({ left: rect.right + 8, top: rect.top })
+													setHoverPage(monthPageName);
+													const rect = (e.target as HTMLElement).getBoundingClientRect();
+													setTooltipPos({ left: rect.right + 8, top: rect.top });
 												}
 											}}
 											onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
@@ -454,7 +457,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 										const deltaWeeks = Math.round(diffMs / (7 * 24 * 60 * 60 * 1000));
 										onRequestScroll(deltaWeeks);
 									} else {
-										openPageFromPageName(format(chosen, preferredDateFormat), false);
+										openPageFromPageName(format(chosen, preferredDateFormat), (e as any).shiftKey);
 									}
 								}}
 								style={{ display: "none" }}
@@ -474,12 +477,12 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 								return (logseq.settings as any).booleanWeeklyJournal === true ? (
 									<button
 										className="daySide daySideWeekNumber"
-										onClick={() => openPageFromPageName(weekPageName, false)}
+										onClick={(e) => openPageFromPageName(weekPageName, (e as any).shiftKey)}
 										onMouseEnter={(e) => {
 											if (weekPageName) {
-												setHoverPage(weekPageName)
-												const rect = (e.target as HTMLElement).getBoundingClientRect()
-												setTooltipPos({ left: rect.right + 8, top: rect.top })
+												setHoverPage(weekPageName);
+												const rect = (e.target as HTMLElement).getBoundingClientRect();
+												setTooltipPos({ left: rect.right + 8, top: rect.top });
 											}
 										}}
 										onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
@@ -568,21 +571,21 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 							return (
 								<td
 									key={key}
-									onClick={() => pageName && openPageFromPageName(pageName, false)}
+									onClick={(e: React.MouseEvent) => pageName && openPageFromPageName(pageName, (e as any).shiftKey)}
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
 									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
 									onMouseEnter={(e) => {
-										const rect = (e.target as HTMLElement).getBoundingClientRect()
-										setTooltipPos({ left: rect.right + 8, top: rect.top })
-														if (u && u.eventName || holiday || icsEventsForCell.length > 0) {
-											const extraLines: string[] = []
+										const rect = (e.target as HTMLElement).getBoundingClientRect();
+										setTooltipPos({ left: rect.right + 8, top: rect.top });
+										if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
+											const extraLines: string[] = [];
 											if (u && u.eventName) {
 												extraLines.push(
 													...u.eventName
 														.split("\n")
 														.map((s) => s.trim())
 														.filter(Boolean)
-												)
+												);
 											}
 											if (holiday) {
 												extraLines.push(
@@ -590,23 +593,23 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 														.split("\n")
 														.map((s) => s.trim())
 														.filter(Boolean)
-												)
+												);
 											}
-															if (icsEventsForCell.length > 0) {
-																extraLines.push(
-																	...icsEventsForCell
-																		.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
-																		.map((s) => String(s || "").trim())
-																		.filter(Boolean)
-																)
-															}
+											if (icsEventsForCell.length > 0) {
+												extraLines.push(
+													...icsEventsForCell
+														.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+														.map((s) => String(s || "").trim())
+														.filter(Boolean)
+												);
+											}
 											const marker = "__HOL__::";
 											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
-											setHoverPage(payload)
-											return
+											setHoverPage(payload);
+											return;
 										}
 										if (pageName) {
-											setHoverPage(pageName)
+											setHoverPage(pageName);
 										}
 									}}
 									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
@@ -632,7 +635,6 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 					</tr>
 				</tbody>
 			</table>
-
 		</div>
 	);
 };
