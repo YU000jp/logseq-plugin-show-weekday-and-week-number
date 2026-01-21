@@ -94,14 +94,6 @@ const main = async () => {
     }
   }, 3000)
 
-  if (logseq.settings!["cashBatch-daily-desk"] !== null) {
-    logseq.updateSettings({ "cashBatch-daily-desk": null })
-  }
-  if (logseq.settings!["cashBatch-weekly-desk"] !== null) {
-    logseq.updateSettings({ "cashBatch-weekly-desk": null })
-  }
-
-
   // CSS適用
   logseq.provideStyle({ key: "main", style: fileMainCSS })
 
