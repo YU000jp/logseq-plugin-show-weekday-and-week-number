@@ -1,3 +1,10 @@
+## [1.71.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.71.1...v1.71.2) (2026-01-21)
+
+
+### Bug Fixes
+
+* **bug:** Weekly page do not open in right sidebar [#177](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/177) ([d302982](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/d30298223c954246684d041f24b645d98d29f08f))
+
 ## [1.71.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.71.0...v1.71.1) (2026-01-16)
 
 
