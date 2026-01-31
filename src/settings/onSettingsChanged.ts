@@ -119,6 +119,8 @@ export const handleSettingsUpdate = () => {
               || oldSet.booleanLcWeekNumber !== newSet.booleanLcWeekNumber
               || oldSet.booleanLcHolidays !== newSet.booleanLcHolidays
               || oldSet.lcHolidaysAlert !== newSet.lcHolidaysAlert
+              || oldSet.booleanLcHidePastEvents !== newSet.booleanLcHidePastEvents
+              || oldSet.booleanLcAutoCollapsePastEvents !== newSet.booleanLcAutoCollapsePastEvents
             )
               refreshMonthlyCalendar(currentCalendarDate, false, false)
 

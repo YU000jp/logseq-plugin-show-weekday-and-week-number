@@ -241,7 +241,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 				return needsUpdate ? { ...prev, ...newCollapsed } : prev;
 			});
 		}
-	}, [groupedAlerts, settingsUpdateKey]);
+	}, [groupedAlerts]);
 
 	// Scroll to Today group when it first becomes available
 	useEffect(() => {
@@ -809,6 +809,12 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						{t("No alerts")}
 					</div>
 				)}
+				<div
+					style={{
+						maxHeight: "400px",
+						overflowY: "auto",
+						overflowX: "hidden",
+					}}>
 				{Object.entries(groupedAlerts)
 					.filter(([k, items]) => {
 						// Filter past events if the setting is enabled
@@ -979,6 +985,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						</div>
 					);
 				})}
+				</div>
 			</div>
 
 			{/* Inline editor replaces modal; no modal rendering here */}
