@@ -125,4 +125,6 @@
   "Cannot create weekly journal": "Не вдалося створити тижневий журнал",
   "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Ваш граф — це DB-граф. Імена тижневих журналів, що містять косі риски, не можна створити.",
   "Please change the week-number format in plugin settings to a format without slashes and try again.": "Змініть формат номера тижня в налаштуваннях плагіна на формат без косих рисок і повторіть спробу."
+  ,"Hide past events in sidebar list":"Hide past events in sidebar list"
+  ,"Auto-collapse past events in sidebar list":"Auto-collapse past events in sidebar list"
 }

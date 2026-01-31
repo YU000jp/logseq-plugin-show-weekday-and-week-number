@@ -131,4 +131,6 @@
   "Cannot create weekly journal": "Não é possível criar o diário semanal",
   "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "O seu grafo é um grafo DB. Nomes de diários semanais que contenham barras não podem ser criados.",
   "Please change the week-number format in plugin settings to a format without slashes and try again.": "Altere o formato do número da semana nas definições do plugin para um formato sem barras e tente novamente."
+  ,"Hide past events in sidebar list":"Hide past events in sidebar list"
+  ,"Auto-collapse past events in sidebar list":"Auto-collapse past events in sidebar list"
 }

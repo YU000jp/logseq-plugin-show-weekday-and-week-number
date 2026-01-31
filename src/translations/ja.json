@@ -131,4 +131,6 @@
   ,"Cannot create weekly journal":"週次ジャーナルを作成できません"
   ,"Your graph is a DB graph. Weekly journal names containing slashes cannot be created.":"このグラフはDBグラフです。スラッシュを含む週次ジャーナル名は作成できません。"
   ,"Please change the week-number format in plugin settings to a format without slashes and try again.":"プラグインの週番号フォーマットをスラッシュを含まない形式に変更してから再試行してください。"
+  ,"Hide past events in sidebar list":"サイドバーリストの過去のイベントを非表示"
+  ,"Auto-collapse past events in sidebar list":"サイドバーリストの過去のイベントを自動折りたたみ"
 }
