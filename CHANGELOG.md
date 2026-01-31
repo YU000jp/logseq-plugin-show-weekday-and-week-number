@@ -1,3 +1,10 @@
+# [1.72.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.71.2...v1.72.0) (2026-01-31)
+
+
+### Features
+
+* **Add:** Add Smart Focus features to Monthly Calendar sidebar ([c8a2366](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/c8a236638a958ee5299d1649b6cc26e407946d01)), closes [#180](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/180)
+
 ## [1.71.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.71.1...v1.71.2) (2026-01-21)
 
 
