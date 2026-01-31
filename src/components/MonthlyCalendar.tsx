@@ -87,6 +87,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 	const [expandedIcs, setExpandedIcs] = useState<Record<string, boolean>>({});
 	const monthInputRef = useRef<HTMLInputElement | null>(null);
 	const todayGroupRef = useRef<HTMLDivElement | null>(null);
+	const [hasScrolledToToday, setHasScrolledToToday] = useState<boolean>(false);
 	// Inline editor state for editing user events (replaces modal)
 	const [showInlineEditor, setShowInlineEditor] = useState<boolean>(false);
 	const [editorText, setEditorText] = useState<string>((logseq.settings!.userColorList as string) || "");
@@ -222,7 +223,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 		const autoCollapse = logseq.settings!.booleanLcAutoCollapsePastEvents as boolean;
 		if (!autoCollapse) return;
 
-		const todayStr = format(today, "yyyy-LL-dd");
+		const todayStr = format(new Date(), "yyyy-LL-dd");
 		const newCollapsed: Record<string, boolean> = {};
 		
 		for (const k of Object.keys(groupedAlerts)) {
@@ -233,14 +234,20 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 		}
 		
 		setCollapsedGroups((prev) => ({ ...prev, ...newCollapsed }));
-	}, [groupedAlerts, targetDate]);
-
-	// Scroll to Today group when it becomes available
-	useEffect(() => {
-		if (todayGroupRef.current) {
-			todayGroupRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-		}
 	}, [groupedAlerts]);
+
+	// Scroll to Today group when it first becomes available
+	useEffect(() => {
+		if (!hasScrolledToToday && todayGroupRef.current) {
+			todayGroupRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+			setHasScrolledToToday(true);
+		}
+	}, [groupedAlerts, hasScrolledToToday]);
+
+	// Reset scroll flag when target date changes
+	useEffect(() => {
+		setHasScrolledToToday(false);
+	}, [targetDate]);
 
 	// Internal: perform immediate removal from settings.userColorList
 	const performRemoveImmediate = async (date: Date, text: string) => {
