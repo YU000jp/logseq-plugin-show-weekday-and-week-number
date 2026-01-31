@@ -256,9 +256,14 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						updated[k] = true;
 					}
 				}
-				// Check if there's actually a change
-				const hasChanges = Object.keys(prev).length !== Object.keys(updated).length ||
-					Object.keys(prev).some(k => prev[k] !== updated[k]);
+				// Check if there's actually a change by comparing keys and values
+				const prevKeys = Object.keys(prev);
+				const updatedKeys = Object.keys(updated);
+				if (prevKeys.length !== updatedKeys.length) {
+					return updated;
+				}
+				// Check if any values differ
+				const hasChanges = prevKeys.some(k => prev[k] !== updated[k]);
 				return hasChanges ? updated : prev;
 			});
 		}
