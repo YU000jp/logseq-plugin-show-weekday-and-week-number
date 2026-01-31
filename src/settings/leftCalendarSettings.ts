@@ -51,6 +51,20 @@ export const leftCalendarSettings = (
       default: "Today only",
       description: "",
     },
+    {
+      key: SettingKeys.booleanLcHidePastEvents,
+      title: t("Hide past events in sidebar list"),
+      type: "boolean",
+      default: true,
+      description: "",
+    },
+    {
+      key: SettingKeys.booleanLcAutoCollapsePastEvents,
+      title: t("Auto-collapse past events in sidebar list"),
+      type: "boolean",
+      default: true,
+      description: "",
+    },
   )
 
   return settings
