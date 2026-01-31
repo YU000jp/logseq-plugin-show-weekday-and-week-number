@@ -233,16 +233,28 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 			}
 		}
 		
-		setCollapsedGroups((prev) => ({ ...prev, ...newCollapsed }));
+		// Only update if there are actually new groups to collapse
+		if (Object.keys(newCollapsed).length > 0) {
+			setCollapsedGroups((prev) => {
+				// Check if we actually need to update
+				const needsUpdate = Object.keys(newCollapsed).some(k => !prev[k]);
+				return needsUpdate ? { ...prev, ...newCollapsed } : prev;
+			});
+		}
 	}, [groupedAlerts]);
 
 	// Scroll to Today group when it first becomes available
 	useEffect(() => {
 		if (!hasScrolledToToday && todayGroupRef.current) {
-			todayGroupRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-			setHasScrolledToToday(true);
+			// Use setTimeout to ensure DOM is fully rendered
+			setTimeout(() => {
+				if (todayGroupRef.current) {
+					todayGroupRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+					setHasScrolledToToday(true);
+				}
+			}, 100);
 		}
-	}, [groupedAlerts, hasScrolledToToday]);
+	}, [hasScrolledToToday, groupedAlerts]);
 
 	// Reset scroll flag when target date changes
 	useEffect(() => {
