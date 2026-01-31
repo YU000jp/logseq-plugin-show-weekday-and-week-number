@@ -224,24 +224,42 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 	// Auto-collapse past events when setting is enabled
 	useEffect(() => {
 		const autoCollapse = logseq.settings!.booleanLcAutoCollapsePastEvents as boolean;
-		if (!autoCollapse) return;
-
 		const todayStr = format(new Date(), "yyyy-LL-dd");
-		const newCollapsed: Record<string, boolean> = {};
 		
-		for (const k of Object.keys(groupedAlerts)) {
-			// Don't auto-collapse today's events
-			if (k !== todayStr && k < todayStr) {
-				newCollapsed[k] = true;
+		if (autoCollapse) {
+			// Auto-collapse past events
+			const newCollapsed: Record<string, boolean> = {};
+			
+			for (const k of Object.keys(groupedAlerts)) {
+				// Don't auto-collapse today's events
+				if (k !== todayStr && k < todayStr) {
+					newCollapsed[k] = true;
+				}
 			}
-		}
-		
-		// Only update if there are actually new groups to collapse
-		if (Object.keys(newCollapsed).length > 0) {
+			
+			// Only update if there are actually new groups to collapse
+			if (Object.keys(newCollapsed).length > 0) {
+				setCollapsedGroups((prev) => {
+					// Check if we actually need to update
+					const needsUpdate = Object.keys(newCollapsed).some(k => !prev[k]);
+					return needsUpdate ? { ...prev, ...newCollapsed } : prev;
+				});
+			}
+		} else {
+			// When auto-collapse is disabled, clear all auto-collapsed past groups
 			setCollapsedGroups((prev) => {
-				// Check if we actually need to update
-				const needsUpdate = Object.keys(newCollapsed).some(k => !prev[k]);
-				return needsUpdate ? { ...prev, ...newCollapsed } : prev;
+				const updated: Record<string, boolean> = {};
+				// Only keep manually toggled groups that are not past events
+				for (const k in prev) {
+					// Keep today and future groups that user manually collapsed
+					if (k >= todayStr && prev[k]) {
+						updated[k] = true;
+					}
+				}
+				// Check if there's actually a change
+				const hasChanges = Object.keys(prev).length !== Object.keys(updated).length ||
+					Object.keys(prev).some(k => prev[k] !== updated[k]);
+				return hasChanges ? updated : prev;
 			});
 		}
 	}, [groupedAlerts]);
