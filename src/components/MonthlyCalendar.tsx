@@ -48,6 +48,9 @@ type Props = {
 
 type AlertItem = { date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string; ics?: IcsEvent }
 
+// Constants for the alerts list container
+const ALERTS_CONTAINER_MAX_HEIGHT = "400px";
+
 const WeeklyCell: React.FC<{ date: Date; ISO: boolean; weekStartsOn: Day }> = ({ date, ISO, weekStartsOn }) => {
 	const weekNumber = ISO ? getISOWeek(date) : getWeek(date, { weekStartsOn });
 	return <td style={{ fontSize: "0.85em" }}>{weekNumber}</td>;
@@ -811,7 +814,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 				)}
 				<div
 					style={{
-						maxHeight: "400px",
+						maxHeight: ALERTS_CONTAINER_MAX_HEIGHT,
 						overflowY: "auto",
 						overflowX: "hidden",
 					}}>
