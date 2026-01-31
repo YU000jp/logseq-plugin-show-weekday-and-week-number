@@ -130,5 +130,7 @@
   "Please change Logseq application date format to use dashes (recommended: yyyy-MM-dd) and try again.": "Logseq 앱의 날짜 형식을 대시 사용(권장: yyyy-MM-dd)으로 변경한 후 다시 시도하세요.",
   "Cannot create weekly journal": "주간 저널을 생성할 수 없습니다.",
   "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "이 그래프는 DB 그래프입니다. 슬래시를 포함한 주간 저널 이름은 생성할 수 없습니다.",
-  "Please change the week-number format in plugin settings to a format without slashes and try again.": "플러그인 설정에서 주 번호 형식을 슬래시가 없는 형식으로 변경한 후 다시 시도하세요."
+  "Please change the week-number format in plugin settings to a format without slashes and try again.": "플러그인 설정에서 주 번호 형식을 슬래시가 없는 형식으로 변경한 후 다시 시도하세요.",
+  "Hide past events in sidebar list":"사이드바 목록에서 과거 이벤트 숨기기",
+  "Auto-collapse past events in sidebar list":"사이드바 목록에서 과거 이벤트 자동 접기"
 }

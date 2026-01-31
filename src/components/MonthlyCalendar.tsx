@@ -48,6 +48,9 @@ type Props = {
 
 type AlertItem = { date: Date; text: string; isToday: boolean; source?: "user" | "holiday" | "ics"; description?: string; uid?: string; ics?: IcsEvent }
 
+// Constants for the alerts list container
+const ALERTS_CONTAINER_MAX_HEIGHT = "400px";
+
 const WeeklyCell: React.FC<{ date: Date; ISO: boolean; weekStartsOn: Day }> = ({ date, ISO, weekStartsOn }) => {
 	const weekNumber = ISO ? getISOWeek(date) : getWeek(date, { weekStartsOn });
 	return <td style={{ fontSize: "0.85em" }}>{weekNumber}</td>;
@@ -86,6 +89,8 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 	const [icsMap, setIcsMap] = useState<Record<string, IcsEvent[]>>({});
 	const [expandedIcs, setExpandedIcs] = useState<Record<string, boolean>>({});
 	const monthInputRef = useRef<HTMLInputElement | null>(null);
+	const todayGroupRef = useRef<HTMLDivElement | null>(null);
+	const [hasScrolledToToday, setHasScrolledToToday] = useState<boolean>(false);
 	// Inline editor state for editing user events (replaces modal)
 	const [showInlineEditor, setShowInlineEditor] = useState<boolean>(false);
 	const [editorText, setEditorText] = useState<string>((logseq.settings!.userColorList as string) || "");
@@ -215,6 +220,72 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 	}, [alerts]);
 
 	const toggleGroup = (k: string) => setCollapsedGroups((s) => ({ ...s, [k]: !s[k] }));
+
+	// Auto-collapse past events when setting is enabled
+	useEffect(() => {
+		const autoCollapse = logseq.settings!.booleanLcAutoCollapsePastEvents as boolean;
+		const todayStr = format(new Date(), "yyyy-LL-dd");
+		
+		if (autoCollapse) {
+			// Auto-collapse past events
+			const newCollapsed: Record<string, boolean> = {};
+			
+			for (const k of Object.keys(groupedAlerts)) {
+				// Don't auto-collapse today's events
+				if (k !== todayStr && k < todayStr) {
+					newCollapsed[k] = true;
+				}
+			}
+			
+			// Only update if there are actually new groups to collapse
+			if (Object.keys(newCollapsed).length > 0) {
+				setCollapsedGroups((prev) => {
+					// Check if we actually need to update
+					const needsUpdate = Object.keys(newCollapsed).some(k => !prev[k]);
+					return needsUpdate ? { ...prev, ...newCollapsed } : prev;
+				});
+			}
+		} else {
+			// When auto-collapse is disabled, clear all auto-collapsed past groups
+			setCollapsedGroups((prev) => {
+				const updated: Record<string, boolean> = {};
+				// Only keep manually toggled groups that are not past events
+				for (const k in prev) {
+					// Keep today and future groups that user manually collapsed
+					if (k >= todayStr && prev[k]) {
+						updated[k] = true;
+					}
+				}
+				// Check if there's actually a change by comparing keys and values
+				const prevKeys = Object.keys(prev);
+				const updatedKeys = Object.keys(updated);
+				if (prevKeys.length !== updatedKeys.length) {
+					return updated;
+				}
+				// Check if any values differ
+				const hasChanges = prevKeys.some(k => prev[k] !== updated[k]);
+				return hasChanges ? updated : prev;
+			});
+		}
+	}, [groupedAlerts, settingsUpdateKey]);
+
+	// Scroll to Today group when it first becomes available
+	useEffect(() => {
+		if (!hasScrolledToToday && todayGroupRef.current) {
+			// Use setTimeout to ensure DOM is fully rendered
+			setTimeout(() => {
+				if (todayGroupRef.current) {
+					todayGroupRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+					setHasScrolledToToday(true);
+				}
+			}, 100);
+		}
+	}, [hasScrolledToToday, groupedAlerts]);
+
+	// Reset scroll flag when target date changes
+	useEffect(() => {
+		setHasScrolledToToday(false);
+	}, [targetDate]);
 
 	// Internal: perform immediate removal from settings.userColorList
 	const performRemoveImmediate = async (date: Date, text: string) => {
@@ -764,7 +835,23 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						{t("No alerts")}
 					</div>
 				)}
-				{Object.entries(groupedAlerts).map(([k, items]) => {
+				<div
+					style={{
+						maxHeight: ALERTS_CONTAINER_MAX_HEIGHT,
+						overflowY: "auto",
+						overflowX: "hidden",
+					}}>
+				{Object.entries(groupedAlerts)
+					.filter(([k, items]) => {
+						// Filter past events if the setting is enabled
+						const hidePast = logseq.settings!.booleanLcHidePastEvents as boolean;
+						if (!hidePast) return true;
+						
+						const todayStr = format(today, "yyyy-LL-dd");
+						// Always show today and future events
+						return k >= todayStr;
+					})
+					.map(([k, items]) => {
 					const first = items[0];
 					const headerLabel = first.isToday ? t("Today") : localizeMonthDayString(first.date);
 					const relativeLabel = first.isToday ? "" : getRelativeDateString(first.date, today);
@@ -772,6 +859,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 					return (
 						<div
 							key={k}
+							ref={first.isToday ? todayGroupRef : null}
 							style={{ borderTop: "1px solid rgba(0,0,0,0.06)", padding: "0.25rem 0.5rem" }}>
 							<div
 								style={{ display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
@@ -923,6 +1011,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 						</div>
 					);
 				})}
+				</div>
 			</div>
 
 			{/* Inline editor replaces modal; no modal rendering here */}

@@ -131,4 +131,6 @@
     "Decide the colour of Sunday.": "Décidez de la couleur du dimanche.",
     "User event": "Événement utilisateur",
     "No alerts": "Aucune alerte"
-  }
+  ,"Hide past events in sidebar list":"Hide past events in sidebar list"
+  ,"Auto-collapse past events in sidebar list":"Auto-collapse past events in sidebar list"
+}

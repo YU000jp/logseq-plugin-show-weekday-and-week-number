@@ -48,6 +48,8 @@ export const SettingKeys = {
   lcHolidaysAlert: "lcHolidaysAlert",
   lcIcsUrls: "lcIcsUrls",
   lcIcsSyncInterval: "lcIcsSyncInterval",
+  booleanLcHidePastEvents: "booleanLcHidePastEvents",
+  booleanLcAutoCollapsePastEvents: "booleanLcAutoCollapsePastEvents",
   heading004: "heading004",
   booleanWeeklyJournal: "booleanWeeklyJournal",
   weeklyJournalTemplateName: "weeklyJournalTemplateName",

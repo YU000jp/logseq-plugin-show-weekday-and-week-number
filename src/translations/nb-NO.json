@@ -131,4 +131,6 @@
   "Cannot create weekly journal": "Kan ikke opprette ukentlig journal",
   "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Grafen din er en DB-graf. Ukentlige journalnavn som inneholder skråstreker kan ikke opprettes.",
   "Please change the week-number format in plugin settings to a format without slashes and try again.": "Endre uke-nummerformatet i plugin-innstillingene til et format uten skråstreker og prøv igjen."
+  ,"Hide past events in sidebar list":"Hide past events in sidebar list"
+  ,"Auto-collapse past events in sidebar list":"Auto-collapse past events in sidebar list"
 }

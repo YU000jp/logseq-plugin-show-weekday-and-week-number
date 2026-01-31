@@ -131,4 +131,6 @@
   "Cannot create weekly journal": "Nie można utworzyć tygodniowego dziennika",
   "Your graph is a DB graph. Weekly journal names containing slashes cannot be created.": "Twój graf to graf DB. Nie można utworzyć nazw tygodniowych dzienników zawierających ukośniki.",
   "Please change the week-number format in plugin settings to a format without slashes and try again.": "Zmień format numeru tygodnia w ustawieniach wtyczki na format bez ukośników i spróbuj ponownie."
+  ,"Hide past events in sidebar list":"Hide past events in sidebar list"
+  ,"Auto-collapse past events in sidebar list":"Auto-collapse past events in sidebar list"
 }
