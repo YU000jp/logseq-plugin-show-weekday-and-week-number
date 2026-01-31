@@ -267,7 +267,7 @@ export const MonthlyCalendar: React.FC<Props> = ({ targetDate: initialTargetDate
 				return hasChanges ? updated : prev;
 			});
 		}
-	}, [groupedAlerts]);
+	}, [groupedAlerts, settingsUpdateKey]);
 
 	// Scroll to Today group when it first becomes available
 	useEffect(() => {
