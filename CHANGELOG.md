@@ -1,3 +1,10 @@
+## [1.72.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.0...v1.72.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* **bug:** mini-calendar links not working [#181](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/181) ([ad7a469](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/ad7a469df2da4f2c9a577d6be4e3c084a65ce786))
+
 # [1.72.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.71.2...v1.72.0) (2026-01-31)
 
 
