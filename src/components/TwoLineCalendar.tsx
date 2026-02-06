@@ -161,9 +161,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 
 	const onCellClickFactory = useCallback(
 		(pageName?: string) => (e: React.MouseEvent) => {
-			return () => {
-				if (pageName) openPageFromPageName(pageName, (e as any).shiftKey);
-			};
+			if (pageName) openPageFromPageName(pageName, (e as any).shiftKey);
 		},
 		[]
 	);
@@ -297,8 +295,13 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 							if (pageName && pageExistsMap[pageName]) {
 								dayNumberInlineStyle.textDecoration = "underline";
 							}
-							const dnStyle = computeDayNumberStyle(u as UserColorInfo | undefined, d.getDay(), (logseq.settings as any)?.booleanWeekendsColor === true);
-							Object.assign(dayNumberInlineStyle, dnStyle);
+							if (u && u.color) {
+								dayNumberInlineStyle.color = u.color;
+								dayNumberInlineStyle.fontWeight = (u.fontWeight as any) || dayNumberInlineStyle.fontWeight;
+							} else if ((logseq.settings as any)?.booleanWeekendsColor === true) {
+								const wk = getWeekendColor(shortDayNames[d.getDay()]);
+								if (wk) dayNumberInlineStyle.color = wk;
+							}
 
 							return (
 								<td
@@ -571,7 +574,7 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 							return (
 								<td
 									key={key}
-									onClick={(e: React.MouseEvent) => pageName && openPageFromPageName(pageName, (e as any).shiftKey)}
+									onClick={onCellClickFactory(pageName)}
 									className={`${pageName ? "cursor" : ""} lc-day-cell`}
 									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
 									onMouseEnter={(e) => {
