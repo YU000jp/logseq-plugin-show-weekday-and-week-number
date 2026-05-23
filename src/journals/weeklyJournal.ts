@@ -1,14 +1,11 @@
 import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
-import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfWeek, startOfISOWeek, subDays, subWeeks } from 'date-fns' //https://date-fns.org/
+import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfISOWeek, startOfWeek, subDays, subWeeks } from 'date-fns'; //https://date-fns.org/
 import { t } from 'logseq-l10n'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshMonthlyCalendar } from '../calendar/left-calendar'
-import { existInsertTemplate, getWeekStartFromWeekNumber } from '../lib'
-import { findPageUuid, showConfirmDialog } from '../lib'
-import { booleanDbGraph } from '..'
-import { getWeekStartOn } from '../lib'
+import { existInsertTemplate, findPageUuid, getWeekStartFromWeekNumber, getWeekStartOn } from '../lib'
 import { separate, weeklyJournalCreateNav } from './nav'
-import CSSThisWeekPopup from "./weeklyEmbed.css?inline" //CSSをインラインで読み込む
+import CSSThisWeekPopup from "./weeklyEmbed.css?inline"; //CSSをインラインで読み込む
 
 let processingWeeklyJournal: boolean = false
 export const keyThisWeekPopup = "weeklyEmbed"
