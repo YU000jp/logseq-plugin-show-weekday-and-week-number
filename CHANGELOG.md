@@ -1,3 +1,10 @@
+## [1.72.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.1...v1.72.2) (2026-07-19)
+
+
+### Bug Fixes
+
+* detect Logseq OG (1.x) as MD model in checkLogseqVersion ([76baf11](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/76baf11474e6db23aab3e81977ec4eecef33fe47)), closes [YU000jp/logseq-plugin-show-weekday-and-week-number#182](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/182)
+
 ## [1.72.1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.0...v1.72.1) (2026-02-06)
 
 
