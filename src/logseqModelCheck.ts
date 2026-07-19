@@ -9,8 +9,11 @@ const checkLogseqVersion = async (): Promise<boolean> => {
     const version = logseqInfo.match(/(\d+)\.(\d+)\.(\d+)/)
     if (version) {
         replaceLogseqVersion(version[0]) // Update the version
-        // If the version is 0.10.* or lower, set logseqVersionMd to true.
-        if (version[0].match(/0\.([0-9]|10)\.\d+/)) {
+        // MD model: legacy file-based app (0.0.x - 0.10.x) or Logseq OG (1.x).
+        // DB-era apps report 0.11+ or 2.x.
+        const major = Number(version[1])
+        const minor = Number(version[2])
+        if ((major === 0 && minor <= 10) || major === 1) {
             return true
         }
     } else {
