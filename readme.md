@@ -1,3 +1,6 @@
+
+</think>
+
 # Logseq Plugin: *Show weekday and week-number* 📆
 
 Make your Logseq journals smarter with weekdays, week numbers, and powerful calendar features!
@@ -53,7 +56,7 @@ Make your Logseq journals smarter with weekdays, week numbers, and powerful cale
 
 ### Installation
 1. Open Logseq.
-2. Go to Marketplace (click `...` in the top-right corner).
+2. Go to Marketplace (click `...` in the top-right corner, or press `Ctrl+Shift+M` / `Cmd+Shift+M`).
 3. Search for "Show weekday" and click Install.
 
 ### Initial Setup
