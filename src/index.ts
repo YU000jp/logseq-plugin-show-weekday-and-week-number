@@ -28,6 +28,7 @@ export const consoleSignature = ` <----- [${pluginName}]`
 let logseqVersion: string = "" //バージョンチェック用
 let logseqMdModel: boolean = false //モデルチェック用
 let logseqDbGraph: boolean = false //DBグラフチェック用
+let logseqDbEraApp: boolean = false //アプリ世代(DB系/新UI)チェック用
 // 外部から参照するためにexportする
 export const getLogseqVersion = () => logseqVersion //バージョンチェック用
 export const replaceLogseqVersion = (version: string) => logseqVersion = version
@@ -36,6 +37,9 @@ export const replaceLogseqMdModel = (mdModel: boolean) => logseqMdModel = mdMode
 
 export const booleanDbGraph = () => logseqDbGraph //DBグラフチェック用
 export const replaceLogseqDbGraph = (dbGraph: boolean) => logseqDbGraph = dbGraph
+
+export const booleanDbEraApp = () => logseqDbEraApp //アプリ世代チェック用
+export const replaceLogseqDbEraApp = (dbEra: boolean) => logseqDbEraApp = dbEra
 
 
 let configPreferredLanguage: string
@@ -186,7 +190,7 @@ const main = async () => {
 
   // Left Calendarのセットアップ
   if (logseq.settings!.booleanLeftCalendar === true)
-    loadLeftCalendar(logseqDbGraph)
+    loadLeftCalendar(logseqDbEraApp)
 
 
 
@@ -229,18 +233,16 @@ const main = async () => {
  * Logseqモデル・DBグラフ種別に応じたDOMクエリーセレクター
  */
 export const getJournalTitleSelector = (): string =>
-  // 必要に応じて条件分岐でセレクターを切り替える
+  // DOM構造はアプリ世代(DOM/UIの新旧)で分岐する(グラフ種別ではない)
   logseqDbGraph ?
-    ""
-    // logseqDbGraph && logseqMdModel ?
-    //   // DBグラフ用
-    //   "#main-content-container div:is(#journals,.is-journals,.page) div.ls-page-title span.block-title-wrap:not([data-checked])"
-    //   : logseqDbGraph && logseqMdModel === false ?
-    //     // DBモデルかつfile-basedグラフ用
-    //     "#main-content-container div:is(.journal,#journals,.page) h1.title:not([data-checked])"
-    :
-    // MDモデル用
-    "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
+    "" // DBグラフでは Beside Journal Title を無効化
+    : logseqDbEraApp ?
+      // DB系アプリ+ファイルグラフ(新UI)用
+      // TODO: 2.x + ファイルグラフの実機でDOM構造の確認が必要
+      "#main-content-container div:is(#journals,.is-journals,.page) div.ls-page-title span.block-title-wrap:not([data-checked])"
+      :
+      // 旧UI(0.10.x, OG 1.x)用
+      "#main-content-container div:is(.journal,.is-journals,.page) h1.title:not([data-checked])"
 
 
 export const getLeftSidebarFooterSelector = (): string =>

@@ -12,7 +12,7 @@ export const keyLeftCalendarContainer = "left-calendar-container"
 export let currentCalendarDate: Date = new Date() //今日の日付を取得
 let flagWeekly = false //週間表示フラグ
 
-export const loadLeftCalendar = (logseqDbGraph: boolean) => {
+export const loadLeftCalendar = (dbEraApp: boolean) => {
     // Prevent concurrent creation: use a parent-scoped creating lock to avoid race conditions
     if ((parent as any).__leftCalendarCreating) return
     (parent as any).__leftCalendarCreating = true
@@ -47,8 +47,8 @@ export const loadLeftCalendar = (logseqDbGraph: boolean) => {
         detailsElement.appendChild(summaryElement)
         detailsElement.appendChild(innerElement)
         containerElement.appendChild(detailsElement)
-        if (logseqDbGraph)
-            footerElement.insertAdjacentElement("afterend", containerElement) //DBグラフの場合は後ろ
+        if (dbEraApp)
+            footerElement.insertAdjacentElement("afterend", containerElement) //新UI(DB系アプリ)の場合は後ろ
         else
             footerElement.insertAdjacentElement("beforebegin", containerElement)
 
