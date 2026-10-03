@@ -75,6 +75,7 @@ export const logseqModelCheck = async (): Promise<boolean[]> => {
             const holidaysCountry = logseq.settings?.holidaysCountry === undefined
                 ? mapLanguageCodeToCountry(await getConfigPreferredLanguage())
                 : logseq.settings!.holidaysCountry as string
+            if (seq !== graphChangeSeq || result !== booleanDbGraph()) return // 言語取得待ちの間にさらに切替があった場合は破棄
             logseq.useSettingsSchema(
                 settingsTemplate(logseq.settings, result, !result, holidaysCountry)
             )
