@@ -7,11 +7,7 @@ import { currentPageIsMonthlyJournal } from "./journals/monthlyJournal"
 import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
-import { advancedQuery, getDateFromJournalDay, queryCodeGetJournalDayFromOriginalName } from "./lib"
-
-// タイトル要素の判定: 旧UIは h1.title、新UI(DB系アプリ+ファイルグラフ)は span.block-title-wrap
-const isJournalTitleElement = (el: HTMLElement): boolean =>
-  el.classList.contains("title") || el.classList.contains("block-title-wrap")
+import { advancedQuery, getDateFromJournalDay, isJournalTitleElement, queryCodeGetJournalDayFromOriginalName } from "./lib"
 
 // Journal Titleの処理
 let processingJournalTitlePage: Boolean = false

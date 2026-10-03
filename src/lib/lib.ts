@@ -30,6 +30,10 @@ const ensureModalStyle = () => {
   parent.document.head.appendChild(style)
 }
 
+// タイトル要素の判定: 旧UIは h1.title、新UI(DB系アプリ+ファイルグラフ)は span.block-title-wrap
+export const isJournalTitleElement = (el: HTMLElement): boolean =>
+  el.classList.contains("title") || el.classList.contains("block-title-wrap")
+
 export const escapeHtml = (unsafe: string) => {
   return String(unsafe)
     .replace(/&/g, '&amp;')

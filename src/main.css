@@ -435,7 +435,7 @@ body {
                 }
             }
 
-            & h1.title+span.showWeekday {
+            & :is(h1.title, span.block-title-wrap)+span.showWeekday {
                 margin-left: 0.75em;
                 opacity: .75;
                 font-size: 1.1em;
