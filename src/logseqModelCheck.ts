@@ -61,7 +61,7 @@ export const logseqModelCheck = async (): Promise<boolean[]> => {
         const seq = ++graphChangeSeq
         const result = await checkLogseqDbGraph()
         if (seq !== graphChangeSeq) return // 後続の切替が発生しているので破棄
-        if (result === null || result === booleanDbGraph()) return // 再検出失敗時は現状維持 / 変化なし
+        if (result === null) return // 再検出失敗時は現状維持(種別一致でも後続処理へ進みスキーマを再適用する)
 
         replaceLogseqDbGraph(result)
         replaceLogseqMdModel(!result)
