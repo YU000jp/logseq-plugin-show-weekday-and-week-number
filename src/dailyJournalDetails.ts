@@ -240,9 +240,10 @@ const addUserEvents = (dayDate: Date, baseLineElement: HTMLSpanElement) => {
 };
 
 export const removeTitleQuery = () => {
-  const titleBehindElements = parent.document.body.querySelectorAll("#main-content-container div:is(.journal,.is-journals) h1.title+span.showWeekday") as NodeListOf<HTMLElement>
+  // 旧UI(h1.title)・新UI(span.block-title-wrap)の両方を対象にする
+  const titleBehindElements = parent.document.body.querySelectorAll("#main-content-container div:is(#journals,.journal,.is-journals,.page) :is(h1.title,span.block-title-wrap)+span.showWeekday") as NodeListOf<HTMLElement>
   titleBehindElements.forEach((titleElement) => titleElement.remove())
-  const titleElements = parent.document.body.querySelectorAll("#main-content-container div:is(.journal,.is-journals) h1.title[data-checked]") as NodeListOf<HTMLElement>
+  const titleElements = parent.document.body.querySelectorAll("#main-content-container div:is(#journals,.journal,.is-journals,.page) :is(h1.title,span.block-title-wrap)[data-checked]") as NodeListOf<HTMLElement>
   titleElements.forEach((titleElement) => titleElement.removeAttribute("data-checked"))
 }
 

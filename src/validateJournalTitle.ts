@@ -9,6 +9,10 @@ import { currentPageIsWeeklyJournal } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
 import { advancedQuery, getDateFromJournalDay, queryCodeGetJournalDayFromOriginalName } from "./lib"
 
+// タイトル要素の判定: 旧UIは h1.title、新UI(DB系アプリ+ファイルグラフ)は span.block-title-wrap
+const isJournalTitleElement = (el: HTMLElement): boolean =>
+  el.classList.contains("title") || el.classList.contains("block-title-wrap")
+
 // Journal Titleの処理
 let processingJournalTitlePage: Boolean = false
 export const validateJournalTitle = async (titleElement: HTMLElement) => {
@@ -32,7 +36,7 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
     //Weekly Journal、Monthly Journal、Quarterly Journal、Yearly Journalのページかどうか
     if (booleanLogseqMdModel() === true //Logseq MDモデルでない場合のみ処理を行う
       && titleElement.classList.contains("journal-title") === false
-      && titleElement.classList.contains("title") === true
+      && isJournalTitleElement(titleElement)
       && title.match(/^(\d{4})/) !== null // titleの先頭が2024から始まる場合のみチェックする
     ) {
       let match: RegExpMatchArray | null = null
@@ -82,7 +86,7 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
           && logseq.settings!.booleanUnderLunarCalendar === false))))
       // titleElementのクラスにjournal-titleまたはtitleが含まれている場合
       && (titleElement.classList.contains("journal-title") === true
-        || titleElement.classList.contains("title") === true))
+        || isJournalTitleElement(titleElement)))
       moveForPageTitleElement(titleElement) //titleElementの後ろにdateInfoElementを追加し、スペース確保しておく
     else {
       // Daily Journal Detailsの処理
