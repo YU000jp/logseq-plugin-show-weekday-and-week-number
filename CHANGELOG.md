@@ -1,3 +1,12 @@
+## [1.72.3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.2...v1.72.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* Devin Review指摘対応 — 同種グラフ切替時のスキーマ不更新を修正しCSS/配置を整備 ([bca270f](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/bca270fc15f547cf925f052e619d694e17e08f01))
+* Devin Review指摘対応 — 新UIタイトル要素の判定とスキーマ適用レースを修正 ([2136fc1](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/2136fc12acee9f60a7d24cebfc26dc523fc2d760))
+* アプリ世代とグラフ種別の検出を分離し、DB系アプリ+ファイルグラフの誤検出を修正 ([59e696e](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/59e696e4a4c8a2d8865d1f798a9d275435fa8f2e))
+
 ## [1.72.2](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.1...v1.72.2) (2026-07-19)
 
 
