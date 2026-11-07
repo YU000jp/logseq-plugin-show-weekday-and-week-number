@@ -94,7 +94,7 @@ const main = async () => {
   setTimeout(() => {
     if (logseq.settings!.weekNumberFormat === undefined) {
       logseq.UI.showMsg("Select either \"US format\" or \"ISO format\"", "info", { timeout: 3000 })
-      setTimeout(async () => { try { await (logseq.App as any).invokeExternalCommand("logseq.ui/toggle-settings") } catch (e) { /* ignore */ } }, 300)
+      setTimeout(() => { try { logseq.showSettingsUI() } catch (e) { /* ignore */ } }, 300)
     }
   }, 3000)
 
@@ -235,7 +235,8 @@ const main = async () => {
 export const getJournalTitleSelector = (): string =>
   // DOM構造はアプリ世代(DOM/UIの新旧)で分岐する(グラフ種別ではない)
   logseqDbGraph ?
-    "" // DBグラフでは Beside Journal Title を無効化
+    // DB graph: Beside Journal Title re-enabled (same title element as the new UI)
+    "#main-content-container div:is(#journals,.is-journals,.page) div.ls-page-title span.block-title-wrap:not([data-checked])"
     : logseqDbEraApp ?
       // DB系アプリ+ファイルグラフ(新UI)用
       // TODO: 2.x + ファイルグラフの実機でDOM構造の確認が必要

@@ -445,6 +445,27 @@ body {
                     margin-left: .75em;
                 }
             }
+
+            /* New UI: the info sits inside the large page title, so scale it down relative to the title */
+            & span.block-title-wrap+span.showWeekday {
+                font-size: .65em;
+                font-weight: normal;
+                white-space: nowrap;
+
+                /* Keep the nested parts at one size instead of each shrinking on its own */
+                & small {
+                    font-size: .9em;
+                }
+
+                & :is(a, button, .text-sm) {
+                    font-size: 1em;
+                }
+
+                /* Larger click area for the prev/next arrows and the settings button */
+                & :is(a, button) {
+                    padding: .1em .25em;
+                }
+            }
         }
     }
 }

@@ -43,6 +43,70 @@ export const findPageUuid = async (pageName: string): Promise<PageEntity["uuid"]
   return result?.[0]?.uuid ?? false
 }
 
+// DB graph: a weekly journal is a page titled "Wnn" whose parent is the year page (e.g. Library > 2026 > W42)
+export const parseWeeklyPageName = (pageName: string): { year: string, week: string } | null => {
+  const match = pageName.match(/^(\d{4})[\/-](?:[qQ]\d[\/-])?[wW](\d{2})$/)
+  return match ? { year: match[1], week: `W${match[2]}` } : null
+}
+
+export const findDbWeeklyPageUuid = async (year: string, week: string): Promise<PageEntity["uuid"] | false> => {
+  const query = `
+    [:find (pull ?p [:block/uuid])
+     :in $ ?week ?year
+     :where
+     [?p :block/title ?week]
+     [?p :block/name]
+     [?p :block/parent ?y]
+     [?y :block/title ?year]]
+  `
+  const result = await advancedQuery<{ uuid: PageEntity["uuid"] }[]>(query, `"${week}"`, `"${year}"`)
+  return result?.[0]?.uuid ?? false
+}
+
+// DB graph: returns the year when the current page's parent is a year page ("2026"), otherwise null
+export const getCurrentPageParentYear = async (): Promise<string | null> => {
+  type Entity = { id?: number, uuid?: string, title?: string, originalName?: string, name?: string, parent?: { id?: number } } | null
+  const isYear = (value: unknown): value is string => typeof value === "string" && /^\d{4}$/.test(value)
+  // const debug: string[] = []
+
+  // 1. Ask the plugin API for the current page; 2. fall back to the page uuid in the route (#/page/<uuid>)
+  let current = await logseq.Editor.getCurrentPage() as Entity
+  // debug.push(`getCurrentPage keys=${current ? Object.keys(current).join(",") : "null"}`)
+  if (!current?.id) {
+    const routeUuid = parent.location.hash.match(/\/page\/([0-9a-fA-F-]{36})/)?.[1]
+    // debug.push(`routeUuid=${routeUuid ?? "none"} hash=${parent.location.hash.slice(0, 60)}`)
+    if (routeUuid) {
+      current = await logseq.Editor.getPage(routeUuid) as Entity
+      // debug.push(`getPage keys=${current ? Object.keys(current).join(",") : "null"}`)
+    }
+  }
+
+  // A. The entity may already carry its parent
+  if (current?.parent?.id) {
+    const parentPage = await logseq.Editor.getPage(current.parent.id) as Entity
+    const parentTitle = parentPage?.title ?? parentPage?.originalName ?? parentPage?.name
+    // debug.push(`parent via entity=${parentTitle}`)
+    if (isYear(parentTitle)) return parentTitle
+  }
+
+  // B. Query the parent by entity id
+  if (current?.id) {
+    const query = `
+      [:find (pull ?y [:block/title])
+       :in $ ?p
+       :where
+       [?p :block/parent ?y]]
+    `
+    const result = await advancedQuery<{ title?: string }[]>(query, String(current.id))
+    // debug.push(`parent via query=${JSON.stringify(result)}`)
+    const parentTitle = result?.[0]?.title
+    if (isYear(parentTitle)) return parentTitle
+  }
+
+  // console.warn("getCurrentPageParentYear failed:", debug)
+  return null
+}
+
 export const doesPageFileExist = async (pageName: string): Promise<boolean> => {
   const result = await advancedQuery<{ file: PageEntity["file"] }[]>(queryCodeGetFileFromOriginalName, `"${pageName}"`)
   return !!result?.[0]?.file

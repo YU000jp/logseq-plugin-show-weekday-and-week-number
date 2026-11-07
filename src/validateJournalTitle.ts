@@ -1,13 +1,13 @@
 import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { t } from "logseq-l10n"
-import { booleanLogseqMdModel } from "."
+import { booleanDbGraph, booleanLogseqMdModel } from "."
 import { refreshCalendarCheckSameMonth } from "./calendar/left-calendar"
 import { dailyJournalDetails } from "./dailyJournalDetails"
 import { currentPageIsMonthlyJournal } from "./journals/monthlyJournal"
 import { currentPageIsQuarterlyJournal } from "./journals/quarterlyJournal"
 import { currentPageIsWeeklyJournal } from "./journals/weeklyJournal"
 import { currentPageIsYearlyJournal } from "./journals/yearlyJournal"
-import { advancedQuery, getDateFromJournalDay, isJournalTitleElement, queryCodeGetJournalDayFromOriginalName } from "./lib"
+import { advancedQuery, getCurrentPageParentYear, getDateFromJournalDay, isJournalTitleElement, queryCodeGetJournalDayFromOriginalName } from "./lib"
 
 // Journal Titleの処理
 let processingJournalTitlePage: Boolean = false
@@ -26,6 +26,17 @@ export const validateJournalTitle = async (titleElement: HTMLElement) => {
       : titleElement.dataset.ref || titleElement.textContent
 
     if (title === "") return //タイトルが空の場合は処理を終了する
+
+    // DB graph: a weekly journal is a page titled "Wnn" under a year page; hand it to the original weekly journal handler
+    const dbWeekly = booleanDbGraph() ? title.match(/^[wW](\d{2})$/) : null
+    if (dbWeekly) {
+      const year = await getCurrentPageParentYear()
+      if (year) {
+        currentPageIsWeeklyJournal(titleElement, [`${year}/W${dbWeekly[1]}`, year, dbWeekly[1]] as RegExpMatchArray)
+        titleElement.title = t("Weekly Journal")
+        return
+      }
+    }
 
 
 

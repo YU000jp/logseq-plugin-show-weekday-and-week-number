@@ -1,6 +1,7 @@
 import { AppUserConfigs, BlockEntity, BlockUUID, IBatchBlock, PageEntity } from '@logseq/libs/dist/LSPlugin.user'
 import { addDays, addWeeks, eachDayOfInterval, format, isSameISOWeek, isSameWeek, startOfISOWeek, startOfWeek, subDays, subWeeks } from 'date-fns'; //https://date-fns.org/
 import { t } from 'logseq-l10n'
+import { booleanDbGraph } from '..'
 import { boundariesProcess } from '../calendar/boundaries'
 import { refreshMonthlyCalendar } from '../calendar/left-calendar'
 import { existInsertTemplate, findPageUuid, getWeekStartFromWeekNumber, getWeekStartOn } from '../lib'
@@ -71,6 +72,9 @@ export const currentPageIsWeeklyJournal = async (titleElement: HTMLElement, matc
             const currentWeek: boolean = ISO === true ? isSameISOWeek(today, weekStart) : isSameWeek(today, weekStart)
             handleScrolling(currentWeek, today, ISO)
         }, 300)
+
+    // DB graph: stop here. The code below looks the page up as "yyyy/Wnn", would not find it, and would create a new page and write content.
+    if (booleanDbGraph()) return
 
     //ページの内容を確認する
     const pageUuid = await findPageUuid(match[0]) as PageEntity["uuid"] | false
