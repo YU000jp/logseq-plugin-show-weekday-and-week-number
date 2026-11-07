@@ -1,3 +1,10 @@
+# [1.73.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.3...v1.73.0) (2026-11-07)
+
+
+### Features
+
+* **db:** add weekly journal navigation for DB graphs and fix debug logs ([a79f709](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/a79f709ab343b5afb23239b70544ddf465081c93))
+
 ## [1.72.3](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.2...v1.72.3) (2026-10-04)
 
 
