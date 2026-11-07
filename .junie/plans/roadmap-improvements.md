@@ -286,3 +286,14 @@ sessionId: session-261107-152950-e5el
 - コードベースのAPI使用状況とバージョン対応を記載
 - 既知の問題と回避策を整理
 - 既存の `DB_GRAPH_FINDINGS.md` とのクロス参照を追加
+
+### ✓ Step 11: コミットメッセージ修正とリリース準備
+- コミットメッセージを `refactor:` から `feat:` に変更
+- semantic-release が MINOR リリースをトリガーするように修正
+- git push --force-with-lease で反映
+
+### ✓ Step 12: PR #189 のコメント対応
+- JacksonM30からのコメントに対応
+- DBグラフでの週次ジャーナルが既存ページを必要とする点をREADMEに明記
+- 英語版・日本語版の両方を更新
+- Logseq CLIを使った一括作成方法も記載

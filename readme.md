@@ -6,7 +6,12 @@
 Make your Logseq journals smarter with weekdays, week numbers, and powerful calendar features!
 
 > [!NOTE]
-> - When using the Logseq DB model, only the two-line calendar and monthly calendar are functional. [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+> - When using the Logseq DB model, the two-line calendar, monthly calendar, and weekly journal navigation are functional. [#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+> - **Weekly Journal on DB graphs**: The plugin expects weekly pages to already exist in **Library** as pages named `W01` … `W52` under a year page (e.g. **Library › 2026 › W42**). The plugin does not create them automatically. If a page is missing, clicking the week number shows a "not found" message.
+>   - Create them manually in Library, or use the [Logseq CLI](https://github.com/logseq/logseq/blob/master/docs/cli/logseq-cli.md) to batch-create:
+>     ```
+>     logseq upsert block -g <graph> --target-id <id of the year page> --pos last-child --content "W42" --update-tags '["Page"]'
+>     ```
 
 <div align="right">
 

@@ -3,7 +3,12 @@
 Logseqのジャーナルをもっとスマートにするプラグインです。日付に曜日や週番号を追加して、カレンダー機能まで提供します。
 
 > [!NOTE]   
-> - Logseq DBモデルでの利用においては、2行カレンダーと月間カレンダーのみ機能します。[#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+> - Logseq DBモデルでの利用においては、2行カレンダー、月間カレンダー、および週次ジャーナルナビゲーションが機能します。[#166](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/issues/166)
+> - **DBグラフでの週次ジャーナル**: プラグインは週次ページが既に **Library** に存在することを前提としています。年ページの下に `W01` … `W52` という名前のページとして配置してください（例: **Library › 2026 › W42**）。プラグインは自動的にページを作成しません。ページが存在しない場合、週番号をクリックすると「見つかりません」メッセージが表示されます。
+>   - Libraryで手動で作成するか、[Logseq CLI](https://github.com/logseq/logseq/blob/master/docs/cli/logseq-cli.md) を使って一括作成できます：
+>     ```
+>     logseq upsert block -g <graph> --target-id <年ページのID> --pos last-child --content "W42" --update-tags '["Page"]'
+>     ```
 
 <div align="right">
 
