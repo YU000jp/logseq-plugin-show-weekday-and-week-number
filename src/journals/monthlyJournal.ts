@@ -72,7 +72,7 @@ const processJournalPage = async (pageName: string, templateName: string, succes
       }
     }
     if (templateName !== "") {
-      const newBlockEntity = await logseq.Editor.insertBlock(firstUuid, "", { isPageBlock: true, sibling: true, before: true }) as { uuid: BlockEntity["uuid"] }
+      const newBlockEntity = await logseq.Editor.insertBlock(firstUuid, "", { sibling: true, before: true }) as { uuid: BlockEntity["uuid"] }
       if (newBlockEntity)
         await journalInsertTemplate(newBlockEntity.uuid, templateName, successMsg)
     }

@@ -1,0 +1,83 @@
+# Project Guidelines for Junie
+
+This file consolidates the project-specific guidelines derived from `docs/AI_GENERATION_GUIDE.md`, `ARCHITECTURE.md`, and `CONTRIBUTING.md`. These documents are the Single Source of Truth (SSOT) for AI-assisted development in this repository.
+
+## Project Overview
+
+This is a Logseq plugin called "Show weekday and week-number" that enhances journal functions with weekday display, week number, relative time, calendar views, and more.
+
+- **Entry Point**: `src/index.ts` — executes `logseq.ready(main)` to initialize settings, load L10N, register event handlers, inject CSS, etc.
+- **Build Output**: `./dist/index.html` (referenced in `package.json`'s `logseq.main`)
+- **Package Manager**: `pnpm` (enforced via `preinstall` script)
+
+## Development Commands
+
+- **Install dependencies**: `pnpm install`
+- **Development server**: `pnpm dev` (uses Vite)
+- **Build (dev mode)**: `pnpm build` (`tsc && vite build --mode=dev`)
+- **Build (production)**: `pnpm prod` (clean + `vite build`)
+
+## Architecture
+
+### Main Directories
+
+- `src/` — Main source code
+  - `lib/` — General utilities (UI helpers, date calculations, localization, ICS sync, etc.)
+    - **Barrel file**: `src/lib/index.ts` — import from here, not from individual files
+  - `calendar/` — Journal Boundaries and Left Calendar implementation (React components)
+  - `components/` — React components (`TwoLineCalendar`, `MonthlyCalendar`, `JournalPreview`, `DayCell.tsx`)
+  - `hooks/` — Custom React hooks (`useCalendarData`, `useIcsEvents`, `useWeeklyPages`)
+  - `journals/` — Weekly/Monthly/Quarterly/Yearly journal generation and navigation
+  - `settings/` — `SettingKeys`, configuration templates per section
+  - `translations/` — Language JSON files loaded via `l10nSetup.ts`
+  - `dailyJournalDetails.ts` — Weekday, week number, relative time display next to daily journal titles
+  - `fetchJournalTitles.ts` — Utility for scanning and processing journal titles
+  - `shortcutItems.ts` — Slash command registration
+
+### Design Principles
+
+1. **Centralized utilities**: Common functions and types live in `src/lib/`. Import via the barrel file `src/lib/index.ts` (e.g., `import { createElementWithClass } from '@/lib'`).
+2. **Avoid over-extraction**: Only promote processes used in multiple places to `lib`. Do not create too many small functions.
+3. **Stable public API**: Avoid breaking changes. Stabilize function names and types.
+4. **Update documentation**: When changing the public API (function names, signatures), update `ARCHITECTURE.md`.
+
+## Settings (SettingKeys)
+
+- All setting keys are defined in `src/settings/SettingKeys.ts` (e.g., `booleanWeekNumber`, `weekNumberFormat`, `holidaysCountry`).
+- Each settings section is structured in `src/settings/*Settings.ts` and combined using `settingsTemplate`.
+- When referencing settings, check the key type (boolean/string/choice), default values, and descriptions from `translations/*.json`.
+
+## Translation (i18n) Support
+
+- Supported languages: `ja`, `en` (defaults), plus `af`, `de`, `es`, `fr`, `id`, `it`, `ko`, `nb-NO`, `nl`, `pl`, `pt-BR`, `pt-PT`, `ru`, `sk`, `tr`, `uk`, `zh-CN`, `zh-Hant`.
+- `src/translations/l10nSetup.ts` loads the relevant file based on the user's Logseq language setting.
+- When generating translations, ensure consistency in tone (formal/informal) by referencing existing translations.
+
+## Key Public APIs (from `src/lib/`)
+
+- **Settings**: `getConfigPreferredLanguage()`, `getConfigPreferredDateFormat()`, `getUserConfig(notFirst?: boolean)`
+- **DOM/UI**: `showConfirmDialog()`, `createSettingButton()`, `createElementWithClass()`, `addEventListenerOnce()`
+- **Date/Week Number**: `getWeeklyNumberFromDate()`, `getWeeklyNumberString()`, `getWeekStartOn()`, `enableWeekNumber()`, `enableRelativeTime()`
+- **Calendar/Holidays**: `getHolidaysBundle()`, `exportHolidaysBundle()`
+- **Journal**: `openPageFromPageName()`
+
+## Testing Notes
+
+- `logseq.settings` only exists at runtime — mock it during tests.
+- Jest is available as a dev dependency. Test files should cover date logic edge cases (ISO vs US week formats, year boundaries, invalid inputs).
+- Be aware of differences between Logseq's DB graph and file-based graph (e.g., page names with slashes may or may not be creatable).
+
+## Code Style
+
+- Follow the existing style: indentation, naming conventions, import order.
+- Add new utilities to `src/lib/` and include exports in `src/lib/index.ts`.
+- Commit messages follow Conventional Commits (enforced by commitlint + husky).
+
+## Source of Truth
+
+The following files are the primary references for this project:
+- `docs/AI_GENERATION_GUIDE.md` — Comprehensive AI generation guide
+- `ARCHITECTURE.md` — Architecture overview and design principles
+- `CONTRIBUTING.md` — Contribution process and code guidelines
+- `docs/LOGSEQ_VERSION_COMPATIBILITY.md` — Logseqバージョン対応、API差異、DBグラフ固有の動作、CLI連携方法を包括的に記録。**Logseq 2.x（DBグラフ）で開発する際は必ず参照**
+- `docs/DB_GRAPH_FINDINGS.md` — DBグラフ（Logseq 2.x）固有の知見と調査結果

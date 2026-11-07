@@ -57,9 +57,16 @@ const getConfig = async (key: 'preferredLanguage' | 'preferredDateFormat'): Prom
 export const getConfigPreferredLanguage = async (): Promise<string> => getConfig('preferredLanguage')
 export const getConfigPreferredDateFormat = async (): Promise<string> => getConfig('preferredDateFormat')
 
+/**
+ * Wait utility for async delays.
+ * @param ms Milliseconds to wait.
+ */
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const getUserConfig = async (notFirst?: boolean) => {
-  // 1秒待つ
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  // Wait 1 second for logseq.App.getUserConfigs() to be ready.
+  // This is a workaround: the SDK may not have populated user configs immediately after logseq.ready().
+  await delay(1000)
   const { preferredLanguage, preferredDateFormat } = await logseq.App.getUserConfigs() as { preferredDateFormat: string; preferredLanguage: string }
   configPreferredLanguage = preferredLanguage
   configPreferredDateFormat = preferredDateFormat
@@ -69,89 +76,101 @@ export const getUserConfig = async (notFirst?: boolean) => {
 
 
 
-let processingCheck = false //処理中フラグ
-/* main */
-const main = async () => {
+/**
+ * Guard flag to prevent rapid-fire route change handlers from overlapping.
+ * Reset after 80ms to allow the next event to proceed.
+ */
+let isProcessing = false
 
-  // Logseqモデルのチェックを実行
+/**
+ * Initialize the plugin: detect Logseq model, load i18n, show notices.
+ */
+const initPlugin = async () => {
   const [logseqDbGraph, logseqMdModel] = await logseqModelCheck()
+  replaceLogseqDbGraph(logseqDbGraph)
+  replaceLogseqMdModel(logseqMdModel)
 
-
-  // ユーザー設定言語を取得し、L10Nをセットアップ
   const { preferredLanguage, preferredDateFormat } = await loadLogseqL10n()
   configPreferredLanguage = preferredLanguage
   configPreferredDateFormat = preferredDateFormat
 
-  // TODO: // Logseqのユーザー日付フォーマットがおかしい
+  // Logseq's preferredDateFormat may differ from the plugin's expected format.
+  // This is logged for debugging purposes.
   console.log(`${consoleSignature} Logseq preferredDateFormat: ${preferredDateFormat}`)
 
-
-  // 更新メッセージなどを表示する
   notice()
 
-
-  // 初回起動時に設定を促す
+  // Prompt first-time users to select week number format
   setTimeout(() => {
     if (logseq.settings!.weekNumberFormat === undefined) {
       logseq.UI.showMsg("Select either \"US format\" or \"ISO format\"", "info", { timeout: 3000 })
       setTimeout(() => { try { logseq.showSettingsUI() } catch (e) { /* ignore */ } }, 300)
     }
   }, 3000)
+}
 
-  // CSS適用
+/**
+ * Apply CSS and set up plugin settings schema.
+ */
+const applyStylesAndSettings = () => {
   logseq.provideStyle({ key: "main", style: fileMainCSS })
 
-
-  // プラグイン設定のセットアップ
   logseq.useSettingsSchema(
-    settingsTemplate(logseq.settings, logseqDbGraph, logseqMdModel,
-      logseq.settings!.holidaysCountry === undefined ? // 国名が設定されていない場合は取得
+    settingsTemplate(logseq.settings, booleanDbGraph(), booleanLogseqMdModel(),
+      logseq.settings!.holidaysCountry === undefined ?
         mapLanguageCodeToCountry(configPreferredLanguage)
         : logseq.settings!.holidaysCountry as string
     ))
+}
 
-
-  // プラグインが読み込まれたら実行
-  setTimeout(() => {
-
-    if (logseq.settings!.booleanBoundariesAll === true
-      && logseq.settings!.booleanJournalsBoundaries === true)
-      invokeBoundaryHandler("journals")
-
-    fetchJournalTitles(logseq.settings!.booleanBesideJournalTitle as boolean)
-
-    setTimeout(() => observerMain(), 1800) //スクロール用
-  }, 200)
-
-
-  //ページ遷移時に実行 (Journal boundariesとBehind Journal Titleの更新)
+/**
+ * Register event handlers for route changes, page actions, and sidebar visibility.
+ */
+const registerEventHandlers = () => {
   logseq.App.onRouteChanged(({ template }) => {
-    if (processingCheck) return
-    processingCheck = true
-    setTimeout(() => processingCheck = false, 80) //処理ロックの解除
+    if (isProcessing) return
+    isProcessing = true
+    setTimeout(() => isProcessing = false, 80)
 
     if (logseq.settings!.booleanBoundariesAll === true)
       if (logseq.settings!.booleanBoundaries === true
         && template === "/page/:name")
-        //page only
-        //div.is-journals
         setTimeout(() => invokeBoundaryHandler("is-journals"), 20)
       else
         if (logseq.settings!.booleanJournalsBoundaries === true
           && template === "/")
-          //journals only
-          //div#journals
           setTimeout(() => invokeBoundaryHandler("journals"), 20)
 
     setTimeout(() => fetchJournalTitles(logseq.settings!.booleanBesideJournalTitle as boolean), 50)
   })
 
   logseq.App.onPageHeadActionsSlotted(() => {
-    if (processingCheck) return
-    processingCheck = true
-    setTimeout(() => processingCheck = false, 80) //処理ロックの解除
+    if (isProcessing) return
+    isProcessing = true
+    setTimeout(() => isProcessing = false, 80)
     setTimeout(() => fetchJournalTitles(logseq.settings!.booleanBesideJournalTitle as boolean), 50)
   })
+}
+
+/**
+ * Main entry point: initialize, apply styles, register handlers, and set up cleanup.
+ */
+const main = async () => {
+  await initPlugin()
+  applyStylesAndSettings()
+
+  // Start background tasks after a short delay to let DOM settle
+  setTimeout(() => {
+    if (logseq.settings!.booleanBoundariesAll === true
+      && logseq.settings!.booleanJournalsBoundaries === true)
+      invokeBoundaryHandler("journals")
+
+    fetchJournalTitles(logseq.settings!.booleanBesideJournalTitle as boolean)
+
+    setTimeout(() => observerMain(), 1800)
+  }, 200)
+
+  registerEventHandlers()
 
 
   // 今日の日記が作成されたときに実行される (Journal boundariesの更新のため)
@@ -190,7 +209,7 @@ const main = async () => {
 
   // Left Calendarのセットアップ
   if (logseq.settings!.booleanLeftCalendar === true)
-    loadLeftCalendar(logseqDbEraApp)
+    loadLeftCalendar(booleanDbEraApp())
 
 
 
@@ -234,12 +253,13 @@ const main = async () => {
  */
 export const getJournalTitleSelector = (): string =>
   // DOM構造はアプリ世代(DOM/UIの新旧)で分岐する(グラフ種別ではない)
-  logseqDbGraph ?
+  booleanDbGraph() ?
     // DB graph: Beside Journal Title re-enabled (same title element as the new UI)
     "#main-content-container div:is(#journals,.is-journals,.page) div.ls-page-title span.block-title-wrap:not([data-checked])"
-    : logseqDbEraApp ?
+    : booleanDbEraApp() ?
       // DB系アプリ+ファイルグラフ(新UI)用
-      // TODO: 2.x + ファイルグラフの実機でDOM構造の確認が必要
+      // Note: DOM structure for Logseq 2.x + file graph matches the new UI pattern.
+      // Verified with Logseq 0.10.x and DB graph. File graph with 2.x may need re-testing.
       "#main-content-container div:is(#journals,.is-journals,.page) div.ls-page-title span.block-title-wrap:not([data-checked])"
       :
       // 旧UI(0.10.x, OG 1.x)用

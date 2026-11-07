@@ -1,15 +1,11 @@
-import { addDays, format, isToday, startOfISOWeek, startOfWeek } from "date-fns";
+import { addDays, format, startOfISOWeek, startOfWeek } from "date-fns";
 import { t } from "logseq-l10n";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getConfigPreferredDateFormat, getConfigPreferredLanguage } from "..";
 import { separate } from "../journals/nav";
 import {
-	getHolidaysBundle,
 	getUserColorData,
 	getWeekendColor,
-	getIcsEventsForDate,
 	IcsEvent,
-	loadIcsOnce,
 	getWeeklyNumberFromDate,
 	getWeeklyNumberString,
 	getWeekStartOn,
@@ -18,10 +14,10 @@ import {
 	openPageFromPageName,
 	shortDayNames,
 } from "../lib";
-import { computeCellBackground, computeDayNumberStyle, UserColorInfo } from "../lib/calendarUtils";
 import { getHolidays } from "../lib/holidays";
-import { findPageUuid } from "../lib/query/advancedQuery";
 import { useJournalPreview } from "./JournalPreview";
+import { useCalendarData } from "../hooks";
+import DayCell from "./DayCell";
 
 type Props = {
 	startDate: Date;
@@ -31,10 +27,7 @@ type Props = {
 };
 
 const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementName, onRequestScroll }) => {
-	const [preferredDateFormat, setPreferredDateFormat] = useState<string>("yyyy/MM/dd");
-	const [pageExistsMap, setPageExistsMap] = useState<Record<string, boolean>>({});
-	const [holidayMap, setHolidayMap] = useState<Record<string, string>>({});
-	const [icsMap, setIcsMap] = useState<Record<string, IcsEvent[]>>({});
+	const { preferredDateFormat, pageExistsMap, holidayMap, icsMap } = useCalendarData(startDate, offsets);
 
 	// tooltip state
 	const [hoverPage, setHoverPage] = useState<string | undefined>(undefined);
@@ -88,65 +81,6 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 		};
 	}, [hoverPage, hoverHtml, tooltipPos]);
 
-	useEffect(() => {
-		const run = async () => {
-			const fmt = await getConfigPreferredDateFormat();
-			// Ensure holiday bundle exists before computing holidays (first render can happen before bundle init elsewhere)
-			try {
-				const lang = await getConfigPreferredLanguage();
-				await getHolidaysBundle(lang, { already: true });
-			} catch {
-				// ignore
-			}
-			setPreferredDateFormat(fmt);
-			const pMap: Record<string, boolean> = {};
-			const hMap: Record<string, string> = {};
-			const iMap: Record<string, IcsEvent[]> = {};
-
-			// Load ICS once (cached) and map events for displayed dates
-			try {
-				const raw = ((logseq.settings as any)?.lcIcsUrls as string) || "";
-				const urls = String(raw || "")
-					.split(/\r?\n/)
-					.map((s) => s.trim())
-					.filter(Boolean);
-				if (urls.length > 0) {
-					await loadIcsOnce(urls);
-				}
-			} catch {
-				// ignore
-			}
-
-			for (const offset of offsets) {
-				const d = offset === 0 ? startDate : addDays(startDate, offset);
-				const pageName = format(d, fmt);
-				if (pageName) {
-					try {
-						pMap[pageName] = Boolean(await findPageUuid(pageName));
-					} catch {
-						pMap[pageName] = false;
-					}
-					try {
-						hMap[pageName] = await getHolidays(d);
-					} catch {
-						hMap[pageName] = "";
-					}
-				}
-				try {
-					const key = format(d, "yyyy-LL-dd");
-					iMap[key] = getIcsEventsForDate(d);
-				} catch {
-					// ignore
-				}
-			}
-			setPageExistsMap(pMap);
-			setHolidayMap(hMap);
-			setIcsMap(iMap);
-		};
-		run();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [startDate, JSON.stringify(offsets)]);
-
 	const days = useMemo(() => offsets.map((o) => (o === 0 ? startDate : addDays(startDate, o))), [startDate, JSON.stringify(offsets)]);
 
 	const onScrollClick = useCallback(
@@ -165,6 +99,62 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 		},
 		[]
 	);
+
+	const buildCellHoverPayload = useCallback(
+		(u: ReturnType<typeof getUserColorData> | undefined, holiday: string, icsEvents: IcsEvent[], pageName: string) => {
+			if ((u && u.eventName) || holiday || icsEvents.length > 0) {
+				const extraLines: string[] = [];
+				if (u && u.eventName) {
+					extraLines.push(
+						...u.eventName
+							.split("\n")
+							.map((s) => s.trim())
+							.filter(Boolean)
+						);
+				}
+				if (holiday) {
+					extraLines.push(
+						...holiday
+							.split("\n")
+							.map((s) => s.trim())
+							.filter(Boolean)
+						);
+				}
+				if (icsEvents.length > 0) {
+					extraLines.push(
+						...icsEvents
+							.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
+							.map((s) => String(s || "").trim())
+							.filter(Boolean)
+						);
+				}
+				const marker = "__HOL__::";
+				return marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
+			}
+			return pageName;
+		},
+		[]
+	);
+
+	const createCellMouseEnter = useCallback(
+		(u: ReturnType<typeof getUserColorData> | undefined, holiday: string, icsEvents: IcsEvent[], pageName: string) => {
+			return (e: React.MouseEvent) => {
+				const rect = (e.target as HTMLElement).getBoundingClientRect();
+				setTooltipPos({ left: rect.right + 8, top: rect.top });
+				const payload = buildCellHoverPayload(u, holiday, icsEvents, pageName);
+				setHoverPage(payload);
+			};
+		},
+		[buildCellHoverPayload]
+	);
+
+	const createCellMouseMove = useCallback((e: React.MouseEvent) => {
+		setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 });
+	}, []);
+
+	const createCellMouseLeave = useCallback(() => {
+		setHoverPage(undefined);
+	}, []);
 
 	const handleMonthClick = useCallback(
 		(monthPageName: string) => (e: React.MouseEvent) => {
@@ -235,127 +225,25 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 						</td>
 
 						{days.slice(0, 7).map((d) => {
-							const key = d.toISOString();
 							const pageName = format(d, preferredDateFormat);
 							const holiday = pageName ? holidayMap[pageName] || "" : "";
 							const icsKeyForCell = format(d, "yyyy-LL-dd");
 							const icsEventsForCell = icsMap[icsKeyForCell] || [];
-							const isOtherMonth = d.getMonth() !== startDate.getMonth();
-							const checkIsToday = isToday(d);
-							const cellStyle: React.CSSProperties = {
-								border: "1px solid rgba(0,0,0,0.06)",
-								padding: "6px 4px",
-								whiteSpace: "nowrap",
-								cursor: pageName ? "pointer" : "default",
-								textAlign: "center",
-							};
-							// Do not dim or shrink cells for days from other months — keep uniform appearance.
-							if (checkIsToday) {
-								cellStyle.border = `2px solid ${(logseq.settings as any).boundariesHighlightColorToday}`;
-								cellStyle.borderRadius = "50%";
-							}
-
 							const u = getUserColorData(d);
-							const bgInfo = computeCellBackground(
-								u as UserColorInfo | undefined,
-								holiday,
-								(logseq.settings as any).booleanBoundariesHolidays === true,
-								(logseq.settings as any).choiceHolidaysColor as string | undefined,
-								(logseq.settings as any).choiceUserColor as string | undefined,
-								icsEventsForCell.length > 0
-							);
-							if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor;
-							if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any;
-
-							const titleParts: string[] = [];
-							if (u && u.eventName)
-								titleParts.push(
-									...u.eventName
-										.split("\n")
-										.map((s) => s.trim())
-										.filter(Boolean)
-								);
-							if (holiday)
-								titleParts.push(
-									...holiday
-										.split("\n")
-										.map((s) => s.trim())
-										.filter(Boolean)
-								);
-							if (icsEventsForCell.length > 0)
-								titleParts.push(
-									...icsEventsForCell
-										.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
-										.map((s) => String(s || "").trim())
-										.filter(Boolean)
-								);
-							if (pageName) titleParts.push(pageName);
-
-							const dayNumberInlineStyle: React.CSSProperties = {};
-							if (pageName && pageExistsMap[pageName]) {
-								dayNumberInlineStyle.textDecoration = "underline";
-							}
-							if (u && u.color) {
-								dayNumberInlineStyle.color = u.color;
-								dayNumberInlineStyle.fontWeight = (u.fontWeight as any) || dayNumberInlineStyle.fontWeight;
-							} else if ((logseq.settings as any)?.booleanWeekendsColor === true) {
-								const wk = getWeekendColor(shortDayNames[d.getDay()]);
-								if (wk) dayNumberInlineStyle.color = wk;
-							}
 
 							return (
-								<td
-									key={key}
+								<DayCell
+									key={d.toISOString()}
+									date={d}
+									pageName={pageName}
+									holiday={holiday}
+									icsEvents={icsEventsForCell}
+									pageExists={pageName ? pageExistsMap[pageName] : false}
 									onClick={onCellClickFactory(pageName)}
-									className={`${pageName ? "cursor" : ""} lc-day-cell`}
-									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
-									onMouseEnter={(e) => {
-										const rect = (e.target as HTMLElement).getBoundingClientRect();
-										setTooltipPos({ left: rect.right + 8, top: rect.top });
-										if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
-											const extraLines: string[] = [];
-											if (u && u.eventName) {
-												extraLines.push(
-													...u.eventName
-														.split("\n")
-														.map((s) => s.trim())
-														.filter(Boolean)
-												);
-											}
-											if (holiday) {
-												extraLines.push(
-													...holiday
-														.split("\n")
-														.map((s) => s.trim())
-														.filter(Boolean)
-												);
-											}
-											if (icsEventsForCell.length > 0) {
-												extraLines.push(
-													...icsEventsForCell
-														.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
-														.map((s) => String(s || "").trim())
-														.filter(Boolean)
-												);
-											}
-											const marker = "__HOL__::";
-											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
-											setHoverPage(payload);
-											return;
-										}
-										if (pageName) {
-											setHoverPage(pageName);
-										}
-									}}
-									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
-									onMouseLeave={() => setHoverPage(undefined)}
-									style={cellStyle}>
-									<span
-										className="lc-day-number"
-										style={dayNumberInlineStyle}>
-										{d.getDate()}
-									</span>
-								</td>
+									onMouseEnter={createCellMouseEnter(u, holiday, icsEventsForCell, pageName)}
+									onMouseMove={createCellMouseMove}
+									onMouseLeave={createCellMouseLeave}
+								/>
 							);
 						})}
 
@@ -504,126 +392,25 @@ const TwoLineCalendar: React.FC<Props> = ({ startDate, offsets, targetElementNam
 						</td>
 
 						{days.slice(7, 14).map((d) => {
-							const key = d.toISOString();
 							const pageName = format(d, preferredDateFormat);
 							const holiday = pageName ? holidayMap[pageName] || "" : "";
 							const icsKeyForCell = format(d, "yyyy-LL-dd");
 							const icsEventsForCell = icsMap[icsKeyForCell] || [];
-							const isOtherMonth = d.getMonth() !== startDate.getMonth();
-							const checkIsToday = isToday(d);
-							const cellStyle: React.CSSProperties = {
-								border: "1px solid rgba(0,0,0,0.06)",
-								padding: "6px 4px",
-								whiteSpace: "nowrap",
-								cursor: pageName ? "pointer" : "default",
-								textAlign: "center",
-							};
-							// Do not dim or shrink cells for days from other months — keep uniform appearance.
-							if (checkIsToday) {
-								cellStyle.border = `2px solid ${(logseq.settings as any).boundariesHighlightColorToday}`;
-								cellStyle.borderRadius = "50%";
-							}
-
 							const u = getUserColorData(d);
-							const bgInfo = computeCellBackground(
-								u as UserColorInfo | undefined,
-								holiday,
-								(logseq.settings as any).booleanBoundariesHolidays === true,
-								(logseq.settings as any).choiceHolidaysColor as string | undefined,
-								(logseq.settings as any).choiceUserColor as string | undefined,
-								icsEventsForCell.length > 0
-							);
-							if (bgInfo.backgroundColor) cellStyle.backgroundColor = bgInfo.backgroundColor;
-							if (bgInfo.fontWeight) cellStyle.fontWeight = bgInfo.fontWeight as any;
-							const titleParts: string[] = [];
-							if (u && u.eventName)
-								titleParts.push(
-									...u.eventName
-										.split("\n")
-										.map((s) => s.trim())
-										.filter(Boolean)
-								);
-							if (holiday)
-								titleParts.push(
-									...holiday
-										.split("\n")
-										.map((s) => s.trim())
-										.filter(Boolean)
-								);
-							if (icsEventsForCell.length > 0)
-								titleParts.push(
-									...icsEventsForCell
-										.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
-										.map((s) => String(s || "").trim())
-										.filter(Boolean)
-								);
-							if (pageName) titleParts.push(pageName);
-
-							const dayNumberInlineStyle: React.CSSProperties = {};
-							if (pageName && pageExistsMap[pageName]) {
-								dayNumberInlineStyle.textDecoration = "underline";
-							}
-							if (u && u.color) {
-								dayNumberInlineStyle.color = u.color;
-								dayNumberInlineStyle.fontWeight = (u.fontWeight as any) || dayNumberInlineStyle.fontWeight;
-							} else if ((logseq.settings as any)?.booleanWeekendsColor === true) {
-								const wk = getWeekendColor(shortDayNames[d.getDay()]);
-								if (wk) dayNumberInlineStyle.color = wk;
-							}
 
 							return (
-								<td
-									key={key}
+								<DayCell
+									key={d.toISOString()}
+									date={d}
+									pageName={pageName}
+									holiday={holiday}
+									icsEvents={icsEventsForCell}
+									pageExists={pageName ? pageExistsMap[pageName] : false}
 									onClick={onCellClickFactory(pageName)}
-									className={`${pageName ? "cursor" : ""} lc-day-cell`}
-									aria-label={titleParts.length > 0 ? titleParts.join("\n") : pageName}
-									onMouseEnter={(e) => {
-										const rect = (e.target as HTMLElement).getBoundingClientRect();
-										setTooltipPos({ left: rect.right + 8, top: rect.top });
-										if ((u && u.eventName) || holiday || icsEventsForCell.length > 0) {
-											const extraLines: string[] = [];
-											if (u && u.eventName) {
-												extraLines.push(
-													...u.eventName
-														.split("\n")
-														.map((s) => s.trim())
-														.filter(Boolean)
-												);
-											}
-											if (holiday) {
-												extraLines.push(
-													...holiday
-														.split("\n")
-														.map((s) => s.trim())
-														.filter(Boolean)
-												);
-											}
-											if (icsEventsForCell.length > 0) {
-												extraLines.push(
-													...icsEventsForCell
-														.map((ev) => (ev.isTodo ? `TODO: ${ev.summary}` : ev.summary))
-														.map((s) => String(s || "").trim())
-														.filter(Boolean)
-												);
-											}
-											const marker = "__HOL__::";
-											const payload = marker + encodeURIComponent(extraLines.join("\n") || "") + "|||" + (pageName || "");
-											setHoverPage(payload);
-											return;
-										}
-										if (pageName) {
-											setHoverPage(pageName);
-										}
-									}}
-									onMouseMove={(e) => setTooltipPos({ left: (e as React.MouseEvent).clientX + 12, top: (e as React.MouseEvent).clientY + 8 })}
-									onMouseLeave={() => setHoverPage(undefined)}
-									style={cellStyle}>
-									<span
-										className="lc-day-number"
-										style={dayNumberInlineStyle}>
-										{d.getDate()}
-									</span>
-								</td>
+									onMouseEnter={createCellMouseEnter(u, holiday, icsEventsForCell, pageName)}
+									onMouseMove={createCellMouseMove}
+									onMouseLeave={createCellMouseLeave}
+								/>
 							);
 						})}
 

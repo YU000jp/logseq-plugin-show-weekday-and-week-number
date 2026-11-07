@@ -1,8 +1,10 @@
 // Barrel file for library exports
 export * from './lib'
+export * from './dialog'
+export * from './page_operations'
+export * from './dom_helpers'
+export * from './color_utils'
 export * from './holidays'
 export * from './ics'
 export * from './query/advancedQuery'
 export * from '../types'
-
-// Add more exports here as utilities are added to `src/lib/`.

@@ -20,14 +20,13 @@
         "prod": "npm run clean && vite build"
     },
     "dependencies": {
-        "@logseq/libs": "^0.0.17",
+        "@logseq/libs": "^0.3.4",
         "date-fns": "^4.1.0",
         "date-holidays": "^3.26.6",
         "logseq-l10n": "^0.2.0",
         "lunar-typescript": "^1.8.6",
         "react": "^19.2.3",
-        "react-dom": "^19.2.3",
-        "sweetalert2": "^11.26.17"
+        "react-dom": "^19.2.3"
     },
     "devDependencies": {
         "@semantic-release/changelog": "^6.0.3",
@@ -41,6 +40,7 @@
         "cz-conventional-changelog": "^3.3.0",
         "jest": "^30.2.0",
         "semantic-release": "^25.0.2",
+        "ts-jest": "^29.4.15",
         "typescript": "^5.9.3",
         "vite": "^7.3.0",
         "vite-plugin-logseq": "^1.1.2"

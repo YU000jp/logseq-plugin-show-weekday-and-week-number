@@ -32,7 +32,7 @@ export const processJournal = async (
                         && templateName === "") {
                         console.log("utils.ts: quarterlyJournalSetPageTag and templateName are empty")
                   } else {
-                        const newBlockEntity = await logseq.Editor.insertBlock(firstUuid, "", { isPageBlock: true, sibling: true, before: true }) as { uuid: BlockEntity["uuid"] } | null
+                        const newBlockEntity = await logseq.Editor.insertBlock(firstUuid, "", { sibling: true, before: true }) as { uuid: BlockEntity["uuid"] } | null
                         if (newBlockEntity)
                               setTimeout(async () =>
                                     await journalInsertTemplate(newBlockEntity.uuid, templateName, successMessage)
