@@ -1,8 +1,39 @@
-import { BlockEntity, PageEntity } from "@logseq/libs/dist/LSPlugin.user"
+import { PageEntity } from "@logseq/libs/dist/LSPlugin.user"
 import { t } from "logseq-l10n"
 import { booleanDbGraph } from ".."
 import { showConfirmDialog } from "./dialog"
 import { findDbWeeklyPageUuid, findPageUuid, parseWeeklyPageName } from "./query/advancedQuery"
+
+/**
+ * When a weekly page is not found on DB graph, guide the user to create it manually.
+ * 
+ * Note: On Logseq DB graphs, it is not possible to automatically create weekly pages
+ * via the plugin API and set them as children of a year page in Library.
+ * 
+ * Reasons:
+ * - `createPage` API does not work correctly on DB graphs
+ * - `:block/namespace` cannot be set directly from the plugin API
+ * - `Extends` property is for tag parent relationships, not for page namespaces
+ * 
+ * Users are guided to create manually with the following steps:
+ * 1. Open Library
+ * 2. Open the year page (e.g., "2026")
+ * 3. Add `[[W42]]` as a child block
+ * 4. Convert `[[W42]]` to a page with `#Page` tag
+ * 
+ * @param year Year (e.g., "2026")
+ * @param weekName Week name (e.g., "W42")
+ * @returns Always null (no auto-creation)
+ */
+export const createDbWeeklyPage = async (year: string, weekName: string): Promise<string | null> => {
+  // Auto-creation of weekly pages is not possible on DB graphs; only guide manual creation
+  logseq.UI.showMsg(
+    `Weekly page "${weekName}" does not exist. Please create it manually in Library under "${year}" by adding [[${weekName}]] and tagging it with #Page.`,
+    'warning',
+    { timeout: 8000 }
+  )
+  return null
+}
 
 export const openPageFromPageName = async (pageName: string, shiftKey: boolean) => {
   // Helper to prompt user to create page when it does not exist
@@ -75,13 +106,28 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
   // DB graph: weekly journals live under the year page, so look them up by parent instead of by "yyyy/Wnn"
   const weekly = booleanDbGraph() ? parseWeeklyPageName(pageName) : null
   if (weekly) {
-    const weeklyUuid = await findDbWeeklyPageUuid(weekly.year, weekly.week)
-    if (!weeklyUuid)
-      logseq.UI.showMsg(`Weekly page "${weekly.week}" was not found under "${weekly.year}".`, 'warning', { timeout: 4000 })
-    else if (shiftKey === true)
+    let weeklyUuid: string | null | false = await findDbWeeklyPageUuid(weekly.year, weekly.week)
+    
+    // If weekly page is not found on DB graph, attempt auto-creation
+    if (!weeklyUuid) {
+      weeklyUuid = await createDbWeeklyPage(weekly.year, weekly.week)
+      
+      if (weeklyUuid) {
+        // After successful creation, open the page
+        if (shiftKey === true) {
+          await logseq.Editor.openInRightSidebar(weeklyUuid)
+        } else {
+          logseq.App.pushState('page', { name: weeklyUuid })
+        }
+      } else {
+        // If creation fails, show a warning message
+        logseq.UI.showMsg(`Weekly page "${weekly.week}" was not found under "${weekly.year}".`, 'warning', { timeout: 4000 })
+      }
+    } else if (shiftKey === true) {
       await logseq.Editor.openInRightSidebar(weeklyUuid)
-    else
+    } else {
       logseq.App.pushState('page', { name: weeklyUuid })
+    }
     return
   }
 
@@ -95,32 +141,32 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
     }
     return
   }
-  // DBグラフでは findPageUuid のクエリが正しく動作しない場合があるため
-  // logseq.Editor.getPage() API を優先して使用する
+  // On DB graphs, findPageUuid query may not work correctly
+  // Prioritize using logseq.Editor.getPage() API
   let pageUuid: PageEntity["uuid"] | false = false
   
   const isDb = booleanDbGraph()
   
   if (isDb) {
-    // DBグラフではページ名が異なる形式で保存されている可能性がある
-    // 複数の形式で試す
+    // On DB graphs, page names may be stored in different formats
+    // Try multiple formats
     const page = await logseq.Editor.getPage(pageName)
     
     if (page?.uuid) {
       pageUuid = page.uuid
     } else {
-      // スラッシュをダッシュに変換して再試行
+      // Retry by converting slashes to dashes
       const dashName = pageName.replace(/\//g, '-')
       if (dashName !== pageName) {
         const page2 = await logseq.Editor.getPage(dashName)
         if (page2?.uuid) pageUuid = page2.uuid
       }
       
-      // journalDay属性で検索する最後の手段
+      // Last resort: search by journalDay attribute
       if (!pageUuid) {
         const journalDayMatch = pageName.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/)
         if (journalDayMatch) {
-          // yyyyMMdd 形式で検索 (例: 20261107)
+          // Search in yyyyMMdd format (e.g., 20261107)
           const journalDay = journalDayMatch[1] + journalDayMatch[2].padStart(2, '0') + journalDayMatch[3].padStart(2, '0')
           const queryResult = await logseq.DB.datascriptQuery(`
             [:find (pull ?b [:block/uuid :block/title :block/name :block/journal-day])
@@ -140,7 +186,7 @@ export const openPageFromPageName = async (pageName: string, shiftKey: boolean) 
   
   if (pageUuid) {
     if (isDb) {
-      // DBグラフでは pushState('page', { name: uuid }) の形式が必要
+      // On DB graphs, pushState('page', { name: uuid }) format is required
       logseq.App.pushState('page', { name: pageUuid })
     } else {
       logseq.App.pushState('page', { name: pageName })

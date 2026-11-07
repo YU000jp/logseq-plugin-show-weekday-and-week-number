@@ -297,3 +297,14 @@ sessionId: session-261107-152950-e5el
 - DBグラフでの週次ジャーナルが既存ページを必要とする点をREADMEに明記
 - 英語版・日本語版の両方を更新
 - Logseq CLIを使った一括作成方法も記載
+
+### ✓ Step 13: DBグラフでの週次ページ自動作成機能調査
+- `createDbWeeklyPage()` 関数を `src/lib/page_operations.ts` に追加
+- 複数の手法を調査: `createPage` + `appendBlockInPage`、`Extends` プロパティ、datascript トランザクション
+- **調査結果**: DBグラフでの週次ページの自動作成はプラグインAPIでは不可能
+  - `createPage()` はDBグラフでサイレント失敗
+  - `:block/namespace` はプラグインAPIから直接設定できない
+  - `Extends` プロパティはタグの親関係用であり、ページの名前空間用ではない
+- 手動作成のみ案内するメッセージを表示する方針に変更
+- 制限を `docs/LOGSEQ_VERSION_COMPATIBILITY.md` に記録
+- ファイルグラフでの動作確認 ✓
