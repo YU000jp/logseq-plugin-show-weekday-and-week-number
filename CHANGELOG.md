@@ -1,3 +1,12 @@
+# [1.74.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.73.0...v1.74.0) (2026-11-07)
+
+
+### Features
+
+* add line break and horizontal scroll container for ICS events ([0347c5b](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/0347c5bc76b794808375b8c76640d484372b172b))
+* DB graph compatibility and refactoring ([fce6e89](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/fce6e899cfcb66f5c10444e58bbb73079e7edcf8))
+* refactor codebase for DB graph compatibility and maintainability ([50652d7](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/commit/50652d7d7fb777ab918cdb6a16d6bea935e22c8a))
+
 # [1.73.0](https://github.com/YU000jp/logseq-plugin-show-weekday-and-week-number/compare/v1.72.3...v1.73.0) (2026-11-07)
 
 
