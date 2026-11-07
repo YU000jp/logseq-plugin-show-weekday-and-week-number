@@ -222,10 +222,27 @@ const enableUnderHolidayForWorldCountry = (journalDate: Date, baseLineElement: H
 const addIcsEvents = async (dayDate: Date, baseLineElement: HTMLSpanElement) => {
   if (logseq.settings!.booleanShowIcsEvents) {
     const icsEvents = getIcsEventsForDate(dayDate);
-    icsEvents.forEach(event => {
-      const eventElement = createSpanElement("icsEvent", event.summary, "text-decoration: underline;");
-      baseLineElement.appendChild(eventElement);
-    });
+    if (icsEvents.length > 0) {
+      const br = parent.document.createElement("br");
+      baseLineElement.appendChild(br);
+      const container = parent.document.createElement("div");
+      container.style.overflowX = "auto";
+      container.style.whiteSpace = "nowrap";
+      container.style.gap = "0.5em";
+      container.style.display = "inline-flex";
+      container.style.flexWrap = "nowrap";
+      icsEvents.forEach((event, index) => {
+        if (index > 0) {
+          const separator = parent.document.createElement("span");
+          separator.textContent = " | ";
+          separator.style.fontSize = "small";
+          container.appendChild(separator);
+        }
+        const eventElement = createSpanElement("icsEvent", event.summary, "text-decoration: underline; font-size: small;");
+        container.appendChild(eventElement);
+      });
+      baseLineElement.appendChild(container);
+    }
   }
 };
 
@@ -233,7 +250,9 @@ const addUserEvents = (dayDate: Date, baseLineElement: HTMLSpanElement) => {
   if (logseq.settings!.booleanShowUserEvents) {
     const userEvent = userColor(dayDate, baseLineElement);
     if (userEvent) {
-      const eventElement = createSpanElement("userEvent", userEvent, "text-decoration: underline;");
+      const br = parent.document.createElement("br");
+      baseLineElement.appendChild(br);
+      const eventElement = createSpanElement("userEvent", userEvent, "text-decoration: underline; font-size: small;");
       baseLineElement.appendChild(eventElement);
     }
   }
